@@ -16,11 +16,11 @@
 
 
 struct Args{
-    std::string fileInfo;
-    std::string fileControls;
-    std::string fileCases;
+    std::string loci;
+    std::string controls;
+    std::string cases;
     
-    std::string output="out";
+    std::string output="";
     
     int permuteSamples=0;
     

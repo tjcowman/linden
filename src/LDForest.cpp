@@ -105,7 +105,7 @@ void LDForest::testTrees(int maxThreadUsage)
         }
             
     }
-    std::cout<<std::endl;
+    std::clog<<std::endl;
 }
 
 void LDForest::writeResults(const Matrix<std::string>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo)
@@ -114,34 +114,61 @@ void LDForest::writeResults(const Matrix<std::string>& infoMatrix, Args& args, D
     
     std::ofstream ofs;
     
-    ofs.open(args.output + ".reciprocalPairs", std::ofstream::out); // | ofstream::app);
+    if(args.output != "")
     {
+        ofs.open(args.output + ".reciprocalPairs", std::ofstream::out); // | ofstream::app);
+        {
+            auto rp = topSnpList_.getReciprocalPairs();
+            std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
+            ofs<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\n";
+            for(const auto& e : rp)
+            {
+                ofs<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
+                <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
+                <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\n";
+            }
+            
+        }
+        ofs.close();
+        
+        ofs.open(args.output + ".cutoffPairs", std::ofstream::out);
+        {
+            auto rp = topSnpList_.getCutoffPairs();
+            std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
+            ofs<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\n";
+            for(const auto& e : rp)
+            {
+                ofs<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
+                <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
+                <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\n";
+            }
+        }
+        ofs.close();
+    }
+    else
+    {
+        std::cout<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\tpair\n";
         auto rp = topSnpList_.getReciprocalPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
-        ofs<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\n";
         for(const auto& e : rp)
         {
-            ofs<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
+            std::cout<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
             <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
-            <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\n";
+            <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\t"
+            <<"recip"<<"\n";
+        }
+        
+        rp = topSnpList_.getCutoffPairs();
+        std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
+        for(const auto& e : rp)
+        {
+            std::cout<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
+            <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
+            <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\t"
+            <<"cutoff"<<"\n";
         }
         
     }
-    ofs.close();
-    
-    ofs.open(args.output + ".cutoffPairs", std::ofstream::out);
-    {
-        auto rp = topSnpList_.getCutoffPairs();
-        std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
-        ofs<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\n";
-        for(const auto& e : rp)
-        {
-            ofs<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
-            <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
-            <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\n";
-        }
-    }
-    ofs.close();
     
     std::clog<<"finished"<<"\n";
     std::clog<<"\tleaf tests: "<<topSnpList_.getLeafTests()<<"\n";

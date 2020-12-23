@@ -31,20 +31,20 @@ void testData(Args& args)
     
     Matrix<char> casesMatrix; 
     Matrix<char> controlsMatrix;
-    Matrix<std::string> infoMatrix = T.parse(args.fileInfo);
+    Matrix<std::string> lociMatrix = T.parse(args.loci);
 
     //The controls and cases expect 0,1,2 chars
     T.setDelimiter(' ');
     #pragma omp parallel sections num_threads( std::min(2, args.maxThreads ) )
     {        
         #pragma omp section
-        casesMatrix = T.parseByteWise(args.fileCases);
+        casesMatrix = T.parseByteWise(args.cases);
         #pragma omp section
-        controlsMatrix = T.parseByteWise(args.fileControls);    
+        controlsMatrix = T.parseByteWise(args.controls);    
     }
     
     //If any of the files were read incorrectly exit
-    if(infoMatrix.size() == 0 || casesMatrix.size() == 0 || infoMatrix.size() == 0)
+    if(controlsMatrix.size() == 0 || casesMatrix.size() == 0 || lociMatrix.size() == 0)
     {
         std::cerr<<"input file error"<<"\n";
         exit(1);
@@ -53,7 +53,7 @@ void testData(Args& args)
     
     //Record the initial size of the dataset read in
     DatasetSizeInfo datasetSizeInfo;
-    datasetSizeInfo.snps_ = infoMatrix.dim(0);
+    datasetSizeInfo.snps_ = lociMatrix.dim(0);
     datasetSizeInfo.cases_ = casesMatrix.dim(1);
     datasetSizeInfo.controls_ = controlsMatrix.dim(1);
 
@@ -66,7 +66,7 @@ void testData(Args& args)
 
     if( args.permuteSamples != 1) 
     {
-        for(long i= 0; i<infoMatrix.dim(0); ++i)
+        for(long i= 0; i<lociMatrix.dim(0); ++i)
         {
             snps.push_back(Snp(i, controlsMatrix.getRow(i), casesMatrix.getRow(i)));
         }
@@ -75,11 +75,11 @@ void testData(Args& args)
     {
         std::pair<Matrix<char>, Matrix<char> > permutedMatrixes = MatrixMath::permuteColumns(controlsMatrix, casesMatrix);
 
-        for(long i= 0; i<infoMatrix.dim(0); ++i)
+        for(long i= 0; i<lociMatrix.dim(0); ++i)
             snps.push_back(Snp(i, permutedMatrixes.first.getRow(i), permutedMatrixes.second.getRow(i)));
     }
 
-    LDForest ldforest( infoMatrix.dim(0) , controlsMatrix.dim(1), casesMatrix.dim(1), infoMatrix.dim(0));
+    LDForest ldforest( lociMatrix.dim(0) , controlsMatrix.dim(1), casesMatrix.dim(1), lociMatrix.dim(0));
 
 
     //Only create trees from snps with a high enough MAF and low enough marginal significance
@@ -95,9 +95,9 @@ void testData(Args& args)
         }
         else
         {
-            if(isdigit(infoMatrix.a(snps[i].getIndex(),1)[0]));
+            if(isdigit(lociMatrix.a(snps[i].getIndex(),1)[0]));
             {
-                ldforest.insert(snps[i], (char)stoi(infoMatrix.a(snps[i].getIndex(),1)), stoi(infoMatrix.a(snps[i].getIndex(),2))); 
+                ldforest.insert(snps[i], (char)stoi(lociMatrix.a(snps[i].getIndex(),1)), stoi(lociMatrix.a(snps[i].getIndex(),2))); 
             }   
         }    
     }
@@ -117,7 +117,7 @@ void testData(Args& args)
         ldforest.mergeTrees( args.maxUnknown, datasetSizeInfo);
         datasetSizeInfo.mergedTreesFormed_ = ldforest.size();
         ldforest.testTrees(args.maxThreads);
-        ldforest.writeResults(infoMatrix, args, datasetSizeInfo);
+        ldforest.writeResults(lociMatrix, args, datasetSizeInfo);
     }
         
     
@@ -139,9 +139,9 @@ int main(int argc, char *argv[])
     
     ARGLOOP(,
         ARG(maxThreads, stol)
-        ARG(fileInfo,)
-        ARG(fileControls,)
-        ARG(fileCases,)
+        ARG(loci,)
+        ARG(controls,)
+        ARG(cases,)
         ARG(output,)
         ARG(permuteSamples, stoi)
         ARG(maxUnknown, stof)
