@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <map>
+#include <time.h>
 
 #include "argParser.h"
 #include "CommonStructs.h"
@@ -15,6 +16,7 @@
 #include "Matrix.h"
 #include "MatrixMath.h"
 #include "TsvParser.h"
+
 
 //Used for determining the chi2 correseponding to a pvalue of 1*10^-i for single locus significance
 //Input as an integer denoting the -log10 signficance up to 6

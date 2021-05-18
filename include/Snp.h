@@ -16,14 +16,26 @@
 #include <stdint.h>
 #include <cmath>
 
+
 #define GENOTYPE_LEVELS 3
 #define GENOTYPE_PAIRINGS 9
 #define CONTINGENCY_COLUMNS 2
 
 #define PACK_SIZE 64
 #define PACK_TYPE uint64_t
-#define POPCOUNT_FUNCTION __builtin_popcountll
-//#define POPCOUNT_FUNCTION sparse64
+
+//If windows use it's popcount
+
+
+
+#ifdef _WIN32
+    #include <intrin.h> 
+    #define POPCOUNT_FUNCTION __popcnt64
+#else
+    #define POPCOUNT_FUNCTION __builtin_popcountll
+#endif
+
+
 
 
 

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <array>
 
 #define MAX_CUTOFF 100
 #define PREFIX_SUM_ROLLOVER 1000
