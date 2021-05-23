@@ -27,8 +27,7 @@ const static std::array<float, 7> chi2DegreesFreedomTable{0, 2.71, 6.63, 10.82, 
 // obtain a time-based seed:
 unsigned randSeed = std::chrono::system_clock::now().time_since_epoch().count();
 
-void testData(Args& args)
-{
+void testData(Args& args){
     std::vector<Locus> loci;
     GenotypeMatrix cases;
     GenotypeMatrix controls;
@@ -57,7 +56,7 @@ void testData(Args& args)
 
         std::vector<uint32_t> indexOrder;
         indexOrder.reserve(cases.width + controls.width);
-        for (uint32_t i = 0; i < cases.width + controls.width; ++i) {
+        for (ID_Sample i = 0; i < cases.width + controls.width; ++i) {
             indexOrder.push_back(i);
         }
 
@@ -103,7 +102,7 @@ void testData(Args& args)
     LDForest ldforest(loci.size(), controls.width, cases.width, loci.size());
 
     //Only create trees from snps with a high enough MAF and low enough marginal significance
-    for(int i=0; i<snps.size(); ++i){  
+    for(ID_Snp i=0; i<snps.size(); ++i){
         if(snps[i].computeMinorAlleleFrequency() <  args.minMAF ){
             datasetSizeInfo.mafRemoved_++; 
         }
@@ -125,8 +124,7 @@ void testData(Args& args)
     
     
     
-    if(ldforest.size() > 1)
-    {    
+    if(ldforest.size() > 1){    
         ldforest.mergeTrees( args.maxUnknown, datasetSizeInfo);
         datasetSizeInfo.mergedTreesFormed_ = ldforest.size();
         ldforest.testTrees(args.maxThreads);
@@ -136,16 +134,11 @@ void testData(Args& args)
     
 }
 
-
-
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
     srand(time(NULL));
     
     //Bring up help menu when no args, help, or h are first argument
-    if( (argc == 1) || ((std::string)argv[1] == "--help") || ((std::string)argv[1] == "-h") )
-    {
+    if( (argc == 1) || ((std::string)argv[1] == "--help") || ((std::string)argv[1] == "-h") ) {
         std::cout<<"linden v 1.0"<<std::endl;
         return 0;
     }

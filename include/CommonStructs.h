@@ -14,6 +14,7 @@
 #include <fstream>
 #include <vector>
 
+#include "Types.h"
 
 struct Args{
     std::string loci;
@@ -25,8 +26,8 @@ struct Args{
     int permuteSamples=0;
     
     int maxThreads=1;
-    float maxUnknown=.1;
-    float minMAF=0.0;
+    double maxUnknown=.1;
+    double minMAF=0.0;
     int maxMS=1;
     
     
@@ -51,15 +52,15 @@ struct Locus {
 };
 
 struct GenotypeMatrix {
-    uint32_t width;
-    uint32_t height;
-    std::vector<uint8_t> data;
+    ID_Sample width;
+    ID_Snp height;
+    std::vector<ID_Genotype> data;
 
-    std::vector<uint8_t>::const_iterator rowBegin(size_t row)const {
+    std::vector<ID_Genotype>::const_iterator rowBegin(size_t row)const {
         return data.begin() + row * width;
     }
 
-    std::vector<uint8_t>::const_iterator rowEnd(size_t row)const {
+    std::vector<ID_Genotype>::const_iterator rowEnd(size_t row)const {
         return data.begin() + (row+1) * width;
     }
     //uint32_t height() { return data.size() / width; }

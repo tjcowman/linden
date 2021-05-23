@@ -70,11 +70,11 @@ class TopSnpList
         
         float getCutoff()const;
         
-        void incrementInternalTestsCounter(long long int testsDone);
-        void incrementLeafTestsCounter(long long int testsDone);
+        void incrementInternalTestsCounter(uint64_t testsDone);
+        void incrementLeafTestsCounter(uint64_t testsDone);
         
-        long long int getInternalTests()const;
-        long long int getLeafTests()const;
+        uint64_t getInternalTests()const;
+        uint64_t getLeafTests()const;
         
         void calculateFormattedResults();
 
@@ -91,8 +91,8 @@ class TopSnpList
         
         std::vector<float> topScores_;
         std::vector<int> topPartners_;
-        long long int internalTestsCounter_;
-        long long int leafTestsCounter_;
+        uint64_t internalTestsCounter_;
+        uint64_t leafTestsCounter_;
         
         float cutoff_;
         int topK_;

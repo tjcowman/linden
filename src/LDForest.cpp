@@ -10,17 +10,17 @@ void LDForest::insert(const Snp & snp, char chromosome, int basePair)
     ldtrees_.push_back(LDTree(snp, chromosome, basePair));
 }
 
-int LDForest::size()const
+size_t LDForest::size()const
 {
     return ldtrees_.size();
 }
 
-void LDForest::mergeTrees(float maxUnknownFraction, DatasetSizeInfo datasetSizeInfo)
+void LDForest::mergeTrees(double maxUnknownFraction, DatasetSizeInfo datasetSizeInfo)
 {
     std::clog<<"merging LD trees"<<std::endl;
 
-    int change = INT_MAX;
-    float unknownFraction = 0.0;
+    uint64_t change = UINT64_MAX;//INT_MAX;
+    double unknownFraction = 0.0;
 
     while(change > 5 || unknownFraction < maxUnknownFraction)
     {
@@ -36,18 +36,18 @@ void LDForest::mergeTrees(float maxUnknownFraction, DatasetSizeInfo datasetSizeI
 
 }
 
-int LDForest::mergeTreeIteration(float unknownFraction, DatasetSizeInfo datasetSizeInfo)
+size_t LDForest::mergeTreeIteration(float unknownFraction, DatasetSizeInfo datasetSizeInfo)
 {
     std::vector<LDTree> mergedTrees;
     
     int allowedDifferences = unknownFraction * (datasetSizeInfo.controls_ + datasetSizeInfo.cases_);
     
-    int beforeSize = ldtrees_.size();
+    size_t beforeSize = ldtrees_.size();
 
-    for(int i=0; i<size(); ++i)
+    for(size_t i=0; i<size(); ++i)
     {
         if(!ldtrees_[i].empty())
-            for(int j=i+1; j < std::min(i+10,size()); ++j)
+            for(size_t j=i+1; j < std::min(i+10,size()); ++j)
             {
                 if((!ldtrees_[j].empty()) && (ldtrees_[i].size() == ldtrees_[j].size()))
                 {
@@ -78,7 +78,7 @@ void LDForest::testTrees(int maxThreadUsage)
     std::clog<<"testing Trees"<<std::endl;
     std::clog<<"\tcompleted: 0/"<<size()<<"               \r"<<std::flush;
     
-    int treesFinished = 0;
+    size_t treesFinished = 0;
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
     for(int i=0; i<size(); ++i)
     {

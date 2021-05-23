@@ -44,7 +44,7 @@ bool LDTree::empty()const
     return nodes_.empty();
 }
 
-int LDTree::size()const
+size_t LDTree::size()const
 {
     return nodes_.size();
 }
@@ -69,11 +69,11 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
     //Vector to use as a stack for tests
     std::vector<std::pair<int, int> > s;
     
-    int leafStart1 = nodes_.size()/2;
-    int leafStart2 = other.nodes_.size()/2;
+    size_t leafStart1 = nodes_.size()/2;
+    size_t leafStart2 = other.nodes_.size()/2;
 
-    long long int localInternalTestsDone = 0;
-    long long int localLeaftTestsDone = 0;
+    uint64_t  localInternalTestsDone = 0;
+    uint64_t  localLeaftTestsDone = 0;
     
     s.push_back(std::make_pair(0,0));
     while(!s.empty())
@@ -150,8 +150,8 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
 void LDTree::epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const
 {
    // cout<<"HERE"<<endl;
-    int leafStart1 = nodes_.size()/2;
-    int leafStart2 = other.nodes_.size()/2;
+    size_t leafStart1 = nodes_.size()/2;
+    size_t leafStart2 = other.nodes_.size()/2;
     
     int n1 = rand() % (leafStart1+1) + leafStart1;
     int n2 = rand() % (leafStart2+1) + leafStart2;

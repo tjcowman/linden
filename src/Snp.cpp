@@ -1,23 +1,25 @@
 #include "Snp.h"
 
 //Define static members, will be set correctly in the Snp constructors
-int Snp::numControls_;
-int Snp::numCases_;
-int Snp::CONR_;
-int Snp::CASR_;
-int Snp::CASS_;
+ID_Sample Snp::numControls_;
+ID_Sample Snp::numCases_;
+int Snp::CONR_; //Number of packed control samples
+int Snp::CASR_; //Number of packed case samples
+int Snp::CASS_; //Offest for the beginning of the case samples
 
-Snp::Snp(uint32_t index, const GenotypeMatrix& controls, const GenotypeMatrix& cases){
+Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases){
     packGenotypes(controls.rowBegin(index), controls.rowEnd(index), allSamples_);
     packGenotypes(cases.rowBegin(index), cases.rowEnd(index), allSamples_);
 
     index_ = index;
     numControls_ = controls.width;
     numCases_ = cases.width;
-    //what?
-    CONR_ = ceil(numControls_ / (double)PACK_SIZE);
-    CASR_ = ceil(numCases_ / (double)PACK_SIZE);
-    CASS_ = (3 * CONR_);//+ 1;
+    
+    //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
+    CONR_ = numControls_ / PACKED_SIZE + (numControls_ % PACKED_SIZE != 0); 
+    CASR_ = numCases_ / PACKED_SIZE + (numCases_ % PACKED_SIZE != 0);
+    
+    CASS_ = (3 * CONR_);//+ 1; 
 }
 
 Snp::Snp(const Snp & cpy)
@@ -30,12 +32,12 @@ Snp::Snp(const Snp & s1, const Snp & s2)
 {
     //Index is -1 because any node created this way will be internal
     //and not refer to a specific snp from the dataset
-    index_ = -1; //TODO: FIX TO BE EXPLICIT TYPE
+    index_ = -1; //TODO: FIX TO BE EXPLICIT TYPE   (currently should wrap arount to largest uval)
     std::cout << index_ << " ? "<< std::endl;
     allSamples_ = bitMerge(s1.allSamples_, s2.allSamples_);
 }
 
-int Snp::getIndex()const
+ID_Snp Snp::getIndex()const
 {
     return index_;
 }
@@ -51,7 +53,7 @@ float Snp::computeMinorAlleleFrequency()const
 }
 
 
-int Snp::computeDifferences(const Snp & other)const
+ID_Sample Snp::computeDifferences(const Snp & other)const
 {
     return ((numControls_ + numCases_)- popCountAnd(allSamples_, other.allSamples_, 0, allSamples_.size()));
 }
@@ -66,8 +68,8 @@ float Snp::computeUnknownRatio()const
 
 float Snp::marginalTest()const
 {
-    float retVal=0.0;
-    SmallContingencyTable t;
+   float retVal=0.0;
+   CTable1 t;
     
     for(int i=0; i<GENOTYPE_LEVELS; ++i)
     {
@@ -107,8 +109,8 @@ float Snp::epistasisTest(const Snp & other)const
 {
     float retVal=0.0;
 
-    ContingencyTable t;
-        t.M_.fill(0);
+    CTable2 t;
+    t.M_.fill(0);
     
     //PLUS ONE FOR CORRECTION
     for(int i=0; i<GENOTYPE_LEVELS; ++i)
@@ -154,18 +156,18 @@ float Snp::epistasisTest(const Snp & other)const
 
 
 void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest ){
-    std::array<std::vector<PACK_TYPE>,3> packedGenotypes;
-    std::array<PACK_TYPE, 3> sectionCode{ 0,0,0 };
+    std::array<std::vector<PackedGenotype>,3> packedGenotypes;
+    std::array<PackedGenotype, 3> sectionCode{ 0,0,0 };
 
-    PACK_TYPE offset=0;
+    PackedGenotype offset=0;
 
     for (auto it = begin; it != end; ++it) {
-        PACK_TYPE mask = (PACK_TYPE)1 << (PACK_SIZE - (offset + 1) % PACK_SIZE);
+        PackedGenotype mask = (PackedGenotype)1 << (PACKED_SIZE - (offset + 1) % PACKED_SIZE);
 
         sectionCode[*it] = sectionCode[*it] | mask;
         
         //When a section is full, push them back and reset the sections to empty;
-        if (((offset + 1) % PACK_SIZE == 0))//((offset + 1) == genotypes.size()))
+        if (((offset + 1) % PACKED_SIZE == 0))//((offset + 1) == genotypes.size()))
         {
             packedGenotypes[0].push_back(sectionCode[0]);
             packedGenotypes[1].push_back(sectionCode[1]);
@@ -180,7 +182,7 @@ void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<
     }
 
     //Push final sections if not full
-    if (sectionCode != std::array<PACK_TYPE, 3>{0, 0, 0}) {
+    if (sectionCode != std::array<PackedGenotype, 3>{0, 0, 0}) {
         packedGenotypes[0].push_back(sectionCode[0]);
         packedGenotypes[1].push_back(sectionCode[1]);
         packedGenotypes[2].push_back(sectionCode[2]);

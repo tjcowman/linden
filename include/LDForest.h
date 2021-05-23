@@ -13,7 +13,7 @@
 #include "Snp.h"
 #include "LDTree.h"
 #include "TopSnpList.h"
-#include "Matrix.h"
+
 
 
 #include <limits.h>
@@ -30,15 +30,15 @@ class LDForest
         
         void insert(const Snp & snp, char chromosome, int basePair);
         
-        int size()const;
+        size_t size()const;
         
-        void mergeTrees(float maxUnkownFraction, DatasetSizeInfo datasetSizeInfo);
+        void mergeTrees(double maxUnkownFraction, DatasetSizeInfo datasetSizeInfo);
         void testTrees(int maxThreadUsage);
         
         void writeResults(const std::vector<Locus>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo);
     
     private:
-        int mergeTreeIteration(float unknownFraction, DatasetSizeInfo datasetSizeInfo);
+        size_t mergeTreeIteration(float unknownFraction, DatasetSizeInfo datasetSizeInfo);
         
         //Results output
         void writeGroundTruthList();

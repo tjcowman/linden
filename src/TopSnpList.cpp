@@ -85,24 +85,24 @@ float TopSnpList::getCutoff()const
     return cutoff_;
 }
 
-void TopSnpList::incrementInternalTestsCounter(long long int testsDone)
+void TopSnpList::incrementInternalTestsCounter(uint64_t testsDone)
 {
     #pragma omp critical
     internalTestsCounter_ += testsDone;
 }
 
-void TopSnpList::incrementLeafTestsCounter(long long int testsDone)
+void TopSnpList::incrementLeafTestsCounter(uint64_t testsDone)
 {
     #pragma omp critical
     leafTestsCounter_ += testsDone;
 }
 
-long long int TopSnpList::getInternalTests()const
+uint64_t TopSnpList::getInternalTests()const
 {
     return internalTestsCounter_;
 }
 
-long long int TopSnpList::getLeafTests()const
+uint64_t TopSnpList::getLeafTests()const
 {
     return leafTestsCounter_;
 }
