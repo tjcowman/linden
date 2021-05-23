@@ -108,7 +108,7 @@ void LDForest::testTrees(int maxThreadUsage)
     std::clog<<std::endl;
 }
 
-void LDForest::writeResults(const Matrix<std::string>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo)
+void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo)
 {
     topSnpList_.calculateFormattedResults();
     
@@ -120,12 +120,10 @@ void LDForest::writeResults(const Matrix<std::string>& infoMatrix, Args& args, D
         {
             auto rp = topSnpList_.getReciprocalPairs();
             std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
-            ofs<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\n";
+            ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
             for(const auto& e : rp)
             {
-                ofs<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
-                <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
-                <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\n";
+                ofs << e.score_ << "\t" << infoMatrix[e.indexes_.first] <<"\t"<< infoMatrix[e.indexes_.second]<<"\n";
             }
             
         }
@@ -135,37 +133,28 @@ void LDForest::writeResults(const Matrix<std::string>& infoMatrix, Args& args, D
         {
             auto rp = topSnpList_.getCutoffPairs();
             std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
-            ofs<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\n";
+            ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
             for(const auto& e : rp)
             {
-                ofs<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
-                <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
-                <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\n";
+                ofs << e.score_ << "\t" << infoMatrix[e.indexes_.first] << "\t"<< infoMatrix[e.indexes_.second] << "\n";
             }
         }
         ofs.close();
     }
     else
     {
-        std::cout<<"chi2\tsnp1\tsnp2\tchr1\tchr2\tbp1\tbp2\tpair\n";
         auto rp = topSnpList_.getReciprocalPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         for(const auto& e : rp)
         {
-            std::cout<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
-            <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
-            <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\t"
-            <<"recip"<<"\n";
+            std::cout << e.score_ << "\t" << infoMatrix[e.indexes_.first] << "\t" << infoMatrix[e.indexes_.second] << "\trecip\n";
         }
         
         rp = topSnpList_.getCutoffPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         for(const auto& e : rp)
         {
-            std::cout<<e.score_<<"\t"<<infoMatrix.a(e.indexes_.first, 0)<<"\t"<<infoMatrix.a(e.indexes_.second,0)<<"\t"
-            <<infoMatrix.a(e.indexes_.first, 1)<<"\t"<<infoMatrix.a(e.indexes_.second, 1)<<"\t"
-            <<infoMatrix.a(e.indexes_.first, 2)<<"\t"<<infoMatrix.a(e.indexes_.second, 2)<<"\t"
-            <<"cutoff"<<"\n";
+            std::cout << e.score_ << "\t" << infoMatrix[e.indexes_.first] << "\t" << infoMatrix[e.indexes_.second] << "\tcutoff\n";
         }
         
     }

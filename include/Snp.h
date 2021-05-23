@@ -16,6 +16,8 @@
 #include <stdint.h>
 #include <cmath>
 
+#include "CommonStructs.h"
+
 
 #define GENOTYPE_LEVELS 3
 #define GENOTYPE_PAIRINGS 9
@@ -65,7 +67,7 @@ static int popCountAnd(const std::vector<PACK_TYPE> & v1, const std::vector<PACK
 
     for(int i=begin; i<begin+distance; ++i)
     {
-        if(v1[begin] | v2[begin] !=0)
+        if((v1[begin] | v2[begin]) !=0)
         retVal += POPCOUNT_FUNCTION(v1[i] & v2[i]);
     }
     return retVal;
@@ -78,7 +80,7 @@ static int popCountAnd(const std::vector<PACK_TYPE> & v1, const std::vector<PACK
     for(int i=0; i<distance; ++i)
     {
         //There are many instnaces of long strings of zeroes, primarily due to homozygous minor this saves popcount operations
-        if(v1[begin1+i] | v2[begin2+i] !=0)
+        if((v1[begin1+i] | v2[begin2+i]) !=0)
             retVal += POPCOUNT_FUNCTION(v1[begin1 +i] & v2[begin2 +i]);
     }
     return retVal;
@@ -160,7 +162,9 @@ struct ContingencyTable
 class Snp
 {
     public:
-        Snp(int index, const std::vector<char> & controls, const std::vector<char> & cases);
+       // Snp(int index, const std::vector<char> & controls, const std::vector<char> & cases);
+        Snp(uint32_t index, const GenotypeMatrix& controls, const GenotypeMatrix& cases);
+
         Snp(const Snp & cpy);
         
         Snp(const Snp & s1, const Snp & s2); 
@@ -183,13 +187,17 @@ class Snp
         
     private:
         
-        std::array<std::vector<PACK_TYPE>, GENOTYPE_LEVELS> packGenotypesHelper(const std::vector<char> & genotypes); 
-        void packGenotypes(std::vector<PACK_TYPE> & allPackedGenotypes, const std::vector<char> & controlGenotypes, const std::vector<char> & caseGenotypes);
+      //  std::array<std::vector<PACK_TYPE>, GENOTYPE_LEVELS> packGenotypesHelper(const std::vector<char> & genotypes); 
+       // void packGenotypes(std::vector<PACK_TYPE> & allPackedGenotypes, const std::vector<char> & controlGenotypes, const std::vector<char> & caseGenotypes);
+
+        void packGenotypes( std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest);
+
+        //std::array<std::vector<PACK_TYPE>, GENOTYPE_LEVELS> packGenotypesHelper();
 
         //Will consist of controls 0 , 1 , 2 then cases 0 , 1 , 2
         std::vector<PACK_TYPE> allSamples_;
 
-        int index_;
+        uint32_t index_;
         
         static int numCases_;
         static int numControls_;

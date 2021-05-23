@@ -4,6 +4,9 @@
 #include <fstream>
 #include <map>
 #include <time.h>
+#include <chrono>
+#include <random>
+#include <algorithm>
 
 #include "argParser.h"
 #include "CommonStructs.h"
@@ -12,95 +15,103 @@
 #include "TopSnpList.h"
 #include "LDForest.h"
 
+#include "InputParser.h"
 
-#include "Matrix.h"
-#include "MatrixMath.h"
-#include "TsvParser.h"
+
 
 
 //Used for determining the chi2 correseponding to a pvalue of 1*10^-i for single locus significance
 //Input as an integer denoting the -log10 signficance up to 6
 const static std::array<float, 7> chi2DegreesFreedomTable{0, 2.71, 6.63, 10.82, 15.14, 19.57, 24.87};
 
+// obtain a time-based seed:
+unsigned randSeed = std::chrono::system_clock::now().time_since_epoch().count();
 
 void testData(Args& args)
 {
-    TsvParser T;
-    
-    //The infoFile expects plaintext 
-    T.setDelimiter('\t');
+    std::vector<Locus> loci;
+    GenotypeMatrix cases;
+    GenotypeMatrix controls;
 
-    
-    Matrix<char> casesMatrix; 
-    Matrix<char> controlsMatrix;
-    Matrix<std::string> lociMatrix = T.parse(args.loci);
 
     //The controls and cases expect 0,1,2 chars
-    T.setDelimiter(' ');
-    #pragma omp parallel sections num_threads( std::min(2, args.maxThreads ) )
-    {        
+    #pragma omp parallel sections num_threads( std::min(3, args.maxThreads ) )
+    {   
         #pragma omp section
-        casesMatrix = T.parseByteWise(args.cases);
+        loci = parseLoci(openFileChecked(args.loci));
         #pragma omp section
-        controlsMatrix = T.parseByteWise(args.controls);    
+        cases = parseGenotypes(openFileChecked(args.cases));
+        #pragma omp section
+        controls = parseGenotypes(openFileChecked(args.controls));
     }
     
-    //If any of the files were read incorrectly exit
-    if(controlsMatrix.size() == 0 || casesMatrix.size() == 0 || lociMatrix.size() == 0)
-    {
-        std::cerr<<"input file error"<<"\n";
-        exit(1);
+    //Call snp constructors to create bitwise snp representations
+    std::vector<Snp> snps;
+
+    if (args.permuteSamples != 1) {
+        for (size_t i = 0; i < loci.size(); ++i) {
+            snps.push_back(Snp(i, controls, cases));
+        }
+    }
+    else {
+
+        std::vector<uint32_t> indexOrder;
+        indexOrder.reserve(cases.width + controls.width);
+        for (uint32_t i = 0; i < cases.width + controls.width; ++i) {
+            indexOrder.push_back(i);
+        }
+
+        std::shuffle(indexOrder.begin(), indexOrder.end(), std::default_random_engine(randSeed));
+        /*
+        for (int i = 0; i < ordering.size(); ++i) {
+            if (i < m1.dim(1)){
+                if (ordering[i] < m1.dim(1)){
+                    retVal.first.addColumn(m1.getColumn(ordering[i]));
+                }
+                else{
+                    retVal.first.addColumn(m2.getColumn(ordering[i] - m1.dim(1)));
+                }
+
+            }
+            else {
+                if (ordering[i] < m1.dim(1)){
+                    retVal.second.addColumn(m1.getColumn(ordering[i]));
+                }
+                else{
+                    retVal.second.addColumn(m2.getColumn(ordering[i] - m1.dim(1)));
+                }
+            }
+        }
+
+        // std::pair<Matrix<char>, Matrix<char> > permutedMatrixes = MatrixMath::permuteColumns(controlsMatrix, casesMatrix);
+
+        //  for (long i = 0; i < lociMatrix.dim(0); ++i)
+        //    snps.push_back(Snp(i, permutedMatrixes.first.getRow(i), permutedMatrixes.second.getRow(i)));
+        */
     }
     
     
     //Record the initial size of the dataset read in
     DatasetSizeInfo datasetSizeInfo;
-    datasetSizeInfo.snps_ = lociMatrix.dim(0);
-    datasetSizeInfo.cases_ = casesMatrix.dim(1);
-    datasetSizeInfo.controls_ = controlsMatrix.dim(1);
+    datasetSizeInfo.snps_ = loci.size();
+    datasetSizeInfo.cases_ = cases.width;
+    datasetSizeInfo.controls_ = controls.width;
 
     datasetSizeInfo.mafRemoved_ = 0;
     datasetSizeInfo.marginalSignificanceRemoved_ = 0;
 
-    //Call snp constructors to create bitwise snp representations
-    std::vector<Snp> snps;
-    
-
-    if( args.permuteSamples != 1) 
-    {
-        for(long i= 0; i<lociMatrix.dim(0); ++i)
-        {
-            snps.push_back(Snp(i, controlsMatrix.getRow(i), casesMatrix.getRow(i)));
-        }
-    }
-    else
-    {
-        std::pair<Matrix<char>, Matrix<char> > permutedMatrixes = MatrixMath::permuteColumns(controlsMatrix, casesMatrix);
-
-        for(long i= 0; i<lociMatrix.dim(0); ++i)
-            snps.push_back(Snp(i, permutedMatrixes.first.getRow(i), permutedMatrixes.second.getRow(i)));
-    }
-
-    LDForest ldforest( lociMatrix.dim(0) , controlsMatrix.dim(1), casesMatrix.dim(1), lociMatrix.dim(0));
-
+    LDForest ldforest(loci.size(), controls.width, cases.width, loci.size());
 
     //Only create trees from snps with a high enough MAF and low enough marginal significance
-    for(int i=0; i<snps.size(); ++i)
-    {  
-        if(snps[i].computeMinorAlleleFrequency() <  args.minMAF )
-        {
+    for(int i=0; i<snps.size(); ++i){  
+        if(snps[i].computeMinorAlleleFrequency() <  args.minMAF ){
             datasetSizeInfo.mafRemoved_++; 
         }
-        else if(snps[i].marginalTest() > chi2DegreesFreedomTable[args.maxMS])
-        {
+        else if(snps[i].marginalTest() > chi2DegreesFreedomTable[args.maxMS]){
             datasetSizeInfo.marginalSignificanceRemoved_++;
         }
-        else
-        {
-            if(isdigit(lociMatrix.a(snps[i].getIndex(),1)[0]));
-            {
-                ldforest.insert(snps[i], (char)stoi(lociMatrix.a(snps[i].getIndex(),1)), stoi(lociMatrix.a(snps[i].getIndex(),2))); 
-            }   
+        else{
+            ldforest.insert(snps[i], loci[i].chromosome, loci[i].location);
         }    
     }
 
@@ -119,11 +130,12 @@ void testData(Args& args)
         ldforest.mergeTrees( args.maxUnknown, datasetSizeInfo);
         datasetSizeInfo.mergedTreesFormed_ = ldforest.size();
         ldforest.testTrees(args.maxThreads);
-        ldforest.writeResults(lociMatrix, args, datasetSizeInfo);
+        ldforest.writeResults(loci, args, datasetSizeInfo);
     }
         
     
 }
+
 
 
 

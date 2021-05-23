@@ -7,20 +7,17 @@ int Snp::CONR_;
 int Snp::CASR_;
 int Snp::CASS_;
 
+Snp::Snp(uint32_t index, const GenotypeMatrix& controls, const GenotypeMatrix& cases){
+    packGenotypes(controls.rowBegin(index), controls.rowEnd(index), allSamples_);
+    packGenotypes(cases.rowBegin(index), cases.rowEnd(index), allSamples_);
 
-Snp::Snp(int index, const std::vector<char> & controls, const std::vector<char> & cases)
-{
-
-    packGenotypes(allSamples_, controls, cases);
-    
     index_ = index;
-    
-    numControls_ = controls.size();
-    numCases_ = cases.size();
-    CONR_ = ceil(numControls_/(double)PACK_SIZE);
-    CASR_ = ceil(numCases_/(double)PACK_SIZE);
-    CASS_ = (3*CONR_) ;//+ 1;
-    
+    numControls_ = controls.width;
+    numCases_ = cases.width;
+    //what?
+    CONR_ = ceil(numControls_ / (double)PACK_SIZE);
+    CASR_ = ceil(numCases_ / (double)PACK_SIZE);
+    CASS_ = (3 * CONR_);//+ 1;
 }
 
 Snp::Snp(const Snp & cpy)
@@ -33,7 +30,8 @@ Snp::Snp(const Snp & s1, const Snp & s2)
 {
     //Index is -1 because any node created this way will be internal
     //and not refer to a specific snp from the dataset
-    index_ = -1;
+    index_ = -1; //TODO: FIX TO BE EXPLICIT TYPE
+    std::cout << index_ << " ? "<< std::endl;
     allSamples_ = bitMerge(s1.allSamples_, s2.allSamples_);
 }
 
@@ -154,61 +152,41 @@ float Snp::epistasisTest(const Snp & other)const
     return retVal;
 }
 
-std::array<std::vector<PACK_TYPE>, GENOTYPE_LEVELS> Snp::packGenotypesHelper(const std::vector<char> & genotypes)
-{
-    std::array<std::vector<PACK_TYPE>, GENOTYPE_LEVELS> packedGenotypes;
 
-    std::array<PACK_TYPE,GENOTYPE_LEVELS> sectionCode{0,0,0};
-    for(int i=0; i<genotypes.size(); ++i)
-    {
-        
-        
-  
-        PACK_TYPE mask = (PACK_TYPE)1<<(PACK_SIZE-(i+1)%PACK_SIZE);
-        
-        //Also convert from ascii value to numerical
-        switch(genotypes[i])
-        {
-            case '0':
-                sectionCode[0] = sectionCode[0] | mask;
-                break;
-            case '1':
-                sectionCode[1] = sectionCode[1] | mask;
-                break;
-            case '2':
-                sectionCode[2] = sectionCode[2] | mask;
-                break;
-        }
+void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest ){
+    std::array<std::vector<PACK_TYPE>,3> packedGenotypes;
+    std::array<PACK_TYPE, 3> sectionCode{ 0,0,0 };
+
+    PACK_TYPE offset=0;
+
+    for (auto it = begin; it != end; ++it) {
+        PACK_TYPE mask = (PACK_TYPE)1 << (PACK_SIZE - (offset + 1) % PACK_SIZE);
+
+        sectionCode[*it] = sectionCode[*it] | mask;
         
         //When a section is full, push them back and reset the sections to empty;
-        if( ((i+1) % PACK_SIZE == 0) || ( (i+1) == genotypes.size()) )
+        if (((offset + 1) % PACK_SIZE == 0))//((offset + 1) == genotypes.size()))
         {
             packedGenotypes[0].push_back(sectionCode[0]);
             packedGenotypes[1].push_back(sectionCode[1]);
             packedGenotypes[2].push_back(sectionCode[2]);
-            
-            sectionCode = {0,0,0};
+
+            sectionCode = { 0,0,0 };
+            offset = 0;
+        }
+        else {
+            ++offset;
         }
     }
 
-    return packedGenotypes;
+    //Push final sections if not full
+    if (sectionCode != std::array<PACK_TYPE, 3>{0, 0, 0}) {
+        packedGenotypes[0].push_back(sectionCode[0]);
+        packedGenotypes[1].push_back(sectionCode[1]);
+        packedGenotypes[2].push_back(sectionCode[2]);
+    }
+
+    dest.insert(dest.end(), packedGenotypes[0].begin(), packedGenotypes[0].end());
+    dest.insert(dest.end(), packedGenotypes[1].begin(), packedGenotypes[1].end());
+    dest.insert(dest.end(), packedGenotypes[2].begin(), packedGenotypes[2].end());
 }
-
-void Snp::packGenotypes(std::vector<PACK_TYPE> & allPackedGenotypes, const std::vector<char> & controlGenotypes, const std::vector<char> & caseGenotypes)
-{
-    std::array<std::vector<PACK_TYPE>, GENOTYPE_LEVELS> packedControls = packGenotypesHelper(controlGenotypes);
-    std::array<std::vector<PACK_TYPE>, GENOTYPE_LEVELS> packedCases = packGenotypesHelper(caseGenotypes);
-
-    for(int coding=0; coding<GENOTYPE_LEVELS; ++coding)
-        for(int i=0; i< packedControls[0].size(); ++i)
-        {
-            allPackedGenotypes.push_back(packedControls[coding][i]);
-        }
-
-    for(int coding=0; coding<GENOTYPE_LEVELS; ++coding)
-        for(int i=0; i< packedCases[0].size(); ++i)
-        {
-            allPackedGenotypes.push_back(packedCases[coding][i]);
-        }
-}
-

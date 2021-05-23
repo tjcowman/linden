@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <vector>
 
 
 struct Args{
@@ -37,6 +37,33 @@ struct Args{
             <<permuteSamples;
     }
     
+};
+
+struct Locus {
+    std::string id;
+    uint32_t chromosome;
+    uint32_t location;
+
+   friend std::ostream& operator<<(std::ostream& os, const Locus& e) {
+        os << e.id << "\t" << e.chromosome << "\t" << e.location;
+        return os;
+    }
+};
+
+struct GenotypeMatrix {
+    uint32_t width;
+    uint32_t height;
+    std::vector<uint8_t> data;
+
+    std::vector<uint8_t>::const_iterator rowBegin(size_t row)const {
+        return data.begin() + row * width;
+    }
+
+    std::vector<uint8_t>::const_iterator rowEnd(size_t row)const {
+        return data.begin() + (row+1) * width;
+    }
+    //uint32_t height() { return data.size() / width; }
+
 };
 
 struct DatasetSizeInfo

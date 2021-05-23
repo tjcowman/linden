@@ -35,7 +35,7 @@ class LDForest
         void mergeTrees(float maxUnkownFraction, DatasetSizeInfo datasetSizeInfo);
         void testTrees(int maxThreadUsage);
         
-        void writeResults(const Matrix<std::string>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo);
+        void writeResults(const std::vector<Locus>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo);
     
     private:
         int mergeTreeIteration(float unknownFraction, DatasetSizeInfo datasetSizeInfo);
