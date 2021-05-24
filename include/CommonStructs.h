@@ -51,7 +51,8 @@ struct Location {
         basePair_ = basePair;
     }
 
-   Location(const Location& l1, const Location& l2)
+    //TODO: change to explicit value representing invalid, ex: numeric_limits<>::max()
+    Location(const Location& l1, const Location& l2)
     {
         chromosome_ = -1;
         basePair_ = -1;

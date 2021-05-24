@@ -89,10 +89,8 @@ void testData(Args& args){
         */
     }
     
-    
     //Record the initial size of the dataset read in
-    Log log;
-   // DatasetSizeInfo datasetSizeInfo;
+    Log log{};
     log.snps_ = loci.size();
     log.cases_ = cases.width;
     log.controls_ = controls.width;
@@ -100,12 +98,10 @@ void testData(Args& args){
     log.mafRemoved_ = 0;
     log.marginalSignificanceRemoved_ = 0;
 
-    //LDForest ldforest(loci.size(), controls.width, cases.width, loci.size());
-    LDForest ldforest(&log, loci.size());
 
+    LDForest ldforest(&log, loci.size());
     //Only create trees from snps with a high enough MAF and low enough marginal significance
     for(ID_Snp i=0; i<snps.size(); ++i){
-       // std::cout << i << " " << snps[i].computeMinorAlleleFrequency() << std::endl;
         if(snps[i].computeMinorAlleleFrequency() <  args.minMAF ){
             log.mafRemoved_++;
         }
@@ -113,11 +109,7 @@ void testData(Args& args){
             log.marginalSignificanceRemoved_++;
         }
         else{
-          //  ldforest.insert(snps[i], loci[i].location.chromosome, loci[i].location.basePair);
-            //LDTree l(snps[i], loci[i].chromosome, loci[i].location);
-           // std::cout << loci[i] << "\n";
             ldforest.insert(LDTree(snps[i], loci[i].location));
-           // std::cout << ldforest.size()<<"    ?\n";
         }    
     }
 

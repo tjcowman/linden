@@ -1,11 +1,5 @@
 #include "LDTree.h" 
 
-/*LDTree::LDTree(const Snp & snp , char chromosome, int basePair)
-{
-   nodes_.push_back(snp);
-   genomeLocations_.push_back(GenomeLocation(chromosome, basePair));
-}*/
-
 LDTree::LDTree(const Snp& snp, const Location& location)
 {
     nodes_.push_back(snp);
@@ -84,8 +78,6 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
     s.push_back(std::make_pair(0,0));
     while(!s.empty())
     {
-        
-        
         float cutOff=topSnpList.getCutoff();
 
         std::pair<int,int> c = s.back();
@@ -149,8 +141,6 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
     }
     topSnpList.incrementInternalTestsCounter(localInternalTestsDone);
     topSnpList.incrementLeafTestsCounter(localLeaftTestsDone);
-    
-    
 }
 
 void LDTree::epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const
@@ -168,5 +158,4 @@ void LDTree::epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)
         topSnpList.attemptInsert(nodes_[n1].getIndex(), other.nodes_[n2].getIndex(), score);
     }
     topSnpList.incrementLeafTestsCounter(2);
-    
 }
