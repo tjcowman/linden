@@ -1,12 +1,18 @@
 #include "LDTree.h" 
 
-LDTree::LDTree(const Snp & snp , char chromosome, int basePair)
+/*LDTree::LDTree(const Snp & snp , char chromosome, int basePair)
 {
    nodes_.push_back(snp);
    genomeLocations_.push_back(GenomeLocation(chromosome, basePair));
+}*/
+
+LDTree::LDTree(const Snp& snp, const Location& location)
+{
+    nodes_.push_back(snp);
+    genomeLocations_.push_back(location);
 }
 
-LDTree::LDTree(const LDTree & cpy)
+LDTree::LDTree(const LDTree& cpy)
 {
     nodes_ = cpy.nodes_;
     genomeLocations_ = cpy.genomeLocations_;
@@ -19,7 +25,7 @@ LDTree::LDTree(const LDTree & t1, const LDTree & t2)
     
     //Create new root node
     nodes_.push_back(Snp(t1.nodes_[0], t2.nodes_[0]));
-    genomeLocations_.push_back(GenomeLocation(t1.genomeLocations_[0], t2.genomeLocations_[0]));
+    genomeLocations_.push_back(Location(t1.genomeLocations_[0], t2.genomeLocations_[0]));
     
     //Push back the sub trees
     

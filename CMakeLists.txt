@@ -20,7 +20,7 @@ set_property(TARGET linden PROPERTY CXX_STANDARD 20)
 #set_property(TARGET linden PROPERTY Wa)
 
 if(NOT MSCV)
-    target_compile_options( linden PUBLIC -Werror -Wpedantic  )
+#    target_compile_options( linden PUBLIC -Werror -Wpedantic  )
 endif()
 
 #set(CMAKE_CXX_STANDARD 17)

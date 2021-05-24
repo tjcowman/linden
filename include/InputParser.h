@@ -44,7 +44,8 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
             exit(1);
         }
 
-        ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1]-delims[0]), chromosome, location });
+        //ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1]-delims[0]), chromosome, location });
+        ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1] - delims[0]), Location(chromosome, location) });
     }
     ifs.close();
  

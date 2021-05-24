@@ -91,48 +91,54 @@ void testData(Args& args){
     
     
     //Record the initial size of the dataset read in
-    DatasetSizeInfo datasetSizeInfo;
-    datasetSizeInfo.snps_ = loci.size();
-    datasetSizeInfo.cases_ = cases.width;
-    datasetSizeInfo.controls_ = controls.width;
+    Log log;
+   // DatasetSizeInfo datasetSizeInfo;
+    log.snps_ = loci.size();
+    log.cases_ = cases.width;
+    log.controls_ = controls.width;
 
-    datasetSizeInfo.mafRemoved_ = 0;
-    datasetSizeInfo.marginalSignificanceRemoved_ = 0;
+    log.mafRemoved_ = 0;
+    log.marginalSignificanceRemoved_ = 0;
 
-    LDForest ldforest(loci.size(), controls.width, cases.width, loci.size());
+    //LDForest ldforest(loci.size(), controls.width, cases.width, loci.size());
+    LDForest ldforest(&log, loci.size());
 
     //Only create trees from snps with a high enough MAF and low enough marginal significance
     for(ID_Snp i=0; i<snps.size(); ++i){
        // std::cout << i << " " << snps[i].computeMinorAlleleFrequency() << std::endl;
         if(snps[i].computeMinorAlleleFrequency() <  args.minMAF ){
-            datasetSizeInfo.mafRemoved_++; 
+            log.mafRemoved_++;
         }
         else if(snps[i].marginalTest() > chi2DegreesFreedomTable[args.maxMS]){
-            datasetSizeInfo.marginalSignificanceRemoved_++;
+            log.marginalSignificanceRemoved_++;
         }
         else{
-            ldforest.insert(snps[i], loci[i].chromosome, loci[i].location);
+          //  ldforest.insert(snps[i], loci[i].location.chromosome, loci[i].location.basePair);
+            //LDTree l(snps[i], loci[i].chromosome, loci[i].location);
+           // std::cout << loci[i] << "\n";
+            ldforest.insert(LDTree(snps[i], loci[i].location));
+           // std::cout << ldforest.size()<<"    ?\n";
         }    
     }
 
-    datasetSizeInfo.passingSnps_ = ldforest.size();
+    log.passingSnps_ = ldforest.size();
     
 
     std::clog<<"filtering SNPs"<<"\n";
-    std::clog<<"\tinitial: "<<datasetSizeInfo.snps_<<"\n";
-    std::clog<<"\tremoved marginal significance: "<<datasetSizeInfo.marginalSignificanceRemoved_<<"\n";
-    std::clog<<"\tremoved minor allele frequency: "<<datasetSizeInfo.mafRemoved_<<"\n";
+    std::clog<<"\tinitial: "<< log.snps_<<"\n";
+    std::clog<<"\tremoved marginal significance: "<< log.marginalSignificanceRemoved_<<"\n";
+    std::clog<<"\tremoved minor allele frequency: "<< log.mafRemoved_<<"\n";
     std::clog<<"\tremaining: "<<ldforest.size()<<"\n";
     
     
     
     if(ldforest.size() > 1){    
-        ldforest.mergeTrees( args.maxUnknown, datasetSizeInfo);
-        datasetSizeInfo.mergedTreesFormed_ = ldforest.size();
+        ldforest.mergeTrees( args.maxUnknown);
+        log.mergedTreesFormed_ = ldforest.size();
         ldforest.testTrees(args.maxThreads);
-        ldforest.writeResults(loci, args, datasetSizeInfo);
+        ldforest.writeResults(loci, args);
     }
-        
+
     
 }
 

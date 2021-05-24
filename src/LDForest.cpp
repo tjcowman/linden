@@ -1,22 +1,32 @@
 #include "LDForest.h"
 
-LDForest::LDForest( int topKSnps, int numberControlSamples, int numberCaseSamples, int numberSnps)
+LDForest::LDForest(Log* log, ID_Snp numSnps)
 {
-    topSnpList_ = TopSnpList(topKSnps, numberSnps, 0);
+    log = log;
+    topSnpList_ = TopSnpList(numSnps, numSnps, 0);
 }
 
-void LDForest::insert(const Snp & snp, char chromosome, int basePair)
+void LDForest::insert(const LDTree& ldTree)
+{
+    ldtrees_.push_back(ldTree);
+
+}
+
+
+
+/*void LDForest::insert(const Snp & snp, char chromosome, int basePair)
 {
     ldtrees_.push_back(LDTree(snp, chromosome, basePair));
-}
+}*/
 
 size_t LDForest::size()const
 {
     return ldtrees_.size();
 }
 
-void LDForest::mergeTrees(double maxUnknownFraction, DatasetSizeInfo datasetSizeInfo)
+void LDForest::mergeTrees(double maxUnknownFraction)
 {
+  
     std::clog<<"merging LD trees"<<std::endl;
 
     uint64_t change = UINT64_MAX;//INT_MAX;
@@ -24,7 +34,7 @@ void LDForest::mergeTrees(double maxUnknownFraction, DatasetSizeInfo datasetSize
 
     while(change > 5 || unknownFraction < maxUnknownFraction)
     {
-        change = mergeTreeIteration(unknownFraction, datasetSizeInfo);
+        change = mergeTreeIteration(unknownFraction);
 
         std::clog<<"\tremaining: "<<size()<<"          \r"<<std::flush;
         
@@ -36,11 +46,11 @@ void LDForest::mergeTrees(double maxUnknownFraction, DatasetSizeInfo datasetSize
 
 }
 
-size_t LDForest::mergeTreeIteration(float unknownFraction, DatasetSizeInfo datasetSizeInfo)
+size_t LDForest::mergeTreeIteration(float unknownFraction)
 {
     std::vector<LDTree> mergedTrees;
     
-    int allowedDifferences = unknownFraction * (datasetSizeInfo.controls_ + datasetSizeInfo.cases_);
+    int allowedDifferences = unknownFraction * (log->controls_ + log->cases_);
     
     size_t beforeSize = ldtrees_.size();
 
@@ -75,6 +85,9 @@ size_t LDForest::mergeTreeIteration(float unknownFraction, DatasetSizeInfo datas
 
 void LDForest::testTrees(int maxThreadUsage)
 {
+
+   // topSnpList_ = TopSnpList(10, 10, 0);
+
     std::clog<<"testing Trees"<<std::endl;
     std::clog<<"\tcompleted: 0/"<<size()<<"               \r"<<std::flush;
     
@@ -109,7 +122,7 @@ void LDForest::testTrees(int maxThreadUsage)
     std::clog<<std::endl;
 }
 
-void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo)
+void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args)
 {
     topSnpList_.calculateFormattedResults();
     

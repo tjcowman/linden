@@ -26,19 +26,20 @@
 class LDForest
 {
     public:
-        LDForest(int topKSnps, int numberControlSamples, int numberCaseSamples, int numberSnps);
+        LDForest(Log* log, ID_Snp numSnps);
         
-        void insert(const Snp & snp, char chromosome, int basePair);
+       // void insert(const Snp & snp, char chromosome, int basePair);
+        void insert(const LDTree& ldtree);
         
         size_t size()const;
         
-        void mergeTrees(double maxUnkownFraction, DatasetSizeInfo datasetSizeInfo);
+        void mergeTrees(double maxUnkownFraction);
         void testTrees(int maxThreadUsage);
         
-        void writeResults(const std::vector<Locus>& infoMatrix, Args& args, DatasetSizeInfo datasetSizeInfo);
+        void writeResults(const std::vector<Locus>& infoMatrix, Args& args);
     
     private:
-        size_t mergeTreeIteration(float unknownFraction, DatasetSizeInfo datasetSizeInfo);
+        size_t mergeTreeIteration(float unknownFraction);
         
         //Results output
         void writeGroundTruthList();
@@ -46,6 +47,9 @@ class LDForest
         std::vector<LDTree> ldtrees_;
         
         TopSnpList topSnpList_;
+
+        //Non-owning pointer to a log struct for storing statistics about the current run
+        Log* log;
         
 };
 #endif //LDFOREST_H

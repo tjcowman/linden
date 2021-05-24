@@ -19,6 +19,7 @@
 
 
 
+
 //Used in the analysis and output of top pairs, not in discovery and cutoff updating
 struct TopPairing
 {
@@ -63,6 +64,8 @@ class TopSnpList
     public:
         TopSnpList();
         TopSnpList(const TopSnpList & cpy);
+
+        //IMPORTANT: Currently needs numberSnps to be set to the size of the possible SNPIndexes (BEFORE ANY FILTERING)
         TopSnpList(int topK, int numberSnps, float cutoff);
         
         

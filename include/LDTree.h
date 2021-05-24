@@ -16,7 +16,7 @@
 
 #define ESTIMATED_LD_RANGE 1000000
 
-struct GenomeLocation
+/*struct GenomeLocation
 {
     GenomeLocation(char chromosome, int basePair)
     {
@@ -44,13 +44,15 @@ struct GenomeLocation
     char chromosome_;
     int basePair_;
 };
-
+*/
 
 class LDTree
 {
     public:
       
-        LDTree(const Snp & snp, char chromosome, int basePair);
+      //  LDTree(const Snp & snp, char chromosome, int basePair);
+        LDTree(const Snp& snp, const Location& location);
+
         LDTree(const LDTree & cpy);
         
         LDTree(const LDTree & t1, const LDTree & t2);
@@ -72,7 +74,8 @@ class LDTree
     private:
         
         std::vector<Snp> nodes_;
-        std::vector<GenomeLocation> genomeLocations_;
+        //std::vector<GenomeLocation> genomeLocations_;
+        std::vector<Location> genomeLocations_;
 
 };
 #endif //LDTREE_H

@@ -29,24 +29,55 @@ struct Args{
     double maxUnknown=.1;
     double minMAF=0.0;
     int maxMS=1;
-    
-    
+     
     void printSummaryRelevant(std::ofstream & ofs)
     {
         ofs <<maxUnknown<<"\t"
             <<minMAF<<"\t"<<maxMS<<"\t"
             <<permuteSamples;
     }
-    
+};
+
+
+static const uint32_t  ESTIMATED_LD_RANGE = 1000000;
+struct Location {
+    uint32_t chromosome_;
+    uint32_t basePair_;
+
+
+    Location(uint32_t chromosome, uint32_t basePair)
+    {
+        chromosome_ = chromosome;
+        basePair_ = basePair;
+    }
+
+   Location(const Location& l1, const Location& l2)
+    {
+        chromosome_ = -1;
+        basePair_ = -1;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Location& e) {
+        os << e.chromosome_ << "\t" << e.basePair_;
+        return os;
+    }
+
+    bool inLinkageDisequilibrium(const Location& other)const{
+        if (chromosome_ != other.chromosome_) {
+            return false;
+        }
+        //gets the absolute difference between two unsigned integral numbers
+        ID_Snp diff = basePair_ > other.basePair_ ? basePair_ - other.basePair_ : other.basePair_ - basePair_;
+        return(diff < ESTIMATED_LD_RANGE);
+    }
 };
 
 struct Locus {
     std::string id;
-    uint32_t chromosome;
-    uint32_t location;
+    Location location;
 
    friend std::ostream& operator<<(std::ostream& os, const Locus& e) {
-        os << e.id << "\t" << e.chromosome << "\t" << e.location;
+        os << e.id << "\t" << e.location;
         return os;
     }
 };
@@ -63,34 +94,28 @@ struct GenotypeMatrix {
     std::vector<ID_Genotype>::const_iterator rowEnd(size_t row)const {
         return data.begin() + (row+1) * width;
     }
-    //uint32_t height() { return data.size() / width; }
-
 };
 
-struct DatasetSizeInfo
-{
-    long snps_;
-    long cases_;
-    long controls_;
+struct Log {
+    ID_Snp snps_;
+    ID_Sample controls_;
+    ID_Sample cases_;
     
     //Varies based on trial
-    long mafRemoved_;
-    long marginalSignificanceRemoved_;
-    
-    long passingSnps_;
-    long mergedTreesFormed_;
-    
-    void printDimensions(std::ofstream & ofs)
-    {
-        ofs<<snps_<<"\t"<<cases_<<"\t"<<controls_;
-    }
-    
-    void printSubsetDimensions(std::ofstream & ofs)
-    {
-        ofs<<mafRemoved_<<"\t"<<marginalSignificanceRemoved_<<"\t"<<mergedTreesFormed_;
-    }
-    
-};
+    ID_Snp mafRemoved_;
+    ID_Snp marginalSignificanceRemoved_;
 
+    ID_Snp passingSnps_;
+    ID_Snp mergedTreesFormed_;
+
+    void printDimensions(std::ofstream& ofs){
+        ofs << snps_ << "\t" << cases_ << "\t" << controls_;
+    }
+
+    void printSubsetDimensions(std::ofstream& ofs){
+        ofs << mafRemoved_ << "\t" << marginalSignificanceRemoved_ << "\t" << mergedTreesFormed_;
+    }
+
+};
 
 #endif //COMMON_STRUCTS_H
