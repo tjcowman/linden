@@ -87,6 +87,7 @@ void LDForest::testTrees(int maxThreadUsage)
         {
             for(int j=i+1; j<size(); ++j)
                 ldtrees_[i].epistasisTest(ldtrees_[j], topSnpList_);
+
         }
         /*else
         {

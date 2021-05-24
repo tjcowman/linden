@@ -52,9 +52,9 @@ class Snp
         ID_Snp index_;
         static ID_Sample numCases_;
         static ID_Sample numControls_;
-        static int CONR_;
-        static int CASR_;
-        static int CASS_;
+        static ID_Sample CONR_;
+        static ID_Sample CASR_;
+        static ID_Sample CASS_;
 };
 
 

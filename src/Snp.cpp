@@ -3,9 +3,9 @@
 //Define static members, will be set correctly in the Snp constructors
 ID_Sample Snp::numControls_;
 ID_Sample Snp::numCases_;
-int Snp::CONR_; //Number of packed control samples
-int Snp::CASR_; //Number of packed case samples
-int Snp::CASS_; //Offest for the beginning of the case samples
+ID_Sample Snp::CONR_; //Number of packed control samples
+ID_Sample Snp::CASR_; //Number of packed case samples
+ID_Sample Snp::CASS_; //Offest for the beginning of the case samples
 
 Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases){
     packGenotypes(controls.rowBegin(index), controls.rowEnd(index), allSamples_);
@@ -22,29 +22,25 @@ Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cas
     CASS_ = (3 * CONR_);//+ 1; 
 }
 
-Snp::Snp(const Snp & cpy)
-{
+Snp::Snp(const Snp & cpy){
     index_ = cpy.index_;
     allSamples_ = cpy.allSamples_;
 }
 
-Snp::Snp(const Snp & s1, const Snp & s2)
-{
+Snp::Snp(const Snp & s1, const Snp & s2){
     //Index is -1 because any node created this way will be internal
     //and not refer to a specific snp from the dataset
     index_ = -1; //TODO: FIX TO BE EXPLICIT TYPE   (currently should wrap arount to largest uval)
-    std::cout << index_ << " ? "<< std::endl;
+  //  std::cout << index_ << " ? "<< std::endl;
     allSamples_ = bitMerge(s1.allSamples_, s2.allSamples_);
 }
 
-ID_Snp Snp::getIndex()const
-{
+ID_Snp Snp::getIndex()const{
     return index_;
 }
 
 
-float Snp::computeMinorAlleleFrequency()const
-{
+float Snp::computeMinorAlleleFrequency()const{
     int homoMajor = popCount(allSamples_, 0, CONR_) + popCount(allSamples_, CASS_, CASR_) ;
     int hetero = popCount(allSamples_, CONR_, CONR_) + popCount(allSamples_, CASS_+CASR_, CASR_); 
     int homoMinor = popCount(allSamples_, 2*CONR_, CONR_) + popCount(allSamples_, CASS_+(2*CASR_), CASR_) ;
@@ -53,107 +49,93 @@ float Snp::computeMinorAlleleFrequency()const
 }
 
 
-ID_Sample Snp::computeDifferences(const Snp & other)const
-{
+ID_Sample Snp::computeDifferences(const Snp & other)const{
     return ((numControls_ + numCases_)- popCountAnd(allSamples_, other.allSamples_, 0, allSamples_.size()));
 }
 
 
-float Snp::computeUnknownRatio()const
-{
+float Snp::computeUnknownRatio()const{
     int numberKnown = popCount(allSamples_, 0, allSamples_.size());
 
     return ( numberKnown/(float)(numControls_ + numCases_) );
 }
 
-float Snp::marginalTest()const
-{
+float Snp::marginalTest()const{
    float retVal=0.0;
    CTable1 t;
-    
-    for(int i=0; i<GENOTYPE_LEVELS; ++i)
-    {
-        t.M_[i] = popCount(allSamples_, i*CONR_, CONR_);
-        t.M_[i+GENOTYPE_LEVELS] = popCount(allSamples_, CASS_ + (i*CASR_), CASR_);
-    }
-       
-    t.addOne(); //For correction    
-    t.calculateTotals();
-        
-		
-    int factors = 3;
-    int levels = 2;
-    
-    for(int y=0; y< factors; ++y)
-    {
+   t.zero();
 
-        for(int x=0; x< levels; ++x)
-        {            
-            //Use margin values
-            float c1 = (float)t.RT_[y];
-            float c2 = (float)t.CT_[x];
-            float c3 = (float)(t.CT_[0] + t.CT_[1]);          
-            
-            float c4 = (float)t.a(y,x);
+   for (uint8_t i = 0; i <= 6; i+=3) {
+       //Fill cells for this row, correcting by adding 1
+       t.data[i] = popCount(allSamples_, i/3 * CONR_, CONR_) + 1;
+       t.data[i + 1] = popCount(allSamples_, CASS_ + (i/3 * CASR_), CASR_) + 1;
 
-            float expected  = ( c1 * c2 ) / c3 ;
+       //fill the row totals
+       t.data[i + 2] = t.data[i] + t.data[i + 1];
 
-            retVal = retVal +  (pow(c4-expected,2)/expected);
+       //accumulate the column totals
+       t.data[9] += t.data[i];
+       t.data[10] += t.data[i + 1];
+   }
 
+    constexpr uint8_t factors = 3;
+    constexpr uint8_t levels = 2;
+
+    float chi2 = 0.0;
+    for (uint8_t row = 0; row < factors; ++row) {
+        for (uint8_t col = 0; col < levels; ++col) {
+            ID_Sample c1 = t.data[row * 3 +2];
+            ID_Sample c2 = t.data[9 + col];
+            ID_Sample c3 = t.data[9] + t.data[10];
+            ID_Sample c4 = t.data[row * 3 + col];
+
+            float expected  = (c1 * c2) / (float)c3 ;
+            chi2 += (pow(c4 - expected, 2) / expected);
         }
     }
-    return retVal;
+    return chi2;
 }
 
-float Snp::epistasisTest(const Snp & other)const
-{
-    float retVal=0.0;
+float Snp::epistasisTest(const Snp& other)const {
+    float retVal = 0.0;
 
     CTable2 t;
-    t.M_.fill(0);
-    
-    //PLUS ONE FOR CORRECTION
-    for(int i=0; i<GENOTYPE_LEVELS; ++i)
-    {
-        //Count controls
-        for(int j=0; j<GENOTYPE_LEVELS; ++j)
-        {
-            t.M_[i+(GENOTYPE_LEVELS*j)] = popCountAnd(allSamples_, other.allSamples_, i*CONR_, j*CONR_, CONR_)+1;
-            
-        }
-        //Count Cases
-        for(int j=0; j<GENOTYPE_LEVELS; ++j)
-        {
-            t.M_[i+(GENOTYPE_LEVELS*j)+(GENOTYPE_LEVELS*GENOTYPE_LEVELS)] = popCountAnd(allSamples_, other.allSamples_, CASS_+(i*CASR_), CASS_+(j*CASR_), CASR_ )+1;
-        }
-    }   
-    
-    t.calculateTotals();
+    t.zero();
 
-    //18 and 27 offset for row and column totals respectively
-    for(int y=0; y< GENOTYPE_PAIRINGS; ++y)
-    {
-
-        for(int x=0; x< CONTINGENCY_COLUMNS; ++x)
-        {            
-            //Use margin values
-            int c1 = t.M_[y+18];
-            int c2 = t.M_[x+27];
-            float c3 = (t.M_[27] + t.M_[28]);
+    constexpr uint8_t factors = 3;
+    constexpr uint8_t levels = 2;
 
 
-            float c4 = t.M_[y+(9*x)];
+    for (const auto& e : CTable::rowOrder) {
+        const uint8_t rowI = 9 * e.first + e.second * 3;
 
-            float expected  = ( c1 * c2 ) / c3 ;
+        t.data[rowI] = popCountAnd(allSamples_, other.allSamples_, e.first * CONR_, e.second * CONR_, CONR_) + 1;
+        t.data[rowI + 1] = popCountAnd(allSamples_, other.allSamples_, e.first * CASR_ + CASS_, e.second * CASR_ + CASS_, CASR_) + 1;
 
-            retVal = retVal +  (pow(c4-expected,2)/expected);
-           
+        //fill the row totals
+        t.data[rowI + 2] = t.data[rowI] + t.data[rowI + 1];
+
+        //accumulate the column totals
+        t.data[27] += t.data[rowI];
+        t.data[28] += t.data[rowI + 1];
+    }
+
+    float chi2 = 0.0;
+
+    for (uint8_t row = 0; row < factors * factors; ++row) {
+        for (uint8_t col = 0; col < levels; ++col) {
+            ID_Sample c1 = t.data[row * 3 + 2];
+            ID_Sample c2 = t.data[27 + col];
+            ID_Sample c3 = t.data[27] + t.data[28];
+            ID_Sample c4 = t.data[row * 3 + col];
+
+            float expected = (c1 * c2) / (float)c3;
+            chi2 += (pow(c4 - expected, 2) / expected);
         }
     }
 
-    return retVal;
+    return chi2;
 }
-
 
 void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest ){
     std::array<std::vector<PackedGenotype>,3> packedGenotypes;

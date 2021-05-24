@@ -1,41 +1,33 @@
 #pragma once
 
+#include "Types.h"
+
+#include<array>
+
 #define GENOTYPE_LEVELS 3
 #define GENOTYPE_PAIRINGS 9
 #define CONTINGENCY_COLUMNS 2
 
+namespace CTable {
+    const static std::array<std::pair<uint8_t, uint8_t>, 9> rowOrder{ { {0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2} } };
+}
+
+
 struct CTable1 {
-    std::array<int, 6> M_;
-    std::array<int, 3> RT_;
-    std::array<int, 2> CT_;
+    std::array<ID_Sample, 11> data;
 
-    int& a(int x, int y)
-    {
-        return M_[x + (3 * y)];
-    }
-
-    void addOne()
-    {
-        for (int i = 0; i < M_.size(); ++i)
-            M_[i]++;
-    }
-
-    void calculateTotals()
-    {
-        CT_.fill(0);
-        RT_.fill(0);
-
-        for (int i = 0; i < 3; ++i)
-        {
-            RT_[i] = M_[i] + M_[i + 3];
-            CT_[0] += M_[i];
-            CT_[1] += M_[i + 3];
-        }
+    void zero(){
+        data.fill(0);
     }
 };
 
 struct CTable2 {
     std::array<int, 29> M_;
+    std::array<ID_Sample, 29> data;
+
+    void zero() {
+        data.fill(0);
+    }
 
     int& a(int x, int y) {
         return M_[x + (9 * y)];

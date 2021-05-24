@@ -103,6 +103,7 @@ void testData(Args& args){
 
     //Only create trees from snps with a high enough MAF and low enough marginal significance
     for(ID_Snp i=0; i<snps.size(); ++i){
+       // std::cout << i << " " << snps[i].computeMinorAlleleFrequency() << std::endl;
         if(snps[i].computeMinorAlleleFrequency() <  args.minMAF ){
             datasetSizeInfo.mafRemoved_++; 
         }
@@ -116,6 +117,7 @@ void testData(Args& args){
 
     datasetSizeInfo.passingSnps_ = ldforest.size();
     
+
     std::clog<<"filtering SNPs"<<"\n";
     std::clog<<"\tinitial: "<<datasetSizeInfo.snps_<<"\n";
     std::clog<<"\tremoved marginal significance: "<<datasetSizeInfo.marginalSignificanceRemoved_<<"\n";
