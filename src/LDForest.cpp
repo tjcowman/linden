@@ -70,22 +70,19 @@ void LDForest::testTrees(int maxThreadUsage){
     
     size_t treesFinished = 0;
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
-    for(int i=0; i<size(); ++i)
-    {
+    for(size_t i=0; i<size(); ++i){
 
-        for(int j=i+1; j<size(); ++j)
+        for (size_t j = i + 1; j < size(); ++j) {
             ldtrees_[i].epistasisTest(ldtrees_[j], topSnpList_);
+        }
 
-        if(i % 100 == 0)
-        {   
+        if(i % 100 == 0){   
             #pragma omp critical
             {
-            treesFinished +=100;
-            std::clog<<"\tcompleted: "<<std::min(treesFinished, size())<<"/"<<size()<<"               \r"<<std::flush;
-            }
-                
-        }
-            
+                treesFinished +=100;
+                std::clog<<"\tcompleted: "<<std::min(treesFinished, size())<<"/"<<size()<<"               \r"<<std::flush;
+            }              
+        }          
     }
     std::clog<<std::endl;
 }

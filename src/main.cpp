@@ -46,7 +46,6 @@ void testData(Args& args){
     
     //Call snp constructors to create bitwise snp representations
     std::vector<Snp> snps;
-
     if (args.permuteSamples != 1) {
         for (size_t i = 0; i < loci.size(); ++i) {
             snps.push_back(Snp(i, controls, cases));
@@ -95,22 +94,22 @@ void testData(Args& args){
     log.cases_ = cases.width;
     log.controls_ = controls.width;
 
-    log.mafRemoved_ = 0;
-    log.marginalSignificanceRemoved_ = 0;
+    //perform filtering logic on the input snps based on single locus measures
+    auto it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.computeMinorAlleleFrequency() < args.minMAF; });
+    log.mafRemoved_ = std::distance(it, snps.end());
+    snps.erase(it, snps.end());
 
+    it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.marginalTest() > chi2DegreesFreedomTable[args.maxMS]; });
+    log.marginalSignificanceRemoved_ = std::distance(it, snps.end());
+    snps.erase(it, snps.end());
 
+    //Initialize the ldforest, note that currently the loci size needs to refer to the range of possible indexes not how many post filterd SNPs there are
+    //This is due to the implementation of TopSnpList
     LDForest ldforest(&log, loci.size());
-    //Only create trees from snps with a high enough MAF and low enough marginal significance
-    for(ID_Snp i=0; i<snps.size(); ++i){
-        if(snps[i].computeMinorAlleleFrequency() <  args.minMAF ){
-            log.mafRemoved_++;
-        }
-        else if(snps[i].marginalTest() > chi2DegreesFreedomTable[args.maxMS]){
-            log.marginalSignificanceRemoved_++;
-        }
-        else{
-            ldforest.insert(LDTree(snps[i], loci[i].location));
-        }    
+  
+
+    for (ID_Snp i = 0; i < snps.size(); ++i) {
+        ldforest.insert(LDTree(snps[i], loci[i].location));
     }
 
     log.passingSnps_ = ldforest.size();

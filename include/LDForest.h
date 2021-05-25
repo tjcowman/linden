@@ -14,8 +14,6 @@
 #include "LDTree.h"
 #include "TopSnpList.h"
 
-
-
 #include <limits.h>
 #include <vector>
 #include <fstream>

@@ -67,7 +67,7 @@ void LDTree::clear()
 void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
 {
     //Vector to use as a stack for tests
-    std::vector<std::pair<int, int> > s;
+    std::vector<std::pair<size_t, size_t> > s;
     
     size_t leafStart1 = nodes_.size()/2;
     size_t leafStart2 = other.nodes_.size()/2;
@@ -80,17 +80,15 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
     {
         float cutOff=topSnpList.getCutoff();
 
-        std::pair<int,int> c = s.back();
+        std::pair<size_t, size_t> c = s.back();
         s.pop_back();
-
-        //cout<<c.first<<" "<<c.second<<endl;
-        
+      
         float score = nodes_[c.first].epistasisTest(other.nodes_[c.second]);
 
-        int l1= (c.first<<1) +1;
-        int r1= (c.first<<1) +2;
-        int l2= (c.second<<1) +1;
-        int r2= (c.second<<1) +2;
+        size_t l1= (c.first<<1) +1;
+        size_t r1= (c.first<<1) +2;
+        size_t l2= (c.second<<1) +1;
+        size_t r2= (c.second<<1) +2;
 
         //If both not at both leaves
         if(c.first<leafStart1 && c.second<leafStart2)

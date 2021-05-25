@@ -39,7 +39,8 @@ struct Args{
 };
 
 
-static const uint32_t  ESTIMATED_LD_RANGE = 1000000;
+//static const uint32_t ESTIMATED_LD_RANGE = 1000000;
+static const uint32_t ESTIMATED_LD_RANGE = 1000000;
 struct Location {
     uint32_t chromosome_;
     uint32_t basePair_;
@@ -68,8 +69,8 @@ struct Location {
             return false;
         }
         //gets the absolute difference between two unsigned integral numbers
-        ID_Snp diff = basePair_ > other.basePair_ ? basePair_ - other.basePair_ : other.basePair_ - basePair_;
-        return(diff < ESTIMATED_LD_RANGE);
+        ID_Snp dist = basePair_ > other.basePair_ ? basePair_ - other.basePair_ : other.basePair_ - basePair_;
+        return(dist <= ESTIMATED_LD_RANGE);
     }
 };
 

@@ -23,8 +23,9 @@
 class Snp
 {
     public:
+       // Snp();
         Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases);
-        Snp(const Snp & cpy);
+       // Snp(const Snp & cpy);
         Snp(const Snp & s1, const Snp & s2); 
         
         //Getters

@@ -18,9 +18,7 @@ class LDTree
 {
     public:
         LDTree(const Snp& snp, const Location& location);
-
-        LDTree(const LDTree & cpy);
-        
+        LDTree(const LDTree & cpy); 
         LDTree(const LDTree & t1, const LDTree & t2);
     
         bool empty()const;
@@ -41,6 +39,5 @@ class LDTree
         
         std::vector<Snp> nodes_;
         std::vector<Location> genomeLocations_;
-
 };
 #endif //LDTREE_H

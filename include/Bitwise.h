@@ -8,13 +8,11 @@
 using PackedGenotype = uint64_t;
 constexpr uint8_t PACKED_SIZE = sizeof(PackedGenotype) * 8;
 
-//If windows use its popcount
-#ifdef _WIN32
+
 #include <intrin.h> 
-#define POPCOUNT_FUNCTION __popcnt64
-#else
+
 #define POPCOUNT_FUNCTION __builtin_popcountll
-#endif
+
 
 
 static PackedGenotype popCount(const std::vector<PackedGenotype>& v, ID_Snp begin, ID_Snp distance)

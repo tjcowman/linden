@@ -7,6 +7,13 @@ ID_Sample Snp::CONR_; //Number of packed control samples
 ID_Sample Snp::CASR_; //Number of packed case samples
 ID_Sample Snp::CASS_; //Offest for the beginning of the case samples
 
+/*Snp::Snp(){
+    index_ = -1;
+    numControls_ = 0;
+    numCases_ = 0;
+    allSamples_ = std::vector<PackedGenotype>();
+}*/
+
 Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases){
     packGenotypes(controls.rowBegin(index), controls.rowEnd(index), allSamples_);
     packGenotypes(cases.rowBegin(index), cases.rowEnd(index), allSamples_);
@@ -22,10 +29,10 @@ Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cas
     CASS_ = (3 * CONR_);//+ 1; 
 }
 
-Snp::Snp(const Snp & cpy){
+/*Snp::Snp(const Snp & cpy){
     index_ = cpy.index_;
     allSamples_ = cpy.allSamples_;
-}
+}*/
 
 Snp::Snp(const Snp & s1, const Snp & s2){
     //Index is -1 because any node created this way will be internal
@@ -149,8 +156,7 @@ void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<
         sectionCode[*it] = sectionCode[*it] | mask;
         
         //When a section is full, push them back and reset the sections to empty;
-        if (((offset + 1) % PACKED_SIZE == 0))//((offset + 1) == genotypes.size()))
-        {
+        if (((offset + 1) % PACKED_SIZE == 0)) {
             packedGenotypes[0].push_back(sectionCode[0]);
             packedGenotypes[1].push_back(sectionCode[1]);
             packedGenotypes[2].push_back(sectionCode[2]);
