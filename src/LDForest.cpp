@@ -1,8 +1,8 @@
 #include "LDForest.h"
 
-LDForest::LDForest(Log* log, ID_Snp numSnps){
-    log_ = log;
-    topSnpList_ = TopSnpList(numSnps, numSnps, 0);
+LDForest::LDForest(Log* log, ID_Snp numSnps) : 
+    log_(log),
+    topSnpList_(TopSnpList(numSnps, numSnps, 0)) {
 }
 
 void LDForest::insert(const LDTree& ldTree){
@@ -34,7 +34,7 @@ void LDForest::mergeTrees(double maxUnknownFraction){
 size_t LDForest::mergeTreeIteration(float unknownFraction){
     std::vector<LDTree> mergedTrees;
     
-    size_t allowedDifferences = unknownFraction * (log_->controls_ + log_->cases_);
+    ID_Snp allowedDifferences = unknownFraction * (log_->controls_ + log_->cases_);
     size_t beforeSize = ldtrees_.size();
 
     for(size_t i=0; i<size(); ++i)
@@ -128,6 +128,6 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
     }
     
     std::clog<<"finished"<<"\n";
-    std::clog<<"\tleaf tests: "<<topSnpList_.getLeafTests()<<"\n";
-    std::clog<<"\tinternal tests: "<<topSnpList_.getInternalTests()<<"\n";
+    std::clog<<"\tleaf tests: "<<topSnpList_.getTestCounter().leaf<<"\n";
+    std::clog<<"\tinternal tests: "<<topSnpList_.getTestCounter().internal<<"\n";
 }

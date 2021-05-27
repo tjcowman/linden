@@ -22,10 +22,10 @@
 
 //Used for determining the chi2 correseponding to a pvalue of 1*10^-i for single locus significance
 //Input as an integer denoting the -log10 signficance up to 6
-const static std::array<float, 7> chi2DegreesFreedomTable{0, 2.71, 6.63, 10.82, 15.14, 19.57, 24.87};
+const static std::array<float, 7> chi2DegreesFreedomTable{0.0f, 2.71f, 6.63f, 10.82f, 15.14f, 19.57f, 24.87f};
 
 // obtain a time-based seed:
-unsigned randSeed = std::chrono::system_clock::now().time_since_epoch().count();
+unsigned  randSeed = std::chrono::system_clock::now().time_since_epoch().count();
 
 void testData(Args& args){
     std::vector<Locus> loci;
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]){
         ARG(maxUnknown, stof)
         ARG(minMAF, stof)
         ARG(maxMS, stoi)
-    );
+    )
  
     
   

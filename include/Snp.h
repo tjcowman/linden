@@ -49,6 +49,9 @@ class Snp
 
         //Will consist of controls 0 , 1 , 2 then cases 0 , 1 , 2
         std::vector<PackedGenotype> allSamples_;
+        std::vector<__m256i> samples_;
+
+
 
         ID_Snp index_;
         static ID_Sample numCases_;
@@ -56,6 +59,10 @@ class Snp
         static ID_Sample CONR_;
         static ID_Sample CASR_;
         static ID_Sample CASS_;
+
+        //static ID_Sample COW_;
+       // static ID_Sample CAW_;
+       // static ID_Sample CAS_;
 };
 
 

@@ -7,6 +7,10 @@ ID_Sample Snp::CONR_; //Number of packed control samples
 ID_Sample Snp::CASR_; //Number of packed case samples
 ID_Sample Snp::CASS_; //Offest for the beginning of the case samples
 
+//ID_Sample Snp::COW_;
+//ID_Sample Snp::CAW_;
+//ID_Sample Snp::CAS_;
+
 /*Snp::Snp(){
     index_ = -1;
     numControls_ = 0;
@@ -18,6 +22,8 @@ Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cas
     packGenotypes(controls.rowBegin(index), controls.rowEnd(index), allSamples_);
     packGenotypes(cases.rowBegin(index), cases.rowEnd(index), allSamples_);
 
+
+
     index_ = index;
     numControls_ = controls.width;
     numCases_ = cases.width;
@@ -27,6 +33,11 @@ Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cas
     CASR_ = numCases_ / PACKED_SIZE + (numCases_ % PACKED_SIZE != 0);
     
     CASS_ = (3 * CONR_);//+ 1; 
+
+    //Determine number of vectorized elements
+    //COW_ = CONR_ / 4 + (CONR_ % 4 != 0);
+    //CAW_ = CASR_ / 4 + (CASR_ % 4 != 0);
+    //CAS_ = (3 * COW_);
 }
 
 /*Snp::Snp(const Snp & cpy){
@@ -48,9 +59,9 @@ ID_Snp Snp::getIndex()const{
 
 
 float Snp::computeMinorAlleleFrequency()const{
-    int homoMajor = popCount(allSamples_, 0, CONR_) + popCount(allSamples_, CASS_, CASR_) ;
-    int hetero = popCount(allSamples_, CONR_, CONR_) + popCount(allSamples_, CASS_+CASR_, CASR_); 
-    int homoMinor = popCount(allSamples_, 2*CONR_, CONR_) + popCount(allSamples_, CASS_+(2*CASR_), CASR_) ;
+    ID_Sample homoMajor = popCount(allSamples_, 0, CONR_) + popCount(allSamples_, CASS_, CASR_) ;
+    ID_Sample hetero = popCount(allSamples_, CONR_, CONR_) + popCount(allSamples_, CASS_+CASR_, CASR_);
+    ID_Sample homoMinor = popCount(allSamples_, 2*CONR_, CONR_) + popCount(allSamples_, CASS_+(2*CASR_), CASR_) ;
     
     return (2*homoMinor+hetero)/(float)(2*homoMajor + hetero + 2*homoMinor);
 }
@@ -116,8 +127,11 @@ float Snp::epistasisTest(const Snp& other)const {
     for (const auto& e : CTable::rowOrder) {
         const uint8_t rowI = 9 * e.first + e.second * 3;
 
-        t.data[rowI] = popCountAnd(allSamples_, other.allSamples_, e.first * CONR_, e.second * CONR_, CONR_) + 1;
+         t.data[rowI] = popCountAnd(allSamples_, other.allSamples_, e.first * CONR_, e.second * CONR_, CONR_) + 1;
         t.data[rowI + 1] = popCountAnd(allSamples_, other.allSamples_, e.first * CASR_ + CASS_, e.second * CASR_ + CASS_, CASR_) + 1;
+
+        //t.data[rowI] =   popCountAnd_Vec(samples_, other.samples_, e.first * COW_, e.second * COW_, COW_ )+ 1;
+       // t.data[rowI + 1] = popCountAnd_Vec(samples_, other.samples_, e.first * CAW_ + CAS_, e.second * CAW_ + CAS_, CAW_) + 1;
 
         //fill the row totals
         t.data[rowI + 2] = t.data[rowI] + t.data[rowI + 1];
@@ -125,6 +139,7 @@ float Snp::epistasisTest(const Snp& other)const {
         //accumulate the column totals
         t.data[27] += t.data[rowI];
         t.data[28] += t.data[rowI + 1];
+
     }
 
     float chi2 = 0.0;
@@ -170,13 +185,44 @@ void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<
     }
 
     //Push final sections if not full
+
     if (sectionCode != std::array<PackedGenotype, 3>{0, 0, 0}) {
         packedGenotypes[0].push_back(sectionCode[0]);
         packedGenotypes[1].push_back(sectionCode[1]);
         packedGenotypes[2].push_back(sectionCode[2]);
     }
 
+    
     dest.insert(dest.end(), packedGenotypes[0].begin(), packedGenotypes[0].end());
     dest.insert(dest.end(), packedGenotypes[1].begin(), packedGenotypes[1].end());
     dest.insert(dest.end(), packedGenotypes[2].begin(), packedGenotypes[2].end());
+
+
+    //pad for AVX
+    /*
+    while (packedGenotypes[0].size() % 4 != 0) {
+        packedGenotypes[0].push_back(0);
+        packedGenotypes[1].push_back(0);
+        packedGenotypes[2].push_back(0);
+    }
+    */
+    /*
+    for (size_t i = 0; i < packedGenotypes[0].size(); i+=4) {
+        samples_.push_back(_mm256_loadu_si256((__m256i*) & packedGenotypes[0][i]));
+    }
+    for (size_t i = 0; i < packedGenotypes[0].size(); i += 4) {
+        samples_.push_back(_mm256_loadu_si256((__m256i*) & packedGenotypes[1][i]));
+    }
+    for (size_t i = 0; i < packedGenotypes[0].size(); i += 4) {
+        samples_.push_back(_mm256_loadu_si256((__m256i*) & packedGenotypes[2][i]));
+    }
+    */
+    //------
+
+
+
+
+
+  
+    
 }

@@ -26,12 +26,12 @@ class LDTree
         
         const Snp & getRoot()const;
         
-        int computeDifferences(const LDTree & other)const;
+        ID_Sample computeDifferences(const LDTree & other)const;
         
         void clear();
         
         void epistasisTest(const LDTree & other, TopSnpList & topSnpList)const;
-        void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
+      //  void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
         
         friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
         

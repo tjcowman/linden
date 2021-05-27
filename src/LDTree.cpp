@@ -19,8 +19,9 @@ LDTree::LDTree(const LDTree & t1, const LDTree & t2)
     
     //Create new root node
     nodes_.push_back(Snp(t1.nodes_[0], t2.nodes_[0]));
-    genomeLocations_.push_back(Location(t1.genomeLocations_[0], t2.genomeLocations_[0]));
-    
+   // genomeLocations_.push_back(Location(t1.genomeLocations_[0], t2.genomeLocations_[0]));
+    genomeLocations_.push_back(Location());
+
     //Push back the sub trees
     
     for(int i=0; i<floor(log2(t1.size())+1); ++i)
@@ -54,7 +55,7 @@ const Snp & LDTree::getRoot()const
     return nodes_[0];
 }
 
-int LDTree::computeDifferences(const LDTree & other)const
+ID_Sample LDTree::computeDifferences(const LDTree & other)const
 {
     return nodes_[0].computeDifferences(other.nodes_[0]);
 }
@@ -137,11 +138,12 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
         //If score below cutoff
             //Do nothing
     }
-    topSnpList.incrementInternalTestsCounter(localInternalTestsDone);
-    topSnpList.incrementLeafTestsCounter(localLeaftTestsDone);
+   // topSnpList.incrementInternalTestsCounter(localInternalTestsDone);
+   // topSnpList.incrementLeafTestsCounter(localLeaftTestsDone);
+    topSnpList.incrementTestCounter(TestCounter{ localInternalTestsDone,  localLeaftTestsDone });
 }
 
-void LDTree::epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const
+/*void LDTree::epistasisTestNoTrees(const LDTree& other, TopSnpList& topSnpList)const
 {
    // cout<<"HERE"<<endl;
     size_t leafStart1 = nodes_.size()/2;
@@ -157,3 +159,4 @@ void LDTree::epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)
     }
     topSnpList.incrementLeafTestsCounter(2);
 }
+*/

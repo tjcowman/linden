@@ -28,7 +28,7 @@ struct Args{
     int maxThreads=1;
     double maxUnknown=.1;
     double minMAF=0.0;
-    int maxMS=1;
+    size_t maxMS=1;
      
     void printSummaryRelevant(std::ofstream & ofs)
     {
@@ -53,11 +53,11 @@ struct Location {
     }
 
     //TODO: change to explicit value representing invalid, ex: numeric_limits<>::max()
-    Location(const Location& l1, const Location& l2)
+    Location()
     {
-        chromosome_ = -1;
-        basePair_ = -1;
-    }
+        chromosome_ = static_cast<uint32_t>(-1);
+        basePair_ = static_cast<uint32_t>(-1);
+      }
 
     friend std::ostream& operator<<(std::ostream& os, const Location& e) {
         os << e.chromosome_ << "\t" << e.basePair_;

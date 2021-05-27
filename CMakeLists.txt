@@ -20,8 +20,11 @@ set_property(TARGET linden PROPERTY CXX_STANDARD 20)
 #set_property(TARGET linden PROPERTY Wa)
 
 #if(NOT MSCV)
-   target_compile_options( linden PUBLIC -Werror -Wpedantic  )
+   target_compile_options( linden PUBLIC -Wall -Wno-c++98-compat-pedantic  -Wno-newline-eof)
 #endif()
+
+#SET_TARGET_PROPERTIES(linden PROPERTIES COMPILE_FLAGS " -march=native" )
+
 
 #set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

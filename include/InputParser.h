@@ -28,7 +28,7 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
 
     
     // Get current position
-    size_t len = ifs.tellg();
+    auto len = ifs.tellg();
     std::getline(ifs, lineBuffer);
     std::string delimiter = lineBuffer.find("\t") != std::string::npos ? "\t": " " ;
     // Return to position before "Read line".
@@ -86,7 +86,7 @@ GenotypeMatrix parseGenotypes(std::ifstream ifs) {
         }
 
         for (const auto& e : lineBuffer) {
-            ID_Genotype val = e - '0';
+            ID_Genotype val = static_cast<ID_Genotype>(e - '0');
             if (val <= 2) {
                 ret.data.push_back(val);
             }else{
