@@ -10,8 +10,9 @@ TopSnpList::TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff)
     testCounter_ = { 0,0 };
     
     pairwiseSignificanceCounts_.fill(0);
-    pairwiseSignificanceCountsPrefixSum_.fill(0);
-    prefixSumTimer_ = 0;
+  
+   // prefixSumTimer_ = 0;
+    insertSincePrefix_ = 0;
 }
 
 bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
@@ -20,34 +21,51 @@ bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
 
     #pragma omp critical
     {
-        if( prefixSumTimer_ >= PREFIX_SUM_ROLLOVER ){
-            pairwiseSignificanceCountsPrefixSum_ = pairwiseSignificanceCounts_;
-            for(int i=MAX_CUTOFF; i>getCutoff(); --i)
-            {
-                pairwiseSignificanceCountsPrefixSum_[i-1] = pairwiseSignificanceCountsPrefixSum_[i-1]+pairwiseSignificanceCounts_[i];
+        if(insertSincePrefix_ == topK_){
+       // if( prefixSumTimer_ >= PREFIX_SUM_ROLLOVER ){
+            ID_Snp reverseSum = 0;
+            //Performs a prefix sum from higher to lower because want number of pairs higher than index, not the number index higher than
+            for(int i=MAX_CUTOFF; i>getCutoff(); --i){
+                reverseSum += pairwiseSignificanceCounts_[i];
+                if (reverseSum > topK_) {
+                    cutoff_ = i;
+                    std::cerr << cutoff_ << std::endl;
+                    break;
+                }
+
+                //pairwiseSignificanceCountsPrefixSum_[i-1] = pairwiseSignificanceCountsPrefixSum_[i-1]+pairwiseSignificanceCounts_[i];
+               // if (pairwiseSignificanceCountsPrefixSum_[i - 1] >= topK_)
+               //     cutoff_ = i - 1;
             }
-            
-            prefixSumTimer_ = 0;
+     
+          //  prefixSumTimer_ = 0;
+            insertSincePrefix_ = 0;
         }
         
-        if(score > getCutoff()) {
+        //If the new score is already < the cutoff we dont care about counting it or updating currentPartners_
+        if (score > getCutoff()) {
+            ++insertSincePrefix_;
+
             int index = std::min((int)score, MAX_CUTOFF);
-            pairwiseSignificanceCounts_[index]++;
-            
-            if(pairwiseSignificanceCounts_[index] >= topK_ || pairwiseSignificanceCountsPrefixSum_[index] >= topK_)
+            ++pairwiseSignificanceCounts_[index];
+
+            if (pairwiseSignificanceCounts_[index] >= topK_ )//|| pairwiseSignificanceCountsPrefixSum_[index] >= topK_)
                 cutoff_ = index;
-        } 
-        
-        if(score > currentPartners_[snpIndex1].second){
-            currentPartners_[snpIndex1] = {snpIndex2, score};
-            retVal = true;
+
+
+            //Check if the new pair score is greater than the current best pairs for each constituent SNP
+            if (score > currentPartners_[snpIndex1].second) {
+                currentPartners_[snpIndex1] = { snpIndex2, score };
+                retVal = true;
+            }
+
+
+            if (score > currentPartners_[snpIndex2].second) {
+                currentPartners_[snpIndex2] = { snpIndex1, score };
+                retVal = true;
+            }
         }
-        
-        if(score > currentPartners_[snpIndex2].second) {
-            currentPartners_[snpIndex2] = { snpIndex1, score };
-            retVal = true;
-        }
-        prefixSumTimer_++;
+        ++prefixSumTimer_;
     }
 
     return retVal;
@@ -70,6 +88,7 @@ const TestCounter& TopSnpList::getTestCounter()const{
 }
 
 void TopSnpList::calculateFormattedResults(){
+    //Iterate over the currently found top partners and push the cutoff pasing ones
     for(size_t i=0; i< currentPartners_.size(); ++i)
         if(currentPartners_[i].second >= getCutoff()-1 && currentPartners_[i].second >0)
             cutoffPairs_.push_back(  TopPairing(i, currentPartners_[i].first, currentPartners_[i].second )       );

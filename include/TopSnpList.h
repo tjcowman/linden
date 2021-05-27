@@ -14,8 +14,8 @@
 #include <algorithm>
 #include <array>
 
-#define MAX_CUTOFF 100
-#define PREFIX_SUM_ROLLOVER 1000
+static const int MAX_CUTOFF = 100;//The maximum chi2 value to differentiate between
+//static const int PREFIX_SUM_ROLLOVER = 1000;
 
 #include "Types.h"
 
@@ -55,7 +55,9 @@ struct TestCounter {
 
 class TopSnpList{
     public:
-        //IMPORTANT: Currently needs numberSnps to be set to the size of the possible SNPIndexes (BEFORE ANY FILTERING)
+        /**
+        * IMPORTANT : Currently needs numberSnps to be set to the size of the possible SNPIndexes(BEFORE ANY FILTERING)
+        */
         TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff);
            
         bool attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score);
@@ -88,10 +90,18 @@ class TopSnpList{
         float cutoff_;
         int topK_;
 
+        /**
+        * Holds the count of detected pairs with <index> significance
+        */
         std::array<int, MAX_CUTOFF+1> pairwiseSignificanceCounts_;
-        std::array<int, MAX_CUTOFF+1> pairwiseSignificanceCountsPrefixSum_;
-        int prefixSumTimer_;
+
+        /**
+        * Simple incrementing variable to control computation of the prefix sum for the significance counts
+        */
+        //int prefixSumTimer_;
     
+        ID_Snp  insertSincePrefix_;
+
         //Formatted results
         std::vector<TopPairing> reciprocalPairs_;
         std::vector<TopPairing> cutoffPairs_;

@@ -92,13 +92,13 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
     
     std::ofstream ofs;
     
+    //If no output file was provided
     if(args.output != ""){
         ofs.open(args.output + ".reciprocalPairs", std::ofstream::out); 
         auto rp = topSnpList_.getReciprocalPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
-        for(const auto& e : rp)
-        {
+        for(const auto& e : rp){
             ofs << e.score_ << "\t" << infoMatrix[e.indexes_.first] <<"\t"<< infoMatrix[e.indexes_.second]<<"\n";
         }
         ofs.close();
@@ -107,13 +107,12 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
         rp = topSnpList_.getCutoffPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
-        for(const auto& e : rp)
-        {
+        for(const auto& e : rp){
             ofs << e.score_ << "\t" << infoMatrix[e.indexes_.first] << "\t"<< infoMatrix[e.indexes_.second] << "\n";
         }
         ofs.close();
     }
-    else{
+    else{ //print to standard out
         auto rp = topSnpList_.getReciprocalPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         for(const auto& e : rp){
