@@ -25,7 +25,7 @@ class LDForest{
     public:
         LDForest(Log* log, ID_Snp numSnps);
         
-        void insert(const LDTree& ldtree);
+        void insert( LDTree&& ldtree);
         
         size_t size()const;
         
@@ -41,5 +41,6 @@ class LDForest{
 
         //Non-owning pointer to a log struct for storing statistics about the current run
         Log* log_;        
+
 };
 #endif //LDFOREST_H

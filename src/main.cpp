@@ -94,6 +94,10 @@ void testData(Args& args){
     log.cases_ = cases.width;
     log.controls_ = controls.width;
 
+    //Set the Snp static size values
+    Snp::setDimensions(controls.width, cases.width);
+   
+
     //perform filtering logic on the input snps based on single locus measures
     auto it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.computeMinorAlleleFrequency() < args.minMAF; });
     log.mafRemoved_ = std::distance(it, snps.end());

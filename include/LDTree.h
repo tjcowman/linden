@@ -13,9 +13,11 @@
 
 #include <iostream>
 #include <vector>
+class LDForest;
 
 class LDTree
 {
+    friend LDForest;
     public:
         LDTree(const Snp& snp, const Location& location);
         LDTree(const LDTree & cpy); 
@@ -27,16 +29,19 @@ class LDTree
         const Snp & getRoot()const;
         
         ID_Sample computeDifferences(const LDTree & other)const;
+        bool validMerge(const LDTree& other, ID_Sample maxDiff)const;
         
         void clear();
         
-        void epistasisTest(const LDTree & other, TopSnpList & topSnpList)const;
+        void epistasisTest(const LDTree & other)const; //, TopSnpList & topSnpList)const;
       //  void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
         
         friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
         
     private:
         
+        TopSnpList* topSnpList_;
+
         std::vector<Snp> nodes_;
         std::vector<Location> genomeLocations_;
 };

@@ -16,6 +16,7 @@
 #include <cmath>
 #include "CommonStructs.h"
 #include "Bitwise.h"
+
 #include "CTable.h"
 
 
@@ -23,9 +24,7 @@
 class Snp
 {
     public:
-       // Snp();
         Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases);
-       // Snp(const Snp & cpy);
         Snp(const Snp & s1, const Snp & s2); 
         
         //Getters
@@ -39,26 +38,26 @@ class Snp
         float computeUnknownRatio()const;
         
         //Epistasis testing
+        static void fillTable(CTable2& t, const Snp& snp1, const Snp& snp2);
+
         float marginalTest()const;
-        float epistasisTest(const Snp & other)const;
+        //float epistasisTest(const Snp & other)const;
         
-        friend std::ostream& operator<< (std::ostream &out, const Snp & snp);
+        //friend std::ostream& operator<< (std::ostream &out, const Snp & snp);
+
+        void to_serial(std::ostream& os)const;
+        void from_serial(std::istream& is);
         
+        
+        static void setDimensions(ID_Sample controls, ID_Sample cases);
     private:
         void packGenotypes( std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest);
 
         //Will consist of controls 0 , 1 , 2 then cases 0 , 1 , 2
         std::vector<PackedGenotype> allSamples_;
-        std::vector<__m256i> samples_;
-
-
-
+       // std::vector<__m256i> samples_;
         ID_Snp index_;
-        static ID_Sample numCases_;
-        static ID_Sample numControls_;
-        static ID_Sample CONR_;
-        static ID_Sample CASR_;
-        static ID_Sample CASS_;
+        static SnpDimensions dim;
 
         //static ID_Sample COW_;
        // static ID_Sample CAW_;

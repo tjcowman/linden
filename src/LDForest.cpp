@@ -5,8 +5,10 @@ LDForest::LDForest(Log* log, ID_Snp numSnps) :
     topSnpList_(TopSnpList(numSnps, numSnps, 0)) {
 }
 
-void LDForest::insert(const LDTree& ldTree){
+void LDForest::insert(LDTree&& ldTree){
+    ldTree.topSnpList_ = &topSnpList_;
     ldtrees_.push_back(ldTree);
+    
 }
 
 size_t LDForest::size()const{
@@ -37,24 +39,21 @@ size_t LDForest::mergeTreeIteration(float unknownFraction){
     ID_Snp allowedDifferences = unknownFraction * (log_->controls_ + log_->cases_);
     size_t beforeSize = ldtrees_.size();
 
-    for(size_t i=0; i<size(); ++i)
-    {
+    for(size_t i=0; i<size(); ++i){
       
-        if (!ldtrees_[i].empty()) {
+        if (!ldtrees_[i].empty()) { //The ldTree may have been merged from a previous iteration of the i loop
             for (size_t j = i + 1; j < std::min(i + 10, size()); ++j){
-                if ((!ldtrees_[j].empty()) && (ldtrees_[i].size() == ldtrees_[j].size())){
-                    if (ldtrees_[i].computeDifferences(ldtrees_[j]) < allowedDifferences) {
-                        LDTree potentialMerge(ldtrees_[i], ldtrees_[j]); {
-                            mergedTrees.push_back(potentialMerge);
-                            ldtrees_[i].clear();
-                            ldtrees_[j].clear();
-                            break;
-                        }
-                    }
+                if(ldtrees_[i].validMerge(ldtrees_[j], allowedDifferences)){
+                    LDTree potentialMerge(ldtrees_[i], ldtrees_[j]); 
+                    mergedTrees.push_back(potentialMerge);
+                    ldtrees_[i].clear();
+                    ldtrees_[j].clear();
+                    break; //If a pair was merged, the i tree is no longer valid for merging
                 }
             }
         }
-            
+        
+        //If no tree was merged in the j loop with this iteration of i 
         if(!ldtrees_[i].empty())
             mergedTrees.push_back(ldtrees_[i]);
     }
@@ -72,8 +71,9 @@ void LDForest::testTrees(int maxThreadUsage){
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
     for(size_t i=0; i<size(); ++i){
 
+        CTable2 cTable;
         for (size_t j = i + 1; j < size(); ++j) {
-            ldtrees_[i].epistasisTest(ldtrees_[j], topSnpList_);
+            ldtrees_[i].epistasisTest(ldtrees_[j]);//, topSnpList_);
         }
 
         if(i % 100 == 0){   
@@ -95,7 +95,7 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
     //If no output file was provided
     if(args.output != ""){
         ofs.open(args.output + ".reciprocalPairs", std::ofstream::out); 
-        auto rp = topSnpList_.getReciprocalPairs();
+        auto rp = topSnpList_.getPairs().reciprocal;// getReciprocalPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
         for(const auto& e : rp){
@@ -104,7 +104,7 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
         ofs.close();
         
         ofs.open(args.output + ".cutoffPairs", std::ofstream::out);
-        rp = topSnpList_.getCutoffPairs();
+        rp = topSnpList_.getPairs().cutoff;
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
         for(const auto& e : rp){
@@ -113,13 +113,13 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
         ofs.close();
     }
     else{ //print to standard out
-        auto rp = topSnpList_.getReciprocalPairs();
+        auto rp = topSnpList_.getPairs().reciprocal;
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         for(const auto& e : rp){
             std::cout << e.score_ << "\t" << infoMatrix[e.indexes_.first] << "\t" << infoMatrix[e.indexes_.second] << "\trecip\n";
         }
         
-        rp = topSnpList_.getCutoffPairs();
+        rp = topSnpList_.getPairs().cutoff;
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         for(const auto& e : rp) {
             std::cout << e.score_ << "\t" << infoMatrix[e.indexes_.first] << "\t" << infoMatrix[e.indexes_.second] << "\tcutoff\n";

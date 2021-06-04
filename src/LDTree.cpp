@@ -1,72 +1,66 @@
 #include "LDTree.h" 
 
-LDTree::LDTree(const Snp& snp, const Location& location)
-{
+LDTree::LDTree(const Snp& snp, const Location& location){
     nodes_.push_back(snp);
     genomeLocations_.push_back(location);
+    topSnpList_ = nullptr;//topSnpList;
 }
 
-LDTree::LDTree(const LDTree& cpy)
-{
+LDTree::LDTree(const LDTree& cpy){
     nodes_ = cpy.nodes_;
     genomeLocations_ = cpy.genomeLocations_;
+    topSnpList_ = cpy.topSnpList_;
 }
 
-LDTree::LDTree(const LDTree & t1, const LDTree & t2)
-{
+LDTree::LDTree(const LDTree & t1, const LDTree & t2){
     nodes_.reserve(1 + t1.size() + t2.size());
     genomeLocations_.reserve(1 + t1.size() + t2.size());
+    topSnpList_ = t1.topSnpList_;
     
     //Create new root node
     nodes_.push_back(Snp(t1.nodes_[0], t2.nodes_[0]));
-   // genomeLocations_.push_back(Location(t1.genomeLocations_[0], t2.genomeLocations_[0]));
     genomeLocations_.push_back(Location());
 
     //Push back the sub trees
-    
-    for(int i=0; i<floor(log2(t1.size())+1); ++i)
-    {
-        for(int j=(1<<(i))-1; j< (1<<(i+1))-1; ++j)
-        {
-           // cout<<j<<endl;
+    for(int i=0; i<floor(log2(t1.size())+1); ++i){
+        for(int j=(1<<(i))-1; j< (1<<(i+1))-1; ++j){
             nodes_.push_back(t1.nodes_[j]);
             genomeLocations_.push_back(t1.genomeLocations_[j]);
         }
-        for(int j=(1<<(i))-1; j< (1<<(i+1))-1; ++j)
-        {
+        for(int j=(1<<(i))-1; j< (1<<(i+1))-1; ++j){
             nodes_.push_back(t2.nodes_[j]);
             genomeLocations_.push_back(t2.genomeLocations_[j]);
         }
     }
 }
 
-bool LDTree::empty()const
-{
+bool LDTree::empty()const{
     return nodes_.empty();
 }
 
-size_t LDTree::size()const
-{
+size_t LDTree::size()const{
     return nodes_.size();
 }
 
-const Snp & LDTree::getRoot()const
-{
+const Snp & LDTree::getRoot()const{
     return nodes_[0];
 }
 
-ID_Sample LDTree::computeDifferences(const LDTree & other)const
-{
+ID_Sample LDTree::computeDifferences(const LDTree & other)const{
     return nodes_[0].computeDifferences(other.nodes_[0]);
 }
 
-void LDTree::clear()
-{
+bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff)const{
+    //if ((!ldtrees_[j].empty()) && (ldtrees_[i].size() == ldtrees_[j].size())) { //check on equivalent tree sizes
+      //  if (ldtrees_[i].computeDifferences(ldtrees_[j]) < allowedDifferences) { //check on tree overlap
+    return (!empty() && size() == other.size()) && computeDifferences(other) < maxDiff;
+}
+
+void LDTree::clear(){
     nodes_.clear();
 }
 
-void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
-{
+void LDTree::epistasisTest(const LDTree & other)const{
     //Vector to use as a stack for tests
     std::vector<std::pair<size_t, size_t> > s;
     
@@ -76,15 +70,19 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
     uint64_t  localInternalTestsDone = 0;
     uint64_t  localLeaftTestsDone = 0;
     
+    CTable2 cTable;
+
     s.push_back(std::make_pair(0,0));
     while(!s.empty())
     {
-        float cutOff=topSnpList.getCutoff();
+        float cutOff=topSnpList_->getCutoff();
 
         std::pair<size_t, size_t> c = s.back();
         s.pop_back();
       
-        float score = nodes_[c.first].epistasisTest(other.nodes_[c.second]);
+       // float score = nodes_[c.first].epistasisTest(other.nodes_[c.second]);
+        Snp::fillTable(cTable, nodes_[c.first], other.nodes_[c.second]);
+        float score = cTable.chi2();
 
         size_t l1= (c.first<<1) +1;
         size_t r1= (c.first<<1) +2;
@@ -102,7 +100,6 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
                 s.push_back(std::make_pair(r1, r2));
             }
             localInternalTestsDone += 2;
-           // ++other.internalTestsDone_;
         }
         else if(c.first<leafStart1)
         {
@@ -130,7 +127,7 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
             //check to make sure not estimated as being in LD
             if(!genomeLocations_[c.first].inLinkageDisequilibrium(other.genomeLocations_[c.second]) )
             {
-                topSnpList.attemptInsert(nodes_[c.first].getIndex(), other.nodes_[c.second].getIndex(), score);
+                topSnpList_->attemptInsert(nodes_[c.first].getIndex(), other.nodes_[c.second].getIndex(), score);
                 localLeaftTestsDone += 2;
             }
                 
@@ -138,9 +135,7 @@ void LDTree::epistasisTest(const LDTree & other, TopSnpList & topSnpList)const
         //If score below cutoff
             //Do nothing
     }
-   // topSnpList.incrementInternalTestsCounter(localInternalTestsDone);
-   // topSnpList.incrementLeafTestsCounter(localLeaftTestsDone);
-    topSnpList.incrementTestCounter(TestCounter{ localInternalTestsDone,  localLeaftTestsDone });
+    topSnpList_->incrementTestCounter(TestCounter{ localInternalTestsDone,  localLeaftTestsDone });
 }
 
 /*void LDTree::epistasisTestNoTrees(const LDTree& other, TopSnpList& topSnpList)const

@@ -59,6 +59,19 @@ static ID_Snp popCountAnd(const std::vector<PackedGenotype>& v1, const std::vect
     return static_cast<ID_Snp>(retVal);
 }
 
+static ID_Snp popCountAnd_it(std::vector<PackedGenotype>::const_iterator v1, std::vector<PackedGenotype>::const_iterator v2, ID_Snp distance) {
+    PackedGenotype retVal = 0;
+
+    for (size_t i = 0; i < distance; ++i) {
+        if ((*v1 | *v2) != 0) {
+            retVal += static_cast<PackedGenotype>(POPCOUNT_FUNCTION(*v1 & *v2));
+        }
+        ++v1;
+        ++v2;
+    }
+    return static_cast<ID_Snp>(retVal);
+}
+
 
 //SIMD TEST
 /*

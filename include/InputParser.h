@@ -20,12 +20,10 @@ std::ifstream openFileChecked(std::string filepath){
 //TODO: Improve input validation ex: char at end of numeric values
 std::vector<Locus> parseLoci(std::ifstream ifs){
     std::vector<Locus> ret;
-
     std::map<std::string, uint32_t> chromosomeEncoder;
    
     //determine delimiter between tab and space by peeking the first line
     std::string lineBuffer;
-
     
     // Get current position
     auto len = ifs.tellg();
@@ -34,7 +32,6 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
     // Return to position before "Read line".
     ifs.seekg(len, std::ios_base::beg);
     
-  
 
     while (std::getline(ifs, lineBuffer)) {
    
@@ -63,7 +60,6 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
             exit(1);
         }
 
-        //ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1]-delims[0]), chromosome, location });
         ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1] - delims[0]), Location(chromosome, location) });
     }
     ifs.close();

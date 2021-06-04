@@ -11,7 +11,7 @@ add_executable(linden src/main.cpp
     src/LDTree.cpp 
     src/Snp.cpp 
     src/TopSnpList.cpp 
-    src/InputParser.cpp "include/Bitwise.h" "include/Types.h" "include/CTable.h")  
+    src/InputParser.cpp "include/Bitwise.h" "include/Types.h" "include/CTable.h" "include/Serialize.h")  
 
 #target_compile_options(linden PRIVATE -We)
 
