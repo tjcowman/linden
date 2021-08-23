@@ -6,11 +6,13 @@ LDTree::LDTree(const Snp& snp, const Location& location){
     topSnpList_ = nullptr;//topSnpList;
 }
 
+/*
 LDTree::LDTree(const LDTree& cpy){
     nodes_ = cpy.nodes_;
     genomeLocations_ = cpy.genomeLocations_;
     topSnpList_ = cpy.topSnpList_;
 }
+*/
 
 LDTree::LDTree(const LDTree & t1, const LDTree & t2){
     nodes_.reserve(1 + t1.size() + t2.size());
@@ -50,9 +52,8 @@ ID_Sample LDTree::computeDifferences(const LDTree & other)const{
     return nodes_[0].computeDifferences(other.nodes_[0]);
 }
 
+//check on equivalent tree sizes and check on tree overlap
 bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff)const{
-    //if ((!ldtrees_[j].empty()) && (ldtrees_[i].size() == ldtrees_[j].size())) { //check on equivalent tree sizes
-      //  if (ldtrees_[i].computeDifferences(ldtrees_[j]) < allowedDifferences) { //check on tree overlap
     return (!empty() && size() == other.size()) && computeDifferences(other) < maxDiff;
 }
 

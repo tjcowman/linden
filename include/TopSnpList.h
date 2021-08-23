@@ -23,8 +23,8 @@ static const int MAX_CUTOFF = 100;//The maximum chi2 value to differentiate betw
 //Used in the analysis and output of top pairs, not in discovery and cutoff updating
 struct TopPairing{
     TopPairing(ID_Snp snpIndex1, ID_Snp snpIndex2, float score) : indexes_({snpIndex1,snpIndex2}), score_(score) {
-        score_ = score;
-        indexes_ = { snpIndex1, snpIndex2 };
+     //   score_ = score;
+      // indexes_ = { snpIndex1, snpIndex2 };
     }
 
     /**

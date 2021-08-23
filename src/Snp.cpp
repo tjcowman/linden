@@ -66,12 +66,6 @@ void Snp::fillTable(CTable2& t, const Snp& snp1, const Snp& snp2){
     for (const auto& e : CTable::rowOrder) {
         const uint8_t rowI = 9 * e.first + e.second * 3;
 
-        //t.data[rowI] = popCountAnd(allSamples_, other.allSamples_, e.first * CONR_, e.second * CONR_, CONR_) + 1;
-        //t.data[rowI + 1] = popCountAnd(allSamples_, other.allSamples_, e.first * CASR_ + CASS_, e.second * CASR_ + CASS_, CASR_) + 1;
-
-       // t.data[rowI] = popCountAnd_it(snp1.allSamples_.begin() + (e.first * CONR_), snp2.allSamples_.begin() + (e.second * CONR_), CONR_) + 1;
-       // t.data[rowI + 1] = popCountAnd_it(snp1.allSamples_.begin() + (e.first * CASR_ + CASS_), snp2.allSamples_.begin() + (e.second * CASR_ + CASS_), CASR_) + 1;
-
         t.data[rowI] = popCountAnd_it(snp1.allSamples_.begin() + (e.first * dim.CONR_), snp2.allSamples_.begin() + (e.second * dim.CONR_), dim.CONR_) + 1;
         t.data[rowI + 1] = popCountAnd_it(snp1.allSamples_.begin() + (e.first * dim.CASR_ + dim.CASS_), snp2.allSamples_.begin() + (e.second * dim.CASR_ + dim.CASS_), dim.CASR_) + 1;
 
@@ -200,4 +194,10 @@ void Snp::setDimensions(ID_Sample controls, ID_Sample cases) {
        cases / PACKED_SIZE + (cases % PACKED_SIZE != 0),
        3 * (controls / PACKED_SIZE + (controls % PACKED_SIZE != 0))
     };
+}
+
+
+void Snp::to_serial(std::ostream& os, const Snp& snp) {
+    os.write(reinterpret_cast<const char*>(&snp.index_),sizeof(ID_Snp));
+    os.write(reinterpret_cast<const char*>(&snp.allSamples_), snp.allSamples_.size()*sizeof(PackedGenotype));
 }

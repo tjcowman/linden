@@ -45,8 +45,8 @@ class Snp
         
         //friend std::ostream& operator<< (std::ostream &out, const Snp & snp);
 
-        void to_serial(std::ostream& os)const;
-        void from_serial(std::istream& is);
+        static void to_serial(std::ostream& os, const Snp& snp);
+        static void from_serial(std::istream& is, Snp& snp);
         
         
         static void setDimensions(ID_Sample controls, ID_Sample cases);

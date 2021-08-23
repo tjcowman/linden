@@ -39,7 +39,7 @@ struct CTable2 {
                 ID_Sample c3 = data[27] + data[28];
                 ID_Sample c4 = data[row * 3 + col];
 
-                float expected = (c1 * c2) / (float)c3;
+                float expected = (float)(c1 * c2) / (float)c3;
                 chi2 += (pow(c4 - expected, 2) / expected);
             }
         }

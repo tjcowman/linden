@@ -11,7 +11,7 @@
 
 #include "CommonStructs.h"
 #include "Snp.h"
-#include "LDTree.h"
+#include "LDTree2.h"
 #include "TopSnpList.h"
 
 #include <limits.h>

@@ -110,14 +110,17 @@ void testData(Args& args){
     //Initialize the ldforest, note that currently the loci size needs to refer to the range of possible indexes not how many post filterd SNPs there are
     //This is due to the implementation of TopSnpList
     LDForest ldforest(&log, loci.size());
-  
-
     for (ID_Snp i = 0; i < snps.size(); ++i) {
         ldforest.insert(LDTree(snps[i], loci[i].location));
     }
 
     log.passingSnps_ = ldforest.size();
     
+    //tmp
+   // std::ofstream OF("tst.cache.txt");
+   // Snp::to_serial(OF, snps[1]);
+   // OF.close();
+
 
     std::clog<<"filtering SNPs"<<"\n";
     std::clog<<"\tinitial: "<< log.snps_<<"\n";

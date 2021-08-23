@@ -20,7 +20,7 @@ class LDTree
     friend LDForest;
     public:
         LDTree(const Snp& snp, const Location& location);
-        LDTree(const LDTree & cpy); 
+       // LDTree(const LDTree & cpy); 
         LDTree(const LDTree & t1, const LDTree & t2);
     
         bool empty()const;
@@ -36,7 +36,7 @@ class LDTree
         void epistasisTest(const LDTree & other)const; //, TopSnpList & topSnpList)const;
       //  void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
         
-        friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
+        //friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
         
     private:
         
@@ -44,5 +44,4 @@ class LDTree
 
         std::vector<Snp> nodes_;
         std::vector<Location> genomeLocations_;
-};
 #endif //LDTREE_H

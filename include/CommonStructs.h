@@ -46,7 +46,7 @@ struct SnpDimensions {
     ID_Sample CASR_;
     ID_Sample CASS_;
 };
-//static SnpDimensions snpDimensions;
+
 
 static const uint32_t ESTIMATED_LD_RANGE = 1000000;
 struct Location {
