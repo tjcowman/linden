@@ -11,9 +11,15 @@
 
 #include "CommonStructs.h"
 #include "Snp.h"
-#include "LDTree2.h"
-#include "TopSnpList.h"
 
+//Include the original Tree version for testing
+#ifdef oldTree
+#include "LDTree.h"
+#else
+#include "LDTree2.h"
+#endif
+
+#include "TopSnpList.h"
 #include <limits.h>
 #include <vector>
 #include <fstream>
@@ -36,11 +42,13 @@ class LDForest{
     private:
         size_t mergeTreeIteration(float unknownFraction);
         
+        //Non-owning pointer to a log struct for storing statistics about the current run
+        Log* log_;
+
         std::vector<LDTree> ldtrees_;
         TopSnpList topSnpList_;
 
-        //Non-owning pointer to a log struct for storing statistics about the current run
-        Log* log_;        
+           
 
 };
 #endif //LDFOREST_H

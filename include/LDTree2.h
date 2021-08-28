@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 
 class LDForest;
@@ -29,9 +30,12 @@ public:
     bool empty()const;
     size_t size()const;
 
+    const Snp& getSnp(ID_Snp i)const;
     const Snp& getRoot()const;
-    const Snp& getLeft(ID_Snp id)const;
-    const Snp& getRight(ID_Snp id)const;
+
+    std::vector<ID_Snp> getChildren(ID_Snp i)const;
+    bool isLeaf(ID_Snp i)const;
+
 
     ID_Sample computeDifferences(const LDTree& other)const;
     bool validMerge(const LDTree& other, ID_Sample maxDiff)const;
@@ -47,7 +51,7 @@ private:
     ID_Snp root_; //Root node as the graph is being utilized as a directed tree
     Graph<Snp, ID_Snp> snps_;
     std::vector<Location> locations_; //Stores the genomic location of snps in this tree  //TODO: reimplement this 
-
+   // std::map<ID_Snp, Location> locations_;
 
     TopSnpList* topSnpList_;
 

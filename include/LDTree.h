@@ -18,30 +18,34 @@ class LDForest;
 class LDTree
 {
     friend LDForest;
-    public:
-        LDTree(const Snp& snp, const Location& location);
-       // LDTree(const LDTree & cpy); 
-        LDTree(const LDTree & t1, const LDTree & t2);
-    
-        bool empty()const;
-        size_t size()const;
-        
-        const Snp & getRoot()const;
-        
-        ID_Sample computeDifferences(const LDTree & other)const;
-        bool validMerge(const LDTree& other, ID_Sample maxDiff)const;
-        
-        void clear();
-        
-        void epistasisTest(const LDTree & other)const; //, TopSnpList & topSnpList)const;
-      //  void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
-        
-        //friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
-        
-    private:
-        
-        TopSnpList* topSnpList_;
+public:
+    LDTree(const Snp& snp, const Location& location);
+    LDTree();
 
-        std::vector<Snp> nodes_;
-        std::vector<Location> genomeLocations_;
+    // LDTree(const LDTree & cpy); 
+    LDTree( LDTree& t1,  LDTree& t2);
+
+    bool empty()const;
+    size_t size()const;
+
+    const Snp& getRoot()const;
+
+    ID_Sample computeDifferences(const LDTree& other)const;
+    bool validMerge(const LDTree& other, ID_Sample maxDiff)const;
+
+    void clear();
+
+    void epistasisTest(const LDTree& other)const;
+    //  void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
+
+      //friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
+
+private:
+
+    TopSnpList* topSnpList_;
+
+    std::vector<Snp> nodes_;
+    std::vector<Location> genomeLocations_;
+};
+
 #endif //LDTREE_H

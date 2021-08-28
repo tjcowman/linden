@@ -43,7 +43,9 @@ void testData(Args& args){
         #pragma omp section
         controls = parseGenotypes(openFileChecked(args.controls));
     }
-    
+    std::clog << "files read" << "\n";
+
+
     //Call snp constructors to create bitwise snp representations
     std::vector<Snp> snps;
     if (args.permuteSamples != 1) {
@@ -98,23 +100,34 @@ void testData(Args& args){
     Snp::setDimensions(controls.width, cases.width);
    
 
+
     //perform filtering logic on the input snps based on single locus measures
+    std::clog << "filtering SNPs" << "\n";
+    std::clog << "\tinitial: " << log.snps_ << "\n";
+
     auto it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.computeMinorAlleleFrequency() < args.minMAF; });
     log.mafRemoved_ = std::distance(it, snps.end());
     snps.erase(it, snps.end());
+    std::clog << "\tremoved marginal significance: " << log.marginalSignificanceRemoved_ << "\n";
+
 
     it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.marginalTest() > chi2DegreesFreedomTable[args.maxMS]; });
     log.marginalSignificanceRemoved_ = std::distance(it, snps.end());
     snps.erase(it, snps.end());
+    std::clog << "\tremoved minor allele frequency: " << log.mafRemoved_ << "\n";
+
+
 
     //Initialize the ldforest, note that currently the loci size needs to refer to the range of possible indexes not how many post filterd SNPs there are
     //This is due to the implementation of TopSnpList
     LDForest ldforest(&log, loci.size());
+
     for (ID_Snp i = 0; i < snps.size(); ++i) {
         ldforest.insert(LDTree(snps[i], loci[i].location));
     }
 
     log.passingSnps_ = ldforest.size();
+    std::clog << "\tremaining: " << ldforest.size() << "\n";
     
     //tmp
    // std::ofstream OF("tst.cache.txt");
@@ -122,11 +135,9 @@ void testData(Args& args){
    // OF.close();
 
 
-    std::clog<<"filtering SNPs"<<"\n";
-    std::clog<<"\tinitial: "<< log.snps_<<"\n";
-    std::clog<<"\tremoved marginal significance: "<< log.marginalSignificanceRemoved_<<"\n";
-    std::clog<<"\tremoved minor allele frequency: "<< log.mafRemoved_<<"\n";
-    std::clog<<"\tremaining: "<<ldforest.size()<<"\n";
+
+
+
     
     
     

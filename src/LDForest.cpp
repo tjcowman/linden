@@ -21,6 +21,7 @@ void LDForest::mergeTrees(double maxUnknownFraction){
     double unknownFraction = 0.0;
     size_t change;
     do {
+     //   std::cout << "TMP MERGE ITER" << std::endl;
         change = mergeTreeIteration(unknownFraction);
 
         std::clog << "\tremaining: " << size() << "          \r" << std::flush;
@@ -40,10 +41,12 @@ size_t LDForest::mergeTreeIteration(float unknownFraction){
     size_t beforeSize = ldtrees_.size();
 
     for(size_t i=0; i<size(); ++i){
-      
+       
+      //  std::cout << "TMP i " << i << std::endl;
         if (!ldtrees_[i].empty()) { //The ldTree may have been merged from a previous iteration of the i loop
             for (size_t j = i + 1; j < std::min(i + 10, size()); ++j){
                 if(ldtrees_[i].validMerge(ldtrees_[j], allowedDifferences)){
+               //     std::cout << "TMP TREES " << i <<" " << j << std::endl;
                     LDTree potentialMerge(ldtrees_[i], ldtrees_[j]); 
                     mergedTrees.push_back(potentialMerge);
                     ldtrees_[i].clear();
@@ -52,12 +55,14 @@ size_t LDForest::mergeTreeIteration(float unknownFraction){
                 }
             }
         }
+
         
         //If no tree was merged in the j loop with this iteration of i 
         if(!ldtrees_[i].empty())
             mergedTrees.push_back(ldtrees_[i]);
     }
     
+   // std::cout << "TMP SWAPPING BUFFER" << std::endl;
     ldtrees_ = mergedTrees;
 		
 	return beforeSize - ldtrees_.size();
@@ -67,11 +72,15 @@ void LDForest::testTrees(int maxThreadUsage){
     std::clog<<"testing Trees"<<std::endl;
     std::clog<<"\tcompleted: 0/"<<size()<<"               \r"<<std::flush;
     
+    std::cout <<"MT "<< maxThreadUsage << std::endl;
+
+
     size_t treesFinished = 0;
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
     for(size_t i=0; i<size(); ++i){
 
-        CTable2 cTable;
+        std::cout << i << "\n";
+        //CTable2 cTable;
         for (size_t j = i + 1; j < size(); ++j) {
             ldtrees_[i].epistasisTest(ldtrees_[j]);//, topSnpList_);
         }

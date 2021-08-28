@@ -16,7 +16,6 @@ TopSnpList::TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff)
 bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
 { 
     bool retVal = false;
-
     #pragma omp critical
     {
         if(insertSincePrefix_ == topK_){
@@ -31,7 +30,7 @@ bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
             }
             insertSincePrefix_ = 0;
         }
-        
+
         //If the new score is already < the cutoff we dont care about counting it or updating currentPartners_
         if (score > getCutoff()) {
             ++insertSincePrefix_;

@@ -1,9 +1,13 @@
 #include "LDTree.h" 
 
-LDTree::LDTree(const Snp& snp, const Location& location){
-    nodes_.push_back(snp);
-    genomeLocations_.push_back(location);
+LDTree::LDTree(const Snp& snp, const Location& location) : nodes_(std::vector<Snp>{ snp }), genomeLocations_(std::vector<Location>{ location }) {
+ 
+
     topSnpList_ = nullptr;//topSnpList;
+}
+
+LDTree::LDTree() {
+
 }
 
 /*
@@ -14,7 +18,7 @@ LDTree::LDTree(const LDTree& cpy){
 }
 */
 
-LDTree::LDTree(const LDTree & t1, const LDTree & t2){
+LDTree::LDTree( LDTree & t1,  LDTree & t2){
     nodes_.reserve(1 + t1.size() + t2.size());
     genomeLocations_.reserve(1 + t1.size() + t2.size());
     topSnpList_ = t1.topSnpList_;

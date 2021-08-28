@@ -71,8 +71,9 @@ struct TopPairing{
         return out;
     }
     
-    float score_;
     std::pair<ID_Snp, ID_Snp> indexes_;
+    float score_;
+
 };
 
 struct TestCounter {
@@ -115,7 +116,7 @@ class TopSnpList{
         /**
         * Holds the count of detected pairs with <index> significance
         */
-        std::array<int, MAX_CUTOFF+1> pairwiseSignificanceCounts_;
+        std::array<ID_Snp, MAX_CUTOFF+1> pairwiseSignificanceCounts_;
     
         ID_Snp  insertSincePrefix_;
 

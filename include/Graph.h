@@ -9,6 +9,8 @@ class Graph {
 public:
 	Graph();
 	//Creates a new Graph of a single node containing a type of T and indexing type of IT
+	Graph(const Graph& cpy);
+
 	Graph(T data);
 
 	bool empty()const;
@@ -17,6 +19,9 @@ public:
 
 	//Gets the element of type T from the passed index
 	const T& getElement(IT id)const;
+
+	std::vector<IT> getOutgoingIds(IT id)const;
+	bool isTerminal(IT id)const;
 
 
 	void print(std::ostream& os)const;
@@ -42,6 +47,9 @@ Graph<T, IT>::Graph() {
 }
 
 template<class T, class IT>
+Graph<T, IT>::Graph(const Graph& cpy) : V(cpy.V), A(cpy.A), JA(cpy.JA), IA(cpy.IA){}
+
+template<class T, class IT>
 Graph<T, IT>::Graph(T data) {
 	V = std::vector<T>{ data };
 	//A = std::vector<IT>{ 1 }
@@ -56,6 +64,16 @@ size_t Graph<T, IT>::size()const {
 template<class T, class IT>
 const T& Graph<T, IT>::getElement(IT id)const{
 	return V[id];
+}
+
+template<class T, class IT>
+std::vector<IT> Graph<T, IT>::getOutgoingIds(IT id)const{
+	return std::vector<IT>(JA.begin() + IA[id], JA.begin() + IA[id + 1]);
+}
+
+template<class T, class IT>
+bool Graph<T, IT>::isTerminal(IT id)const {
+	return IA[id + 1] - IA[id] == 0;
 }
 
 template<class T, class IT>
@@ -111,10 +129,14 @@ Graph<T,IT> Graph<T, IT>::joinToRoot(T newRoot, Graph& g1, Graph& g2) {
 	IT offsetLeft = 1;
 	IT offsetRight = offsetLeft + g1.V.size();
 
+	//std::cout << "TS1 " << g1.V.size() << std::endl;
 	//Move the node data
 	newGraph.V = std::vector<T>{ newRoot };
 	newGraph.V.insert(newGraph.V.end(), std::make_move_iterator(g1.V.begin()), std::make_move_iterator(g1.V.end()));
 	newGraph.V.insert(newGraph.V.end(), std::make_move_iterator(g2.V.begin()), std::make_move_iterator(g2.V.end()));
+	g1.V.clear();
+	g2.V.clear();
+	//std::cout <<"TS2 "<<g1.V.size() << std::endl;
 
 	//Expand the edge weights vector
 	newGraph.A = std::vector<IT>{ 1,1 }; //Edge weights for the 2 new edges from root
@@ -132,13 +154,15 @@ Graph<T,IT> Graph<T, IT>::joinToRoot(T newRoot, Graph& g1, Graph& g2) {
 
 	//expand row indexes vector
 	newGraph.IA = std::vector<IT>{ 0,2 };
-	auto offset = newGraph.IA.back();
+	//auto offset = newGraph.IA.back();
 	for ( auto it = g1.IA.begin() + 1; it != g1.IA.end(); ++it)
-		newGraph.IA.push_back(*it - (*(it - 1)) + offset);
+		//newGraph.IA.push_back(*it - (*(it - 1)) + offset);
+		newGraph.IA.push_back(*it - (*(it - 1)) + newGraph.IA.back());
 
-	offset = newGraph.IA.back();
+	//offset = newGraph.IA.back();
 	for (auto it = g2.IA.begin() + 1; it != g2.IA.end(); ++it)
-		newGraph.IA.push_back(*it - (*(it - 1)) + offset);
+		newGraph.IA.push_back(*it - (*(it - 1)) + newGraph.IA.back());
+		//newGraph.IA.push_back(*it - (*(it - 1)) + offset);
 
 	//std::for_each(g1.IA.begin(), g1.IA.end(), [offsetLeft](auto& e) {e += offsetLeft; });
 	//newGraph.IA.insert(newGraph.IA.end(), std::make_move_iterator(g1.IA.begin()), std::make_move_iterator(g1.IA.end()));

@@ -18,6 +18,9 @@ TEST_CASE() {
 	g1.print(std::cout);
 	std::cout << "\n\n";
 
+	REQUIRE(g1.getOutgoingIds(0).size() == 0);
+	REQUIRE(g1.isTerminal(0));
+
 	g2.print(std::cout);
 	std::cout << "\n\n";
 
@@ -25,9 +28,33 @@ TEST_CASE() {
 	g3.print(std::cout);
 	std::cout << "\n\n";
 
+	auto ga(g3);
+	auto gb(g3);
+	auto gs1(g3);
+	auto gs2(g3);
+	auto gc = TestGraph::joinToRoot(0, ga, gb);
+	gc.print(std::cout);
+	std::cout<< "\n\n";
+
 	TestGraph g5 = TestGraph::joinToRoot(5, g4, g3);
 	g5.print(std::cout);
+	std::cout << "\n\n";
+
+
+
+	REQUIRE(g3.getOutgoingIds(0).size() == 2);
+	REQUIRE(!g3.isTerminal(0));
+
+	auto gb1(g5);
+	auto gb2(g5);
+
+	TestGraph gr = TestGraph::joinToRoot(7, gb1, gs1);
+	gr.print(std::cout);
+	std::cout << "\n\n";
+	TestGraph gl = TestGraph::joinToRoot(7, gs2, gb2);
+	gl.print(std::cout);
 	std::cout << "\n";
 
-	REQUIRE(1 == 1);
+
+	
 }

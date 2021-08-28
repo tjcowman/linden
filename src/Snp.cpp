@@ -82,7 +82,6 @@ void Snp::fillTable(CTable2& t, const Snp& snp1, const Snp& snp2){
 }
 
 float Snp::marginalTest()const{
-   float retVal=0.0;
    CTable1 t;
    t.zero();
 
