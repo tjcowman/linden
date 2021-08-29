@@ -51,12 +51,6 @@ private:
     ID_Snp root_; //Root node as the graph is being utilized as a directed tree
     Graph<Snp, ID_Snp> snps_;
     std::vector<Location> locations_; //Stores the genomic location of snps in this tree  //TODO: reimplement this 
-   // std::map<ID_Snp, Location> locations_;
 
     TopSnpList* topSnpList_;
-
-    
-
-   // std::vector<Snp> nodes_;
-   // std::vector<Location> genomeLocations_;
 };

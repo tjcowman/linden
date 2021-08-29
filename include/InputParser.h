@@ -9,7 +9,7 @@ std::ifstream openFileChecked(std::string filepath){
     std::ifstream file(filepath);
 
     if (!file.is_open()){
-        std::cerr << "file " << filepath << " not opened\n";
+        std::cerr << "file <" << filepath << "> not opened\n";
         exit(1);
     }
     else{

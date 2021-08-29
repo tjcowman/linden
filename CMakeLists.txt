@@ -9,7 +9,6 @@ cmake_minimum_required(VERSION 3.20)
 project(linden VERSION 1.0)
 
 
-
 # add the primary executable
 add_executable(linden src/main.cpp 
     src/LDForest.cpp 
@@ -38,9 +37,8 @@ add_executable(linden-tests test/main.cpp
 
 
 
-
 find_package(OpenMP REQUIRED)
-#target_compile_options(linden PRIVATE -fopenmp)
+
 
 target_link_libraries(linden PRIVATE OpenMP::OpenMP_CXX)
 target_link_libraries(lindenV0 PRIVATE OpenMP::OpenMP_CXX)

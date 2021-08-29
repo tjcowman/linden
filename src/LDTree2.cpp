@@ -5,9 +5,7 @@ LDTree::LDTree(const Snp& snp, const Location& location) : snps_(Graph<Snp, ID_S
     root_ = 0;
 }
 
-//TODO initlist tmp to compile
 LDTree::LDTree( LDTree& t1,  LDTree& t2)  {
-    //TODO
     root_ = 0;
    
     //Create new representative snp
@@ -17,9 +15,7 @@ LDTree::LDTree( LDTree& t1,  LDTree& t2)  {
     locations_ = std::vector<Location>();
     locations_.insert(locations_.end(), std::make_move_iterator(t1.locations_.begin()), std::make_move_iterator(t1.locations_.end()));
     locations_.insert(locations_.end(), std::make_move_iterator(t2.locations_.begin()), std::make_move_iterator(t2.locations_.end()));
-
-
-    
+   
     //Update the Snp Tree (Graph) structure
     snps_ = Graph<Snp, ID_Snp>::joinToRoot(newRoot, t1.snps_, t2.snps_);
 
@@ -65,24 +61,10 @@ ID_Sample LDTree::computeDifferences(const LDTree& other)const {
 }
 
 bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff)const {
-    //TODO
-  //  std::cout << "TMP M SIZE " << size() << " " << other.size() << std::endl;
-   // std::cout << "TMP COMPDIFF " <<  << std::endl;
     //The restriction used to be to enusre binary trees, with this DS it is no longer required. However a useful hueristic should be investigated.
     if (size() == 0 || other.size() == 0) return false;
     else
         return computeDifferences(other) < maxDiff;
-
-    /*
-    if (computeDifferences(other) < maxDiff) {
-     
-        // if (size() == other.size() && computeDifferences(other) < maxDiff)
-        return true;
-    }
-    else {
-        return false;
-    }
-    */
 }
 
 
@@ -94,9 +76,6 @@ void LDTree::clear() {
 
 
 void LDTree::epistasisTest(const LDTree& other)const {
-
-  //  std::cout << "STARTING TREE PAIR (" <<size()<<" : "<<other.size()<<")"<< std::endl;
-
     uint64_t localInternalTestsDone = 0;
     uint64_t localLeaftTestsDone = 0;
     CTable2 cTable;
@@ -106,10 +85,8 @@ void LDTree::epistasisTest(const LDTree& other)const {
     s.push_back({ 0, 0 });
 
     while (!s.empty()) {
-        float cutOff = topSnpList_->getCutoff();
-        
+        float cutOff = topSnpList_->getCutoff();      
         auto c = s.back();
-       // std::cout << "exploring " << c.first << " : " << c.second << std::endl;
 
         s.pop_back();
 
@@ -117,21 +94,12 @@ void LDTree::epistasisTest(const LDTree& other)const {
         Snp::fillTable(cTable, snps_.getElement(c.first), other.snps_.getElement(c.second));
         float score = cTable.chi2();
      
-
         auto lChildren = getChildren(c.first);
         auto rChildren = other.getChildren(c.second);
         
-       // if (lChildren.size() != 2 || rChildren.size() != 2) {
-         //   std::cerr << c.first << " " << c.second << std::endl;
-      //      std::cerr << "CHILDREN WRONG SIZE" << std::endl;
-       // }
-      //  std::cerr << c.first << " " << c.second << std::endl;
 
         //If both not at leaves
         if(!isLeaf(c.first) && !other.isLeaf(c.second)) {
-           // std::cerr << "B" << std::endl;
-           // std::cout << lChildren[0] << " || " << lChildren[1] << std::endl;
-           // std::cout << rChildren[0] << " || " << rChildren[1] << std::endl;
             if (score >= cutOff) {
                 s.push_back(std::make_pair(lChildren[0], rChildren[0]));
                 s.push_back(std::make_pair(lChildren[0], rChildren[1]));
@@ -141,9 +109,6 @@ void LDTree::epistasisTest(const LDTree& other)const {
             localInternalTestsDone += 2;
         }
         else if(!isLeaf(c.first)){
-          //  std::cerr << "R is leaf" << std::endl;
-          //  std::cout << lChildren[0] << " || " << lChildren[1] << std::endl;
-
             if (score >= cutOff){
                 s.push_back(std::make_pair(lChildren[0], c.second));
                 s.push_back(std::make_pair(lChildren[1], c.second));
@@ -153,10 +118,7 @@ void LDTree::epistasisTest(const LDTree& other)const {
             ++localLeaftTestsDone;
         }
         else if(!other.isLeaf(c.second)){
-          //  std::cerr << "L is leaf" << std::endl;
-         //   std::cout << rChildren[0] << " || " << rChildren[1] << std::endl;
-            if (score >= cutOff)
-            {
+            if (score >= cutOff){
                 s.push_back(std::make_pair(c.first, rChildren[0]));
                 s.push_back(std::make_pair(c.first, rChildren[1]));
             }
@@ -165,16 +127,10 @@ void LDTree::epistasisTest(const LDTree& other)const {
         }
         //If at both leaves
         else{
-
             //check to make sure not estimated as being in LD
             if (!locations_[c.first].inLinkageDisequilibrium(other.locations_[c.second])){
 
-             //   std::cout << score << std::endl;
-             //   std::cout << "CU " << cutOff << std::endl;
-
                 topSnpList_->attemptInsert(snps_.getElement(c.first).getIndex(), other.snps_.getElement(c.second).getIndex(), score);
-
-
 
                 localLeaftTestsDone += 2;
            }

@@ -72,14 +72,13 @@ void LDForest::testTrees(int maxThreadUsage){
     std::clog<<"testing Trees"<<std::endl;
     std::clog<<"\tcompleted: 0/"<<size()<<"               \r"<<std::flush;
     
-    std::cout <<"MT "<< maxThreadUsage << std::endl;
+    //std::cout <<"MT "<< maxThreadUsage << std::endl;
 
 
     size_t treesFinished = 0;
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
     for(size_t i=0; i<size(); ++i){
 
-        std::cout << i << "\n";
         //CTable2 cTable;
         for (size_t j = i + 1; j < size(); ++j) {
             ldtrees_[i].epistasisTest(ldtrees_[j]);//, topSnpList_);
