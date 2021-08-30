@@ -50,7 +50,7 @@ bool testObject(const T& object) {
 	T::to_serial(res, object);
 	T objectNew = T::from_serial(res);
 
-	return object == objectNew;
+	return  object == objectNew;
 }
 
 //Test for Graph structure serialization and deserialization
@@ -83,7 +83,20 @@ TEST_CASE() {
 	}
 	Snp::setDimensions(controls.width, cases.width);
 
-	REQUIRE(testObject(snps[0]));
+	//test all of the snps
+	for(const auto& e : snps)
+		REQUIRE(testObject(e));
+
+	//build a vector of ldtrees and test them
+	//std::vector<LDTree> trees;
+	//for (ID_Snp i = 0; i < snps.size(); ++i)
+	//	trees.push_back(LDTree(snps[i], loci[i].location));
+
+
+
+	//for (const auto& e : trees)
+	//	REQUIRE(testObject(e));
+
 
 	LDForest ldforest(nullptr, loci.size());
 
@@ -91,7 +104,7 @@ TEST_CASE() {
 		ldforest.insert(LDTree(snps[i], loci[i].location));
 	}
 
-	//REQUIRE(testObject(ldforest));
+	REQUIRE(testObject(ldforest));
 	
 }
 

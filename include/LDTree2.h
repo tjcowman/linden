@@ -28,6 +28,8 @@ public:
  
     LDTree( LDTree& t1,  LDTree& t2);
 
+    bool operator==(const LDTree& lhs)const;
+
     bool empty()const;
     size_t size()const;
 

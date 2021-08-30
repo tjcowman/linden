@@ -35,6 +35,10 @@ LDTree::LDTree( LDTree& t1,  LDTree& t2)  {
 
 }
 
+bool LDTree::operator==(const LDTree& lhs)const {
+    return std::tie(root_, snps_, locations_) == std::tie(lhs.root_, lhs.snps_, lhs.locations_);
+}
+
 bool LDTree::empty()const{
     return snps_.empty();
 }

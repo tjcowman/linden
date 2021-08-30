@@ -16,8 +16,8 @@ size_t LDForest::size()const{
 }
 
 bool LDForest::operator==(const LDForest& lhs)const {
-    std::cout << "IMPLEMENT LDFOREST ==" << std::endl;
-    return true;
+   // std::cout << "IMPLEMENT LDFOREST ==" << std::endl;
+    return ldtrees_ == lhs.ldtrees_;
 }
 
 void LDForest::mergeTrees(double maxUnknownFraction){
@@ -157,7 +157,7 @@ void LDForest::to_serial(std::ostream& os, const LDForest& e) {
     ID_Snp numTrees = e.ldtrees_.size();
     os.write(reinterpret_cast<const char*>(&numTrees), sizeof(ID_Snp));
     for(const auto& tree : e.ldtrees_){
-        LDTree::to_serial(std::cout, tree);
+        LDTree::to_serial(os, tree);
     }
     
 }

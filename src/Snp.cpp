@@ -206,10 +206,14 @@ const SnpDimensions& Snp::getDimensions() {
 
 void Snp::to_serial(std::ostream& os, const Snp& snp) {
     os.write(reinterpret_cast<const char*>(&snp.index_),sizeof(ID_Snp));
-    os.write(reinterpret_cast<const char*>(&snp.allSamples_), snp.allSamples_.size()*sizeof(PackedGenotype));
+    vector_to_serial<PackedGenotype,ID_Snp>(os, snp.allSamples_);
 }
 
 Snp Snp::from_serial(std::istream& is) {
-    std::cout << "TODO SNP from_Serial" << std::endl;
-    return Snp();
+    Snp e;
+
+    is.read(reinterpret_cast<char*>(&e.index_), sizeof(ID_Snp));
+    e.allSamples_ = vector_from_serial<PackedGenotype, ID_Snp>(is);
+
+    return e;
 }

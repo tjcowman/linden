@@ -67,6 +67,10 @@ struct Location {
         basePair_ = static_cast<uint32_t>(-1);
       }
 
+    bool operator==(const Location& lhs)const {
+        return std::tie(chromosome_, basePair_) == std::tie(lhs.chromosome_, lhs.basePair_);
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Location& e) {
         os << e.chromosome_ << "\t" << e.basePair_;
         return os;

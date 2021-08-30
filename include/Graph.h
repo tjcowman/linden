@@ -9,31 +9,6 @@
 
 
 
-template<class T, class IT>
-void vector_to_serial(std::ostream& os, std::vector<T> e){
-	IT length = e.size();
-	os.write(reinterpret_cast<const char*>(&length), sizeof(IT));
-	os.write(reinterpret_cast<const char*>(&e[0]), length * sizeof(T));
-}
-
-template<class T, class IT>
-std::vector<T> vector_from_serial(std::istream& is) {
-	//Read the length
-	IT length;
-	is.read(reinterpret_cast<char*>(&length), sizeof(IT));
-
-	//Allocate space for the vector
-	std::vector<IT> e;
-	e.resize(length);
-	
-
-	//Read the elements
-	is.read(reinterpret_cast<char*>(&e[0]), length * sizeof(T));
-	//std::cout << "DB " << e.size() << std::endl;
-
-	return e;
-}
-
 
 template<class T, class IT>
 class Graph {
@@ -93,7 +68,8 @@ bool Graph<T, IT>::operator==(const Graph& lhs)const {
 template<class T, class IT>
 Graph<T, IT>::Graph(T data) {
 	V = std::vector<T>{ data };
-	//A = std::vector<IT>{ 1 }
+	A = std::vector<IT>();
+	JA = std::vector<IT>();
 	IA = std::vector<IT>{ 0,0 };
 }
 
@@ -161,14 +137,12 @@ bool Graph<T, IT>::empty()const {
 template<class T, class IT>
 void Graph<T, IT>::to_serial(std::ostream& os, const Graph& e) {
 
-	//The T may be mor ecomplex than an integer indexing value
-	//vector_to_serial<T, IT>(os, e.V);
+	//The T may be more complex than an integer indexing value
 	IT num=e.V.size();
 	os.write(reinterpret_cast<const char*>(&num), sizeof(IT));
-	for (IT i = 0; i < num; ++i)
+	for (IT i = 0; i < num; ++i) {
 		T::to_serial(os, e.V[i]);
-	//os.write(reinterpret_cast<const char*>(&e.V[0]), num*sizeof(T));
-	//T::to_serial(os, )
+	}
 
 	vector_to_serial<IT, IT>(os, e.A);
 	vector_to_serial<IT, IT>(os, e.JA);
@@ -183,13 +157,8 @@ Graph<T, IT>  Graph<T, IT>::from_serial(std::istream& is) {
 	is.read(reinterpret_cast<char*>(&num), sizeof(IT));
 	e.V.reserve(num);
 	for (IT i = 0; i < num; ++i) {
-	//	std::cout << i << std::endl;
 		e.V.push_back(T::from_serial(is));
 	}
-	//is.read(reinterpret_cast<char*>(&e.V[0]), num*sizeof(T));
-
-	//e.V = vector_from_serial<T, IT>(is);
-
 	e.A = vector_from_serial<IT, IT>(is);
 	e.JA = vector_from_serial<IT,IT>(is);
 	e.IA = vector_from_serial<IT, IT>(is);
