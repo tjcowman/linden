@@ -1,5 +1,9 @@
 #include "LDTree2.h" 
 
+LDTree::LDTree() {
+
+}
+
 LDTree::LDTree(const Snp& snp, const Location& location) : snps_(Graph<Snp, ID_Snp>(snp)), locations_(std::vector<Location>{location}) {
     topSnpList_ = nullptr;
     root_ = 0;
@@ -141,4 +145,34 @@ void LDTree::epistasisTest(const LDTree& other)const {
     }
     
     topSnpList_->incrementTestCounter(TestCounter{ localInternalTestsDone,  localLeaftTestsDone });
+}
+
+void LDTree::to_serial(std::ostream& os, const LDTree& e){
+   
+    //Root node
+    os.write(reinterpret_cast<const char*>(&e.root_), sizeof(ID_Snp));
+   // Graph<Snp, ID_Snp> snps_;
+    Graph<Snp, ID_Snp>::to_serial(os, e.snps_);
+
+   // std::vector<Location> locations_;
+    ID_Snp num_locations = e.locations_.size();
+    os.write(reinterpret_cast<const char*>(&num_locations), sizeof(ID_Snp));
+    os.write(reinterpret_cast<const char*>(&e.locations_[0]), num_locations*sizeof(Location));
+
+
+}
+
+LDTree LDTree::from_serial(std::istream& is) {
+    LDTree e;
+
+    is.read(reinterpret_cast<char*>(&e.root_), sizeof(ID_Snp));
+    e.snps_ = Graph<Snp, ID_Snp>::from_serial(is);
+
+    ID_Snp num_locations;
+    is.read(reinterpret_cast<char*>(&num_locations), sizeof(ID_Snp));
+
+    e.locations_.resize(num_locations);
+    is.read(reinterpret_cast<char*>(&e.locations_[0]), num_locations*sizeof(Location));
+
+    return e;
 }

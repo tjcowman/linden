@@ -108,13 +108,13 @@ void testData(Args& args){
     auto it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.computeMinorAlleleFrequency() < args.minMAF; });
     log.mafRemoved_ = std::distance(it, snps.end());
     snps.erase(it, snps.end());
-    std::clog << "\tremoved marginal significance: " << log.marginalSignificanceRemoved_ << "\n";
+    std::clog << "\tremoved minor allele frequency: "  << log.mafRemoved_ << "\n";
 
 
     it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.marginalTest() > chi2DegreesFreedomTable[args.maxMS]; });
     log.marginalSignificanceRemoved_ = std::distance(it, snps.end());
     snps.erase(it, snps.end());
-    std::clog << "\tremoved minor allele frequency: " << log.mafRemoved_ << "\n";
+    std::clog << "\tremoved marginal significance: " << log.marginalSignificanceRemoved_ << "\n";
 
 
 
@@ -144,11 +144,17 @@ void testData(Args& args){
     if(ldforest.size() > 1){    
         ldforest.mergeTrees( args.maxUnknown);
         log.mergedTreesFormed_ = ldforest.size();
+
+        LDForest::to_serial(std::cout, ldforest);
+        exit(0);
+
         ldforest.testTrees(args.maxThreads);
         ldforest.writeResults(loci, args);
     }
 
     
+
+
 }
 
 int main(int argc, char *argv[]){

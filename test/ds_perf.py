@@ -15,13 +15,13 @@ def main(args):
 
     args = ["--loci", loci_name, "--cases", cases_name, "--controls", controls_name]
 
-    test_bin("./build/linden", args, ["--maxThreads", maxThreads, "--maxUnknown", maxUnknown])
-    test_bin("./build/lindenV0", args, ["--maxThreads", maxThreads, "--maxUnknown", maxUnknown])
+    test_bin("./build/linden", args, ["--maxThreads", maxThreads, "--maxUnknown", maxUnknown, "--minMAF", ".05", "--maxMS", "6" ])
+    #test_bin("./build/lindenV0", args, ["--maxThreads", maxThreads, "--maxUnknown", maxUnknown, "--minMAF", ".05", "--maxMS", "6"])
 
 
 def test_bin(bin_path, input_args, other_args):
     t_begin = time.perf_counter()
-    result = subprocess.run( [bin_path] + input_args + other_args, stdout=PIPE, stderr=PIPE, text=True )
+    result = subprocess.run( [bin_path] + input_args + other_args, stdout=PIPE, text=True ) # stderr=PIPE
     t_end = time.perf_counter()
 
     data = result.stdout;

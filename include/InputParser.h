@@ -3,6 +3,7 @@
 
 #include <string>
 #include <charconv>
+#include <array>
 #include <map>
 
 std::ifstream openFileChecked(std::string filepath){

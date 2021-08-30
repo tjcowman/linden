@@ -6,12 +6,12 @@ SnpDimensions Snp::dim;
 //ID_Sample Snp::CAW_;
 //ID_Sample Snp::CAS_;
 
-/*Snp::Snp(){
-    index_ = -1;
-    numControls_ = 0;
-    numCases_ = 0;
-    allSamples_ = std::vector<PackedGenotype>();
-}*/
+Snp::Snp(){
+   // index_ = -1;
+   // numControls_ = 0;
+   // numCases_ = 0;
+   // allSamples_ = std::vector<PackedGenotype>();
+}
 
 Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases){
     packGenotypes(controls.rowBegin(index), controls.rowEnd(index), allSamples_);
@@ -36,6 +36,10 @@ Snp::Snp(const Snp & s1, const Snp & s2){
     index_ = -1; //TODO: FIX TO BE EXPLICIT TYPE   (currently should wrap arount to largest uval)
   //  std::cout << index_ << " ? "<< std::endl;
     allSamples_ = bitMerge(s1.allSamples_, s2.allSamples_);
+}
+
+bool Snp::operator==(const Snp& lhs)const {
+    return std::tie(index_, allSamples_) == std::tie(lhs.index_, lhs.allSamples_);
 }
 
 ID_Snp Snp::getIndex()const{
@@ -195,8 +199,17 @@ void Snp::setDimensions(ID_Sample controls, ID_Sample cases) {
     };
 }
 
+const SnpDimensions& Snp::getDimensions() {
+    return Snp::dim;
+}
+
 
 void Snp::to_serial(std::ostream& os, const Snp& snp) {
     os.write(reinterpret_cast<const char*>(&snp.index_),sizeof(ID_Snp));
     os.write(reinterpret_cast<const char*>(&snp.allSamples_), snp.allSamples_.size()*sizeof(PackedGenotype));
+}
+
+Snp Snp::from_serial(std::istream& is) {
+    std::cout << "TODO SNP from_Serial" << std::endl;
+    return Snp();
 }

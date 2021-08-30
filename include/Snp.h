@@ -14,6 +14,7 @@
 #include <array>
 #include <stdint.h>
 #include <cmath>
+#include <tuple>
 #include "CommonStructs.h"
 #include "Bitwise.h"
 
@@ -24,8 +25,11 @@
 class Snp
 {
     public:
+        Snp();
         Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases);
         Snp(const Snp & s1, const Snp & s2); 
+
+        bool operator==(const Snp& lhs)const;
         
         //Getters
         ID_Snp getIndex()const;
@@ -46,10 +50,12 @@ class Snp
         //friend std::ostream& operator<< (std::ostream &out, const Snp & snp);
 
         static void to_serial(std::ostream& os, const Snp& snp);
-        static void from_serial(std::istream& is, Snp& snp);
+        static Snp from_serial(std::istream& is);
         
         
         static void setDimensions(ID_Sample controls, ID_Sample cases);
+        static const SnpDimensions& getDimensions(); //Mostly used as access for serialization/deserialization
+
     private:
         void packGenotypes( std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest);
 

@@ -3,15 +3,47 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <tuple>
+
+#pragma once
+
+
+
+template<class T, class IT>
+void vector_to_serial(std::ostream& os, std::vector<T> e){
+	IT length = e.size();
+	os.write(reinterpret_cast<const char*>(&length), sizeof(IT));
+	os.write(reinterpret_cast<const char*>(&e[0]), length * sizeof(T));
+}
+
+template<class T, class IT>
+std::vector<T> vector_from_serial(std::istream& is) {
+	//Read the length
+	IT length;
+	is.read(reinterpret_cast<char*>(&length), sizeof(IT));
+
+	//Allocate space for the vector
+	std::vector<IT> e;
+	e.resize(length);
+	
+
+	//Read the elements
+	is.read(reinterpret_cast<char*>(&e[0]), length * sizeof(T));
+	//std::cout << "DB " << e.size() << std::endl;
+
+	return e;
+}
+
 
 template<class T, class IT>
 class Graph {
 public:
 	Graph();
 	//Creates a new Graph of a single node containing a type of T and indexing type of IT
+	Graph(T data);
 	Graph(const Graph& cpy);
 
-	Graph(T data);
+	bool operator==(const Graph& lhs)const;
 
 	bool empty()const;
 	size_t size()const;
@@ -34,6 +66,9 @@ public:
 	//Should probably move this out to the LDTree class as it is specific to trees and not graphs
 	static Graph joinToRoot(T newRoot,  Graph& g1, Graph& g2 );
 
+	static void to_serial(std::ostream& os, const Graph& e);
+	static Graph from_serial(std::istream& is);
+
 private:
 	std::vector<T> V;
 	std::vector<IT> A;
@@ -48,6 +83,12 @@ Graph<T, IT>::Graph() {
 
 template<class T, class IT>
 Graph<T, IT>::Graph(const Graph& cpy) : V(cpy.V), A(cpy.A), JA(cpy.JA), IA(cpy.IA){}
+
+template<class T, class IT>
+bool Graph<T, IT>::operator==(const Graph& lhs)const {
+	return std::tie(V, A, JA, IA) == std::tie(lhs.V, lhs.A, lhs.JA, lhs.IA);
+
+}
 
 template<class T, class IT>
 Graph<T, IT>::Graph(T data) {
@@ -117,11 +158,46 @@ bool Graph<T, IT>::empty()const {
 }
 
 
-/*template<class T, class IT>
-void Graph<T, IT>::addOffset(IT offset) {
+template<class T, class IT>
+void Graph<T, IT>::to_serial(std::ostream& os, const Graph& e) {
 
+	//The T may be mor ecomplex than an integer indexing value
+	//vector_to_serial<T, IT>(os, e.V);
+	IT num=e.V.size();
+	os.write(reinterpret_cast<const char*>(&num), sizeof(IT));
+	for (IT i = 0; i < num; ++i)
+		T::to_serial(os, e.V[i]);
+	//os.write(reinterpret_cast<const char*>(&e.V[0]), num*sizeof(T));
+	//T::to_serial(os, )
 
-}*/
+	vector_to_serial<IT, IT>(os, e.A);
+	vector_to_serial<IT, IT>(os, e.JA);
+	vector_to_serial<IT, IT>(os, e.IA);
+}
+
+template<class T, class IT>
+Graph<T, IT>  Graph<T, IT>::from_serial(std::istream& is) {
+	Graph e;
+
+	IT num;
+	is.read(reinterpret_cast<char*>(&num), sizeof(IT));
+	e.V.reserve(num);
+	for (IT i = 0; i < num; ++i) {
+	//	std::cout << i << std::endl;
+		e.V.push_back(T::from_serial(is));
+	}
+	//is.read(reinterpret_cast<char*>(&e.V[0]), num*sizeof(T));
+
+	//e.V = vector_from_serial<T, IT>(is);
+
+	e.A = vector_from_serial<IT, IT>(is);
+	e.JA = vector_from_serial<IT,IT>(is);
+	e.IA = vector_from_serial<IT, IT>(is);
+
+	
+	return e;
+}
+
 
 template<class T, class IT>
 Graph<T,IT> Graph<T, IT>::joinToRoot(T newRoot, Graph& g1, Graph& g2) {

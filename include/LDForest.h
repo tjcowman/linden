@@ -34,11 +34,15 @@ class LDForest{
         void insert( LDTree&& ldtree);
         
         size_t size()const;
-        
+        bool operator==(const LDForest& lhs)const;
+
         void mergeTrees(double maxUnkownFraction);
         void testTrees(int maxThreadUsage);   
         void writeResults(const std::vector<Locus>& infoMatrix, Args& args);
     
+        static void to_serial(std::ostream& os, const LDForest& e);
+        static LDForest from_serial(std::istream& is);
+
     private:
         size_t mergeTreeIteration(float unknownFraction);
         

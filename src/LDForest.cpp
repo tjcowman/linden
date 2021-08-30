@@ -15,6 +15,11 @@ size_t LDForest::size()const{
     return ldtrees_.size();
 }
 
+bool LDForest::operator==(const LDForest& lhs)const {
+    std::cout << "IMPLEMENT LDFOREST ==" << std::endl;
+    return true;
+}
+
 void LDForest::mergeTrees(double maxUnknownFraction){
     std::clog<<"merging LD trees"<<std::endl;
 
@@ -78,7 +83,7 @@ void LDForest::testTrees(int maxThreadUsage){
     size_t treesFinished = 0;
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
     for(size_t i=0; i<size(); ++i){
-
+        std::cerr <<"i = "<< i << std::endl;
         //CTable2 cTable;
         for (size_t j = i + 1; j < size(); ++j) {
             ldtrees_[i].epistasisTest(ldtrees_[j]);//, topSnpList_);
@@ -137,4 +142,43 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
     std::clog<<"finished"<<"\n";
     std::clog<<"\tleaf tests: "<<topSnpList_.getTestCounter().leaf<<"\n";
     std::clog<<"\tinternal tests: "<<topSnpList_.getTestCounter().internal<<"\n";
+}
+
+void LDForest::to_serial(std::ostream& os, const LDForest& e) {
+    //Write the number of Snps to build a new TopSnpList
+    ID_Snp numSnps = e.topSnpList_.size();
+    os.write(reinterpret_cast<const char*>(&numSnps), sizeof(ID_Snp));
+
+    //IMPORTANT WRITE/READ SET SNP SIZE DIMENSIONS HERE AS THEY ARE STATIC TODO: make this less confusing
+    auto dim = Snp::getDimensions();
+    os.write(reinterpret_cast<const char*>(&dim), sizeof(SnpDimensions));
+
+    //Write number of trees
+    ID_Snp numTrees = e.ldtrees_.size();
+    os.write(reinterpret_cast<const char*>(&numTrees), sizeof(ID_Snp));
+    for(const auto& tree : e.ldtrees_){
+        LDTree::to_serial(std::cout, tree);
+    }
+    
+}
+
+LDForest LDForest::from_serial(std::istream& is)
+{
+    ID_Snp numSnps;
+    SnpDimensions dim;
+    ID_Snp numTrees;
+
+    is.read(reinterpret_cast<char*>(&numSnps), sizeof(ID_Snp));
+    is.read(reinterpret_cast<char*>(&dim), sizeof(SnpDimensions));
+    is.read(reinterpret_cast<char*>(&numTrees), sizeof(ID_Snp));
+
+    Snp::setDimensions(dim.numControls_, dim.numCases_);
+    LDForest e(nullptr, numSnps);
+
+    e.ldtrees_.reserve(numTrees);
+    for (ID_Snp i = 0; i < numTrees; ++i)
+        e.ldtrees_.emplace_back(LDTree::from_serial(is));
+
+    return e;
+
 }

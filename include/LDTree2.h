@@ -23,6 +23,7 @@ class LDTree
 {
     friend LDForest;
 public:
+    LDTree();
     LDTree(const Snp& snp, const Location& location);
  
     LDTree( LDTree& t1,  LDTree& t2);
@@ -44,13 +45,14 @@ public:
 
     void epistasisTest(const LDTree& other)const;
 
-
+    static void to_serial(std::ostream& os, const LDTree& e);
+    static LDTree from_serial(std::istream& is);
 
 private:
 
     ID_Snp root_; //Root node as the graph is being utilized as a directed tree
     Graph<Snp, ID_Snp> snps_;
-    std::vector<Location> locations_; //Stores the genomic location of snps in this tree  //TODO: reimplement this 
+    std::vector<Location> locations_; //Stores the genomic location of snps in this tree  
 
     TopSnpList* topSnpList_;
 };

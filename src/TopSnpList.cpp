@@ -57,6 +57,10 @@ bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
     return retVal;
 }
 
+ID_Snp TopSnpList::size()const {
+    return currentPartners_.size();
+}
+
 float TopSnpList::getCutoff()const{
     return cutoff_;
 }

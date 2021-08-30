@@ -33,8 +33,13 @@ target_compile_definitions(lindenV0 PUBLIC -DoldTree)
 
 
 add_executable(linden-tests test/main.cpp
+    src/LDForest.cpp 
+    src/LDTree2.cpp 
+    src/Snp.cpp 
+    src/TopSnpList.cpp 
+    src/Bitwise.cpp
     "include/Graph.h")
-
+set_property(TARGET linden-tests PROPERTY CXX_STANDARD 17)
 
 
 find_package(OpenMP REQUIRED)

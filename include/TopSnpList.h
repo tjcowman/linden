@@ -94,6 +94,8 @@ class TopSnpList{
         TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff);          
         bool attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score);
         
+        //Gets the number of snp Indexes used
+        ID_Snp size()const;
         float getCutoff()const;
         
         void incrementTestCounter(const TestCounter& tests);    
