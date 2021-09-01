@@ -1,5 +1,15 @@
 #include "TopSnpList.h"
 
+TopSnpList::TopSnpList(ID_Snp numberSnps) :
+    topK_(numberSnps),
+    cutoff_(0.0),
+    currentPartners_(std::vector<std::pair<ID_Snp, float>>(numberSnps, { -1,0.0 })),
+    testCounter_({0,0}),
+    insertSincePrefix_(0){
+
+    pairwiseSignificanceCounts_.fill(0);
+}
+
 TopSnpList::TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff)
 {
     topK_ = topK;

@@ -39,10 +39,6 @@ struct IntType {
 	uint16_t val;
 };
 
-
-using TestGraph = Graph<IntType, uint16_t>;
-
-
 //Test a serialization followed by a deserialization operation for equivalence on the passed object
 template<class T>
 bool testObject(const T& object) {
@@ -53,6 +49,13 @@ bool testObject(const T& object) {
 	return  object == objectNew;
 }
 
+//Load test data
+using TestGraph = Graph<IntType, uint16_t>;
+std::vector<Locus> loci = parseLoci(openFileChecked("example/loci"));
+GenotypeMatrix cases = parseGenotypes(openFileChecked("example/cases"));
+GenotypeMatrix controls = parseGenotypes(openFileChecked("example/controls"));
+
+
 //Test for Graph structure serialization and deserialization
 TEST_CASE() {
 	TestGraph g1(0);
@@ -60,22 +63,16 @@ TEST_CASE() {
 	REQUIRE(!(g1 == g2));
 
 	TestGraph g3 = TestGraph::joinToRoot(3, g1, g2);
-
-	//std::stringstream res;
-	//TestGraph::to_serial(res, g3);
-	//TestGraph g4 = TestGraph::from_serial(res);
-
-	//REQUIRE(g3 == g4);
 	REQUIRE(testObject(g3));
+}
 
+//ldforest
+TEST_CASE() {
+	LDForest e(nullptr, loci.size());
+	REQUIRE(!e.validate());
 }
 
 TEST_CASE() {
-	
-	std::vector<Locus> loci = parseLoci(openFileChecked("example/loci"));
-	GenotypeMatrix cases = parseGenotypes(openFileChecked("example/cases"));
-	GenotypeMatrix controls = parseGenotypes(openFileChecked("example/controls"));
-
 	//Call snp constructors to create bitwise snp representations
 	std::vector<Snp> snps;
 	for (size_t i = 0; i < loci.size(); ++i) {
@@ -84,8 +81,8 @@ TEST_CASE() {
 	Snp::setDimensions(controls.width, cases.width);
 
 	//test all of the snps
-	for(const auto& e : snps)
-		REQUIRE(testObject(e));
+	//for(const auto& e : snps)
+	//	REQUIRE(testObject(e));
 
 	//build a vector of ldtrees and test them
 	//std::vector<LDTree> trees;

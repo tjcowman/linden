@@ -16,7 +16,8 @@ add_executable(linden src/main.cpp
     src/Snp.cpp 
     src/TopSnpList.cpp 
     src/Bitwise.cpp
-    src/InputParser.cpp "include/Bitwise.h" "include/Types.h" "include/CTable.h"  "include/Graph.h" "src/Graph.cpp")  
+    src/SnpSet.cpp
+    src/InputParser.cpp "include/Bitwise.h" "include/Types.h" "include/CTable.h"  "include/Graph.h" "src/Graph.cpp" "include/SnpSet.h")  
 set_property(TARGET linden PROPERTY CXX_STANDARD 17)
 
 

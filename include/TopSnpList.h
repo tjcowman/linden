@@ -91,6 +91,8 @@ class TopSnpList{
         /**
         * IMPORTANT : Currently needs numberSnps to be set to the size of the possible SNPIndexes(BEFORE ANY FILTERING)
         */
+        TopSnpList(ID_Snp nmberSnps);
+        //probably deprecate
         TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff);          
         bool attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score);
         

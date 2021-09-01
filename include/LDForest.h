@@ -11,6 +11,7 @@
 
 #include "CommonStructs.h"
 #include "Snp.h"
+#include "SnpSet.h"
 
 //Include the original Tree version for testing
 #ifdef oldTree
@@ -24,12 +25,16 @@
 #include <vector>
 #include <fstream>
 
-
+//The number of ldtrees each tree will compare against for merging
 static const ID_Snp MERGE_SEARCH_DISTANCE = 10;
 
 class LDForest{
     public:
-        LDForest(Log* log, ID_Snp numSnps);
+
+        //TODO implement to not require a num snps by correctly sizing the topSnplist based on internal data (NOTE NEEEDS THE MAX POSSIBLE INDEX NOT FILTERED NUMBER)
+        LDForest();
+        LDForest( ID_Snp numSnps);
+        LDForest( SnpSet& snpSet, ID_Snp numSnps); //TODO: Make only require SnpSet
         
         void insert( LDTree&& ldtree);
         
@@ -39,16 +44,13 @@ class LDForest{
         void mergeTrees(double maxUnkownFraction);
         void testTrees(int maxThreadUsage);   
         void writeResults(const std::vector<Locus>& infoMatrix, Args& args);
-    
+
         static void to_serial(std::ostream& os, const LDForest& e);
         static LDForest from_serial(std::istream& is);
 
     private:
         size_t mergeTreeIteration(float unknownFraction);
         
-        //Non-owning pointer to a log struct for storing statistics about the current run
-        Log* log_;
-
         std::vector<LDTree> ldtrees_;
         TopSnpList topSnpList_;
 

@@ -39,6 +39,8 @@ public:
     //  void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
 
       //friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
+    static void to_serial(std::ostream& os, const LDTree& e);
+    static LDTree from_serial(std::istream& is);
 
 private:
 

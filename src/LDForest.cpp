@@ -1,14 +1,25 @@
 #include "LDForest.h"
 
-LDForest::LDForest(Log* log, ID_Snp numSnps) : 
-    log_(log),
-    topSnpList_(TopSnpList(numSnps, numSnps, 0)) {
+LDForest::LDForest(ID_Snp numSnps) :
+    topSnpList_(TopSnpList(numSnps)){
+    //topSnpList_(TopSnpList(numSnps, numSnps, 0)) {
+}
+
+LDForest::LDForest(SnpSet& snpSet, ID_Snp numSnps) :
+    topSnpList_(TopSnpList(numSnps)) {
+
+    const auto& s = snpSet.getSnps();
+    const auto& l = snpSet.getLocations();
+
+    for (ID_Snp i = 0; i < s.size(); ++i) {
+        ldtrees_.push_back(LDTree(s[i], l[i]));
+        ldtrees_.back().topSnpList_ = &topSnpList_;
+    }
 }
 
 void LDForest::insert(LDTree&& ldTree){
     ldTree.topSnpList_ = &topSnpList_;
-    ldtrees_.push_back(ldTree);
-    
+    ldtrees_.push_back(ldTree);  
 }
 
 size_t LDForest::size()const{
@@ -16,7 +27,6 @@ size_t LDForest::size()const{
 }
 
 bool LDForest::operator==(const LDForest& lhs)const {
-   // std::cout << "IMPLEMENT LDFOREST ==" << std::endl;
     return ldtrees_ == lhs.ldtrees_;
 }
 
@@ -42,7 +52,8 @@ void LDForest::mergeTrees(double maxUnknownFraction){
 size_t LDForest::mergeTreeIteration(float unknownFraction){
     std::vector<LDTree> mergedTrees;
     
-    ID_Snp allowedDifferences = unknownFraction * (log_->controls_ + log_->cases_);
+    
+    ID_Snp allowedDifferences = unknownFraction * (Snp::getDimensions().numControls_ + Snp::getDimensions().numCases_); //(log_->controls_ + log_->cases_);
     size_t beforeSize = ldtrees_.size();
 
     for(size_t i=0; i<size(); ++i){
@@ -77,9 +88,6 @@ void LDForest::testTrees(int maxThreadUsage){
     std::clog<<"testing Trees"<<std::endl;
     std::clog<<"\tcompleted: 0/"<<size()<<"               \r"<<std::flush;
     
-    //std::cout <<"MT "<< maxThreadUsage << std::endl;
-
-
     size_t treesFinished = 0;
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
     for(size_t i=0; i<size(); ++i){
@@ -173,7 +181,7 @@ LDForest LDForest::from_serial(std::istream& is)
     is.read(reinterpret_cast<char*>(&numTrees), sizeof(ID_Snp));
 
     Snp::setDimensions(dim.numControls_, dim.numCases_);
-    LDForest e(nullptr, numSnps);
+    LDForest e(numSnps);
 
     e.ldtrees_.reserve(numTrees);
     for (ID_Snp i = 0; i < numTrees; ++i)

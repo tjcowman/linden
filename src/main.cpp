@@ -12,6 +12,7 @@
 #include "CommonStructs.h"
 
 #include "Snp.h"
+#include "SnpSet.h"
 #include "TopSnpList.h"
 #include "LDForest.h"
 
@@ -45,6 +46,7 @@ void testData(Args& args){
     }
     std::clog << "files read" << "\n";
 
+    
 
     //Call snp constructors to create bitwise snp representations
     std::vector<Snp> snps;
@@ -91,62 +93,44 @@ void testData(Args& args){
     }
     
     //Record the initial size of the dataset read in
+    //TODO Rework this log class and try to remove
     Log log{};
     log.snps_ = loci.size();
     log.cases_ = cases.width;
     log.controls_ = controls.width;
 
     //Set the Snp static size values
+    //TODO REPLACE WITH SETTING FROM SNPSET AND CHANGE API IN SNP TO TAKE A SNPDIMENSION
     Snp::setDimensions(controls.width, cases.width);
    
 
+    SnpSet snps_N(loci, controls, cases);
 
     //perform filtering logic on the input snps based on single locus measures
     std::clog << "filtering SNPs" << "\n";
     std::clog << "\tinitial: " << log.snps_ << "\n";
 
-    auto it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.computeMinorAlleleFrequency() < args.minMAF; });
-    log.mafRemoved_ = std::distance(it, snps.end());
-    snps.erase(it, snps.end());
-    std::clog << "\tremoved minor allele frequency: "  << log.mafRemoved_ << "\n";
+    log.mafRemoved_ = snps_N.remove_if([args](const Snp& e){return e.computeMinorAlleleFrequency() < args.minMAF; });
+    std::clog << "\tremoved minor allele frequency: " << log.mafRemoved_ << "\n";
 
-
-    it = std::remove_if(snps.begin(), snps.end(), [args](const Snp& e) {return e.marginalTest() > chi2DegreesFreedomTable[args.maxMS]; });
-    log.marginalSignificanceRemoved_ = std::distance(it, snps.end());
-    snps.erase(it, snps.end());
+    log.marginalSignificanceRemoved_ = snps_N.remove_if([args](const Snp& e) {return e.marginalTest() > chi2DegreesFreedomTable[args.maxMS]; });
     std::clog << "\tremoved marginal significance: " << log.marginalSignificanceRemoved_ << "\n";
-
 
 
     //Initialize the ldforest, note that currently the loci size needs to refer to the range of possible indexes not how many post filterd SNPs there are
     //This is due to the implementation of TopSnpList
-    LDForest ldforest(&log, loci.size());
-
-    for (ID_Snp i = 0; i < snps.size(); ++i) {
-        ldforest.insert(LDTree(snps[i], loci[i].location));
-    }
-
-    log.passingSnps_ = ldforest.size();
-    std::clog << "\tremaining: " << ldforest.size() << "\n";
-    
-    //tmp
-   // std::ofstream OF("tst.cache.txt");
-   // Snp::to_serial(OF, snps[1]);
-   // OF.close();
+    //BUG PROBABLY I THINK THIS LOCATION INDEX IS WRONG WHEN FILTERED
+    LDForest ldforest(snps_N, loci.size() );
 
 
-
-
-
-    
     
     
     if(ldforest.size() > 1){    
         ldforest.mergeTrees( args.maxUnknown);
         log.mergedTreesFormed_ = ldforest.size();
 
-        LDForest::to_serial(std::cout, ldforest);
-        exit(0);
+        //LDForest::to_serial(std::cout, ldforest);
+        //exit(0);
 
         ldforest.testTrees(args.maxThreads);
         ldforest.writeResults(loci, args);

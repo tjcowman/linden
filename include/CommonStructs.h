@@ -39,13 +39,7 @@ struct Args{
 };
 
 
-struct SnpDimensions {
-    ID_Sample numControls_;
-    ID_Sample numCases_;
-    ID_Sample CONR_;
-    ID_Sample CASR_;
-    ID_Sample CASS_;
-};
+
 
 
 static const uint32_t ESTIMATED_LD_RANGE = 1000000;

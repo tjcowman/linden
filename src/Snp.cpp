@@ -189,6 +189,9 @@ void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<
 }
 
 void Snp::setDimensions(ID_Sample controls, ID_Sample cases) {
+    Snp::dim = SnpDimensions(controls, cases);
+
+    /*
     Snp::dim = {
        controls,
        cases,
@@ -197,6 +200,7 @@ void Snp::setDimensions(ID_Sample controls, ID_Sample cases) {
        cases / PACKED_SIZE + (cases % PACKED_SIZE != 0),
        3 * (controls / PACKED_SIZE + (controls % PACKED_SIZE != 0))
     };
+    */
 }
 
 const SnpDimensions& Snp::getDimensions() {

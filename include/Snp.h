@@ -21,6 +21,24 @@
 #include "CTable.h"
 
 
+struct SnpDimensions {
+
+    SnpDimensions() {};
+
+    SnpDimensions(ID_Sample numControls, ID_Sample numCases) :
+        numControls_(numControls),
+        numCases_(numCases),
+        //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
+        CONR_(numControls / PACKED_SIZE + (numControls % PACKED_SIZE != 0)),
+        CASR_(numCases / PACKED_SIZE + (numCases % PACKED_SIZE != 0)),
+        CASS_(3 * (numControls / PACKED_SIZE + (numControls % PACKED_SIZE != 0))){}
+
+    ID_Sample numControls_;
+    ID_Sample numCases_;
+    ID_Sample CONR_;
+    ID_Sample CASR_;
+    ID_Sample CASS_;
+};
 
 class Snp
 {
