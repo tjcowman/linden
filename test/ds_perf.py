@@ -48,4 +48,5 @@ def test_bin(bin_path, input_args, other_args):
 
 
 if __name__ == "__main__":
+    print(sys.argv)
     main(sys.argv)

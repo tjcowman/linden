@@ -43,7 +43,8 @@ class LDForest{
 
         void mergeTrees(double maxUnkownFraction);
         void testTrees(int maxThreadUsage);   
-        void writeResults(const std::vector<Locus>& infoMatrix, Args& args);
+        //void writeResults(const std::vector<Locus>& infoMatrix, Args& args);
+        void writeResults(const std::vector<Locus>& infoMatrix, const std::string& output);
 
         static void to_serial(std::ostream& os, const LDForest& e);
         static LDForest from_serial(std::istream& is);

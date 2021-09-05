@@ -16,42 +16,32 @@
 
 #include "Types.h"
 
-struct Args{
-    std::string loci;
-    std::string controls;
-    std::string cases;
-    
-    std::string output="";
-    
-    int permuteSamples=0;
-    
-    int maxThreads=1;
-    double maxUnknown=.1;
-    double minMAF=0.0;
-    size_t maxMS=1;
-     
-    void printSummaryRelevant(std::ofstream & ofs)
-    {
-        ofs <<maxUnknown<<"\t"
-            <<minMAF<<"\t"<<maxMS<<"\t"
-            <<permuteSamples;
+/*
+struct Location {
+   // uint32_t chromosome_;
+    uint32_t basePair_;
+    bool inLinkageDisequilibrium(const Location& other)const { return true; }
+    bool operator==(const Location& lhs)const { return false; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Location& e) {
+        os  << e.basePair_;
+        return os;
     }
+
 };
-
-
-
+*/
 
 
 static const uint32_t ESTIMATED_LD_RANGE = 1000000;
+
 struct Location {
-    uint32_t chromosome_;
-    uint32_t basePair_;
 
 
-    Location(uint32_t chromosome, uint32_t basePair)
+
+    Location(uint32_t chromosome, uint32_t basePair) : chromosome_(chromosome), basePair_(basePair)
     {
-        chromosome_ = chromosome;
-        basePair_ = basePair;
+       // chromosome_ = chromosome;
+       // basePair_ = basePair;
     }
 
     //TODO: change to explicit value representing invalid, ex: numeric_limits<>::max()
@@ -78,11 +68,46 @@ struct Location {
         ID_Snp dist = basePair_ > other.basePair_ ? basePair_ - other.basePair_ : other.basePair_ - basePair_;
         return(dist <= ESTIMATED_LD_RANGE);
     }
+    uint32_t chromosome_;
+    uint32_t basePair_;
+
 };
+
 
 struct Locus {
     std::string id;
     Location location;
+
+    static void to_serial(std::ostream& os, const Locus& e) {
+
+        //Writes the id length and id chars
+        size_t length = e.id.size();
+      //  std::cerr << "TMP LENGTH WRIT " <<length<< std::endl;
+        os.write(reinterpret_cast<const char*>(&length), sizeof(size_t));
+        os.write(reinterpret_cast<const char*>(e.id.data()), length * sizeof(char) );
+
+        //Writes the location struct 
+        os.write(reinterpret_cast<const char*>(&e.location), sizeof(Location));
+        //os.write(reinterpret_cast<const char*>(&length), sizeof(size_t));
+    }
+
+    static Locus from_serial(std::istream& is) {
+       // std::cerr << "TEST" << std::endl;
+        Locus e;
+        size_t length;
+        
+        is.read(reinterpret_cast<char*>(&length), sizeof(size_t));
+        //std::cerr << "TMP LOC LEN READ " << length << std::endl;
+        e.id.resize(length);
+        is.read(reinterpret_cast<char*>(e.id.data()), length*sizeof(char));
+       // std::cerr << e.id << std::endl;
+        
+        is.read(reinterpret_cast<char*>(&e.location), sizeof(Location));
+       // std::cerr << "LOC DSIZE " << sizeof(Location) << " ::: " << e.location << std::endl;
+        //is.read(reinterpret_cast<char*>(&length), sizeof(size_t));
+      //  std::cerr << "\n";
+        return e;
+    }
 
    friend std::ostream& operator<<(std::ostream& os, const Locus& e) {
         os << e.id << "\t" << e.location;

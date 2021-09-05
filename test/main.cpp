@@ -68,8 +68,8 @@ TEST_CASE() {
 
 //ldforest
 TEST_CASE() {
-	LDForest e(nullptr, loci.size());
-	REQUIRE(!e.validate());
+	LDForest e(loci.size());
+
 }
 
 TEST_CASE() {
@@ -95,7 +95,7 @@ TEST_CASE() {
 	//	REQUIRE(testObject(e));
 
 
-	LDForest ldforest(nullptr, loci.size());
+	LDForest ldforest(loci.size());
 
 	for (ID_Snp i = 0; i < snps.size(); ++i) {
 		ldforest.insert(LDTree(snps[i], loci[i].location));

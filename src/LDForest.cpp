@@ -2,17 +2,16 @@
 
 LDForest::LDForest(ID_Snp numSnps) :
     topSnpList_(TopSnpList(numSnps)){
-    //topSnpList_(TopSnpList(numSnps, numSnps, 0)) {
 }
 
 LDForest::LDForest(SnpSet& snpSet, ID_Snp numSnps) :
     topSnpList_(TopSnpList(numSnps)) {
 
     const auto& s = snpSet.getSnps();
-    const auto& l = snpSet.getLocations();
+    const auto& l = snpSet.loci;//.getLocations();
 
     for (ID_Snp i = 0; i < s.size(); ++i) {
-        ldtrees_.push_back(LDTree(s[i], l[i]));
+        ldtrees_.push_back(LDTree(s[i], l[s[i].getIndex()].location));
         ldtrees_.back().topSnpList_ = &topSnpList_;
     }
 }
@@ -91,7 +90,7 @@ void LDForest::testTrees(int maxThreadUsage){
     size_t treesFinished = 0;
     #pragma omp parallel for num_threads(maxThreadUsage) schedule(dynamic, 20)
     for(size_t i=0; i<size(); ++i){
-        std::cerr <<"i = "<< i << std::endl;
+      //  std::cerr <<"i = "<< i << std::endl;
         //CTable2 cTable;
         for (size_t j = i + 1; j < size(); ++j) {
             ldtrees_[i].epistasisTest(ldtrees_[j]);//, topSnpList_);
@@ -108,14 +107,14 @@ void LDForest::testTrees(int maxThreadUsage){
     std::clog<<std::endl;
 }
 
-void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
+void LDForest::writeResults(const std::vector<Locus>& infoMatrix, const std::string& output){
     topSnpList_.calculateFormattedResults();
     
     std::ofstream ofs;
     
     //If no output file was provided
-    if(args.output != ""){
-        ofs.open(args.output + ".reciprocalPairs", std::ofstream::out); 
+    if(output != ""){
+        ofs.open(output + ".reciprocalPairs", std::ofstream::out); 
         auto rp = topSnpList_.getPairs().reciprocal;// getReciprocalPairs();
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
@@ -124,7 +123,7 @@ void LDForest::writeResults(const std::vector<Locus>& infoMatrix, Args& args){
         }
         ofs.close();
         
-        ofs.open(args.output + ".cutoffPairs", std::ofstream::out);
+        ofs.open(output + ".cutoffPairs", std::ofstream::out);
         rp = topSnpList_.getPairs().cutoff;
         std::sort(rp.begin(), rp.end(), TopPairing::orderByScore);
         ofs << "chi2\tid1\tchr1\tbp1\tid2\tchr2\tbp2\n";
