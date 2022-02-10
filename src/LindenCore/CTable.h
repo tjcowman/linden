@@ -3,9 +3,6 @@
 #include "Types.h"
 #include <array>
 
-#include "Snp.h"
-class Snp;
-
 namespace CTable {
     const static std::array<std::pair<uint8_t, uint8_t>, 9> rowOrder{ { {0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2} } };
 }

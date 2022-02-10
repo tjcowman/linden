@@ -7,6 +7,7 @@
 #include <chrono>
 #include <random>
 #include <algorithm>
+#include <filesystem>
 
 #include "argParser.h"
 #include "CommonStructs.h"
@@ -34,7 +35,7 @@ struct Args {
     std::string controls;
     std::string cases;
 
-    std::string snpSet = ""; //if a serialized snpet provided, dont need ythe other files
+    std::filesystem::path snpSet = ""; //if a serialized snpet provided, dont need ythe other files
 
     std::string output = "";
 
@@ -60,7 +61,7 @@ void testData(Args& args){
     GenotypeMatrix controls;
 
     SnpSet snps;
-    if (args.snpSet == "") {
+    if (args.snpSet.empty()) {
    
 
         //The controls and cases expect 0,1,2 chars
@@ -125,10 +126,25 @@ void testData(Args& args){
         snps = SnpSet(loci, controls, cases);
     }
     else {
+        std::cout<<"Reading from "<<args.snpSet<<std::endl;
+
+        if(!std::filesystem::exists(args.snpSet))
+        {
+            std::cerr<<args.snpSet<<" does not exist"<<std::endl;
+            return;
+        }
+
         std::ifstream is(args.snpSet, std::ios::binary);
-      //  loci = parseLoci(openFileChecked(args.loci)); //TODO: IMPORTANT MAKE THIS SERIALIZE CORRECTLY
+
+        if(!is.is_open())
+        {
+            std::cerr<<"failed to open file"<<std::endl;
+            return;
+        }
+      
+
         snps = SnpSet::from_serial(is);
-        //snps.loci = loci;
+
      
         Snp::setDimensions(snps.getDimensions().numControls_, snps.getDimensions().numCases_);
     }

@@ -8,6 +8,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 
 //Integer type extension for allowing serialize and de-serialize with same api as Snps
@@ -51,9 +52,9 @@ bool testObject(const T& object) {
 
 //Load test data
 using TestGraph = Graph<IntType, uint16_t>;
-std::vector<Locus> loci = parseLoci(openFileChecked("example/loci"));
-GenotypeMatrix cases = parseGenotypes(openFileChecked("example/cases"));
-GenotypeMatrix controls = parseGenotypes(openFileChecked("example/controls"));
+std::vector<Locus> loci = parseLoci(openFileChecked("../example/loci"));
+GenotypeMatrix cases = parseGenotypes(openFileChecked("../example/cases"));
+GenotypeMatrix controls = parseGenotypes(openFileChecked("../example/controls"));
 
 
 //Test for Graph structure serialization and deserialization

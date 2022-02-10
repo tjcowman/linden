@@ -1,6 +1,10 @@
 #include "SnpSet.h"
 
-SnpSet::SnpSet() {
+SnpSet::SnpSet() :
+    sizeUnfiltered(0),
+    dim(SnpDimensions(0,0)),
+    data(std::vector<Snp>())
+{
 
 }
 
@@ -49,11 +53,21 @@ void SnpSet::to_serial(std::ostream& os, const SnpSet& snpSet) {
 
 SnpSet SnpSet::from_serial(std::istream& is) {
     SnpSet e;
+    auto Bread = is.tellg();
     is.read(reinterpret_cast<char*>(&e.sizeUnfiltered), sizeof(ID_Snp));
+    auto Aread = is.tellg();
     is.read(reinterpret_cast<char*>(&e.dim), sizeof(SnpDimensions));
+
+    if(is.fail())
+    {
+        std::cerr<<"Read fail"<<std::endl;
+    }
+
     e.data = vector_from_serialc<Snp, ID_Snp>(is);
     //e.locations = vector_from_serial<Location, ID_Snp>(is);
+
     e.loci = vector_from_serialc<Locus, ID_Snp>(is);
+    auto Lread = is.tellg();
 
    // std::cerr << "TMP FROM SET SERIAL" << std::endl;
     return e;

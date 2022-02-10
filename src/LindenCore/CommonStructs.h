@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <tuple>
 
 #include "Types.h"
 
@@ -99,7 +100,7 @@ struct Locus {
         is.read(reinterpret_cast<char*>(&length), sizeof(size_t));
         //std::cerr << "TMP LOC LEN READ " << length << std::endl;
         e.id.resize(length);
-        is.read(reinterpret_cast<char*>(e.id.data()), length*sizeof(char));
+        is.read(const_cast<char*>(e.id.data()), length*sizeof(char));
        // std::cerr << e.id << std::endl;
         
         is.read(reinterpret_cast<char*>(&e.location), sizeof(Location));

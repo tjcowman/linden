@@ -4,7 +4,10 @@ LDTree::LDTree() {
 
 }
 
-LDTree::LDTree(const Snp& snp, const Location& location) : snps_(Graph<Snp, ID_Snp>(snp)), locations_(std::vector<Location>{location}) {
+LDTree::LDTree(const Snp& snp, const Location& location) : 
+    snps_(Graph<Snp, ID_Snp>(snp)), 
+    locations_(Graph<Location, ID_Snp>(location)) 
+{
     topSnpList_ = nullptr;
     root_ = 0;
 }
@@ -16,10 +19,12 @@ LDTree::LDTree( LDTree& t1,  LDTree& t2)  {
     Snp newRoot(t1.getRoot(), t2.getRoot());
 
     //Update the locations data
-    locations_ = std::vector<Location>();
-    locations_.insert(locations_.end(), std::make_move_iterator(t1.locations_.begin()), std::make_move_iterator(t1.locations_.end()));
-    locations_.insert(locations_.end(), std::make_move_iterator(t2.locations_.begin()), std::make_move_iterator(t2.locations_.end()));
+   // locations_ = std::vector<Location>();
+    //locations_.insert(locations_.end(), std::make_move_iterator(t1.locations_.begin()), std::make_move_iterator(t1.locations_.end()));
+    //locations_.insert(locations_.end(), std::make_move_iterator(t2.locations_.begin()), std::make_move_iterator(t2.locations_.end()));
    
+    locations_ = Graph<Location, ID_Snp>::joinToRoot(Location(), t1.locations_, t2.locations_);
+
     //Update the Snp Tree (Graph) structure
     snps_ = Graph<Snp, ID_Snp>::joinToRoot(newRoot, t1.snps_, t2.snps_);
 
@@ -136,7 +141,8 @@ void LDTree::epistasisTest(const LDTree& other)const {
         //If at both leaves
         else{
             //check to make sure not estimated as being in LD
-            if (!locations_[c.first].inLinkageDisequilibrium(other.locations_[c.second])){
+            //if (!locations_[c.first].inLinkageDisequilibrium(other.locations_[c.second])){
+            if (!locations_.getElement(c.first).inLinkageDisequilibrium(other.locations_.getElement(c.second))){
 
                 topSnpList_->attemptInsert(snps_.getElement(c.first).getIndex(), other.snps_.getElement(c.second).getIndex(), score);
 
@@ -152,7 +158,7 @@ void LDTree::epistasisTest(const LDTree& other)const {
 }
 
 void LDTree::to_serial(std::ostream& os, const LDTree& e){
-   
+ /*  
     //Root node
     os.write(reinterpret_cast<const char*>(&e.root_), sizeof(ID_Snp));
    // Graph<Snp, ID_Snp> snps_;
@@ -162,12 +168,12 @@ void LDTree::to_serial(std::ostream& os, const LDTree& e){
     ID_Snp num_locations = e.locations_.size();
     os.write(reinterpret_cast<const char*>(&num_locations), sizeof(ID_Snp));
     os.write(reinterpret_cast<const char*>(&e.locations_[0]), num_locations*sizeof(Location));
-
+*/
 
 }
 
 LDTree LDTree::from_serial(std::istream& is) {
-    LDTree e;
+ /*   LDTree e;
 
     is.read(reinterpret_cast<char*>(&e.root_), sizeof(ID_Snp));
     e.snps_ = Graph<Snp, ID_Snp>::from_serial(is);
@@ -178,5 +184,5 @@ LDTree LDTree::from_serial(std::istream& is) {
     e.locations_.resize(num_locations);
     is.read(reinterpret_cast<char*>(&e.locations_[0]), num_locations*sizeof(Location));
 
-    return e;
+    return e;*/
 }
