@@ -1,5 +1,7 @@
 #include "SnpSet.h"
 
+#include "Serializers.hpp"
+
 SnpSet::SnpSet() :
     sizeUnfiltered(0),
     dim(SnpDimensions(0,0)),
@@ -52,9 +54,12 @@ void SnpSet::to_serial(std::ostream& os, const SnpSet& snpSet) {
 }
 
 SnpSet SnpSet::from_serial(std::istream& is) {
+
     SnpSet e;
+  
     auto Bread = is.tellg();
     is.read(reinterpret_cast<char*>(&e.sizeUnfiltered), sizeof(ID_Snp));
+
     auto Aread = is.tellg();
     is.read(reinterpret_cast<char*>(&e.dim), sizeof(SnpDimensions));
 
@@ -65,7 +70,7 @@ SnpSet SnpSet::from_serial(std::istream& is) {
 
     e.data = vector_from_serialc<Snp, ID_Snp>(is);
     //e.locations = vector_from_serial<Location, ID_Snp>(is);
-
+ auto Rread = is.tellg();
     e.loci = vector_from_serialc<Locus, ID_Snp>(is);
     auto Lread = is.tellg();
 

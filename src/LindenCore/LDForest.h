@@ -6,8 +6,7 @@
  */
 
 
-#ifndef LDFOREST_H
-#define LDFOREST_H
+#pragma once
 
 #include "CommonStructs.h"
 #include "Snp.h"
@@ -58,4 +57,3 @@ class LDForest{
            
 
 };
-#endif //LDFOREST_H

@@ -6,8 +6,7 @@
  */
 
 
-#ifndef SNP_H
-#define SNP_H
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -29,9 +28,9 @@ struct SnpDimensions {
         numControls_(numControls),
         numCases_(numCases),
         //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
-        CONR_(numControls / PACKED_SIZE + (numControls % PACKED_SIZE != 0)),
-        CASR_(numCases / PACKED_SIZE + (numCases % PACKED_SIZE != 0)),
-        CASS_(3 * (numControls / PACKED_SIZE + (numControls % PACKED_SIZE != 0))){}
+        CONR_(numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)),
+        CASR_(numCases / Bitwise::Size + (numCases % Bitwise::Size != 0)),
+        CASS_(3 * (numControls / Bitwise::Size + (numControls % Bitwise::Size != 0))){}
 
     ID_Sample numControls_;
     ID_Sample numCases_;
@@ -63,9 +62,7 @@ class Snp
         static void fillTable(CTable2& t, const Snp& snp1, const Snp& snp2);
 
         float marginalTest()const;
-        //float epistasisTest(const Snp & other)const;
-        
-        //friend std::ostream& operator<< (std::ostream &out, const Snp & snp);
+
 
         static void to_serial(std::ostream& os, const Snp& snp);
         static Snp from_serial(std::istream& is);
@@ -78,7 +75,7 @@ class Snp
         void packGenotypes( std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest);
 
         //Will consist of controls 0 , 1 , 2 then cases 0 , 1 , 2
-        std::vector<PackedGenotype> allSamples_;
+        std::vector<Bitwise::Genotype> allSamples_;
        // std::vector<__m256i> samples_;
         ID_Snp index_;
         static SnpDimensions dim;
@@ -87,8 +84,3 @@ class Snp
        // static ID_Sample CAW_;
        // static ID_Sample CAS_;
 };
-
-
-
-
-#endif //SNP_H

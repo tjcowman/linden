@@ -17,7 +17,7 @@
 #include "TopSnpList.h"
 #include "LDForest.h"
 
-#include "InputParser.h"
+#include "InputParser.hpp"
 
 
 
@@ -149,14 +149,14 @@ void testData(Args& args){
         Snp::setDimensions(snps.getDimensions().numControls_, snps.getDimensions().numCases_);
     }
 
-
+    std::cout<<"File Read "<<args.snpSet<<std::endl;
     //tesdt
   //  for (const auto& e : snps.loci)
    //     std::cerr << e << std::endl;
 
     //Record the initial size of the dataset read in
     //TODO Rework this log class and try to remove
-    Log log{};
+    Log log;
     log.snps_ = snps.size();//loci.size();
     log.cases_ = snps.getDimensions().numCases_;// cases.width;
     log.controls_ = snps.getDimensions().numControls_;// controls.width;
@@ -172,6 +172,8 @@ void testData(Args& args){
     log.marginalSignificanceRemoved_ = snps.remove_if([args](const Snp& e) {return e.marginalTest() > chi2DegreesFreedomTable[args.maxMS]; });
     std::clog << "\tremoved marginal significance: " << log.marginalSignificanceRemoved_ << "\n";
 
+    //TMP DEBUG
+    snps.truncateTo(14000);
 
     //Initialize the ldforest, note that currently the loci size needs to refer to the range of possible indexes not how many post filterd SNPs there are
     //This is due to the implementation of TopSnpList
@@ -179,11 +181,10 @@ void testData(Args& args){
     LDForest ldforest(snps, snps.getSizeUnfiltered() );
 
     if(ldforest.size() > 1){    
-        ldforest.mergeTrees( args.maxUnknown);
+        ldforest.mergeTrees(args.maxUnknown);
         log.mergedTreesFormed_ = ldforest.size();
         ldforest.testTrees(args.maxThreads);
-        //ldforest.writeResults(loci, args.output);
-        ldforest.writeResults(snps.loci, args.output);
+        //ldforest.writeResults(snps.loci, args.output);
     }
 }
 

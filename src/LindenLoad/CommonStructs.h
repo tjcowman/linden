@@ -15,29 +15,19 @@
 #include <vector>
 #include <tuple>
 
-#include "Types.h"
+using ID_Snp = std::uint32_t; //Maxium number of input Snps
+using ID_Genotype = std::uint8_t; //Maximum number of genotype values 0, 1, 2 ...
+using ID_Sample = std::uint32_t; //Maximum number of input samples
 
-/*
-struct Location {
-   // uint32_t chromosome_;
-    uint32_t basePair_;
-    bool inLinkageDisequilibrium(const Location& other)const { return true; }
-    bool operator==(const Location& lhs)const { return false; }
-
-    friend std::ostream& operator<<(std::ostream& os, const Location& e) {
-        os  << e.basePair_;
-        return os;
-    }
-
-};
-*/
+namespace ID_Invalid{
+	constexpr ID_Snp Snp = std::numeric_limits<ID_Snp>::max();
+}
 
 
 static const uint32_t ESTIMATED_LD_RANGE = 1000000;
 
 struct Location {
-
-
+    
 
     Location(uint32_t chromosome, uint32_t basePair) : chromosome_(chromosome), basePair_(basePair)
     {
@@ -51,7 +41,15 @@ struct Location {
         chromosome_ = static_cast<uint32_t>(-1);
         basePair_ = static_cast<uint32_t>(-1);
       }
-
+/*
+    Location(
+        uint32_t chromosome = static_cast<uint32_t>(-1), 
+        uint32_t basePair = static_cast<uint32_t>(-1)
+    ) : 
+        chromosome_(chromosome), 
+        basePair_(basePair)
+    { }
+*/
     bool operator==(const Location& lhs)const {
         return std::tie(chromosome_, basePair_) == std::tie(lhs.chromosome_, lhs.basePair_);
     }
@@ -69,9 +67,9 @@ struct Location {
         ID_Snp dist = basePair_ > other.basePair_ ? basePair_ - other.basePair_ : other.basePair_ - basePair_;
         return(dist <= ESTIMATED_LD_RANGE);
     }
+
     uint32_t chromosome_;
     uint32_t basePair_;
-
 };
 
 
@@ -92,21 +90,18 @@ struct Locus {
         //os.write(reinterpret_cast<const char*>(&length), sizeof(size_t));
     }
 
+    //BUG: SIZE_T IS A HUGE ISSUE WAS NOT 8 BYTES ON MY PC
     static Locus from_serial(std::istream& is) {
-       // std::cerr << "TEST" << std::endl;
         Locus e;
         size_t length;
         
-        is.read(reinterpret_cast<char*>(&length), sizeof(size_t));
-        //std::cerr << "TMP LOC LEN READ " << length << std::endl;
+        is.read(reinterpret_cast<char*>(&length), 8);//sizeof(size_t));
+
         e.id.resize(length);
         is.read(const_cast<char*>(e.id.data()), length*sizeof(char));
-       // std::cerr << e.id << std::endl;
-        
+
         is.read(reinterpret_cast<char*>(&e.location), sizeof(Location));
-       // std::cerr << "LOC DSIZE " << sizeof(Location) << " ::: " << e.location << std::endl;
-        //is.read(reinterpret_cast<char*>(&length), sizeof(size_t));
-      //  std::cerr << "\n";
+
         return e;
     }
 

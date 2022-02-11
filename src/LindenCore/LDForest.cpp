@@ -10,6 +10,8 @@ LDForest::LDForest(SnpSet& snpSet, ID_Snp numSnps) :
     const auto& s = snpSet.getSnps();
     const auto& l = snpSet.loci;//.getLocations();
 
+    ldtrees_.reserve(s.size());
+
     for (ID_Snp i = 0; i < s.size(); ++i) {
         ldtrees_.push_back(LDTree(s[i], l[s[i].getIndex()].location));
         ldtrees_.back().topSnpList_ = &topSnpList_;
@@ -50,6 +52,7 @@ void LDForest::mergeTrees(double maxUnknownFraction){
 
 size_t LDForest::mergeTreeIteration(float unknownFraction){
     std::vector<LDTree> mergedTrees;
+      //mergedTrees.reserve(ldtrees_);
     
     
     ID_Snp allowedDifferences = unknownFraction * (Snp::getDimensions().numControls_ + Snp::getDimensions().numCases_); //(log_->controls_ + log_->cases_);

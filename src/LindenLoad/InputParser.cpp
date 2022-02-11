@@ -1,10 +1,11 @@
-#include "CommonStructs.h"
-#include "Types.h"
 
 #include <string>
 #include <charconv>
 #include <array>
 #include <map>
+
+#include "InputParser.hpp"
+
 
 std::ifstream openFileChecked(std::string filepath){
     std::ifstream file(filepath);
@@ -99,3 +100,4 @@ GenotypeMatrix parseGenotypes(std::ifstream ifs) {
     ret.height = ret.data.size() / width;
     return ret;
 }
+

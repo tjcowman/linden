@@ -1,13 +1,15 @@
 add_subdirectory(LindenCore)
+add_subdirectory(LindenLoad)
 
 # main executable
 add_executable(linden 
     linden.cpp 
 ) 
 set_property(TARGET linden PROPERTY CXX_STANDARD 17) 
-target_include_directories(linden PRIVATE LindenCore)
+target_include_directories(linden PRIVATE LindenCore LindenLoad)
 target_link_libraries(linden
     Linden-Core
+    Linden-Load
     OpenMP::OpenMP_CXX
 )
 
@@ -19,6 +21,7 @@ set_property(TARGET lindenV0 PROPERTY CXX_STANDARD 17)
 target_include_directories(lindenV0 PRIVATE LindenCore)
 target_link_libraries(lindenV0
     Linden-Core-Old
+    Linden-Load
     OpenMP::OpenMP_CXX
 )
 

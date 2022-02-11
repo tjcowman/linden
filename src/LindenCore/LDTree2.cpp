@@ -19,10 +19,6 @@ LDTree::LDTree( LDTree& t1,  LDTree& t2)  {
     Snp newRoot(t1.getRoot(), t2.getRoot());
 
     //Update the locations data
-   // locations_ = std::vector<Location>();
-    //locations_.insert(locations_.end(), std::make_move_iterator(t1.locations_.begin()), std::make_move_iterator(t1.locations_.end()));
-    //locations_.insert(locations_.end(), std::make_move_iterator(t2.locations_.begin()), std::make_move_iterator(t2.locations_.end()));
-   
     locations_ = Graph<Location, ID_Snp>::joinToRoot(Location(), t1.locations_, t2.locations_);
 
     //Update the Snp Tree (Graph) structure
@@ -185,4 +181,5 @@ LDTree LDTree::from_serial(std::istream& is) {
     is.read(reinterpret_cast<char*>(&e.locations_[0]), num_locations*sizeof(Location));
 
     return e;*/
+    return LDTree();
 }

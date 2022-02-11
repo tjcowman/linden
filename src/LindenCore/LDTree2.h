@@ -24,6 +24,7 @@ class LDTree
     friend LDForest;
 public:
     LDTree();
+
     LDTree(const Snp& snp, const Location& location);
  
     LDTree( LDTree& t1,  LDTree& t2);
@@ -54,8 +55,7 @@ private:
 
     ID_Snp root_; //Root node as the graph is being utilized as a directed tree
     Graph<Snp, ID_Snp> snps_;
-    Graph<Location, ID_Snp> locations_;
-    //std::vector<Location> locations_; //Stores the genomic location of snps in this tree  
+    Graph<Location, ID_Snp> locations_; //Stores the genomic location of snps in this tree  
 
     TopSnpList* topSnpList_;
 };

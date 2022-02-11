@@ -5,8 +5,7 @@
  * to reduce the memory footprint when calculating contingecy tables.
  */
 
-#ifndef LDTREE_H
-#define LDTREE_H
+#pragma once
 
 #include "Snp.h"
 #include "TopSnpList.h"
@@ -38,9 +37,8 @@ public:
     void clear();
 
     void epistasisTest(const LDTree& other)const;
-    //  void epistasisTestNoTrees(const LDTree & other, TopSnpList & topSnpList)const;
 
-      //friend std::ostream& operator<< (std::ostream &out, const LDTree & ldtree);
+
     static void to_serial(std::ostream& os, const LDTree& e);
     static LDTree from_serial(std::istream& is);
 
@@ -51,5 +49,3 @@ private:
     std::vector<Snp> nodes_;
     std::vector<Location> genomeLocations_;
 };
-
-#endif //LDTREE_H

@@ -1,10 +1,9 @@
 #include "Snp.h"
 
+#include "Serializers.hpp"
+
 //Define static members, set in main
 SnpDimensions Snp::dim;
-//ID_Sample Snp::COW_;
-//ID_Sample Snp::CAW_;
-//ID_Sample Snp::CAS_;
 
 Snp::Snp(){
    // index_ = -1;
@@ -18,11 +17,6 @@ Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cas
     packGenotypes(cases.rowBegin(index), cases.rowEnd(index), allSamples_);
 
     index_ = index;
-
-    //Determine number of vectorized elements
-    //COW_ = CONR_ / 4 + (CONR_ % 4 != 0);
-    //CAW_ = CASR_ / 4 + (CASR_ % 4 != 0);
-    //CAS_ = (3 * COW_);
 }
 
 /*Snp::Snp(const Snp & cpy){
@@ -35,7 +29,7 @@ Snp::Snp(const Snp & s1, const Snp & s2){
     //and not refer to a specific snp from the dataset
     index_ = -1; //TODO: FIX TO BE EXPLICIT TYPE   (currently should wrap arount to largest uval)
   //  std::cout << index_ << " ? "<< std::endl;
-    allSamples_ = bitMerge(s1.allSamples_, s2.allSamples_);
+    allSamples_ = Bitwise::merge(s1.allSamples_, s2.allSamples_);
 }
 
 bool Snp::operator==(const Snp& lhs)const {
@@ -47,19 +41,19 @@ ID_Snp Snp::getIndex()const{
 }
 
 float Snp::computeMinorAlleleFrequency()const{
-    ID_Sample homoMajor = popCount(allSamples_, 0, dim.CONR_) + popCount(allSamples_, dim.CASS_, dim.CASR_) ;
-    ID_Sample hetero = popCount(allSamples_, dim.CONR_, dim.CONR_) + popCount(allSamples_, dim.CASS_+ dim.CASR_, dim.CASR_);
-    ID_Sample homoMinor = popCount(allSamples_, 2* dim.CONR_, dim.CONR_) + popCount(allSamples_, dim.CASS_+(2* dim.CASR_), dim.CASR_) ;
+    ID_Sample homoMajor = Bitwise::count(allSamples_.begin(), dim.CONR_) + Bitwise::count(allSamples_.begin() + dim.CASS_, dim.CASR_) ;
+    ID_Sample hetero = Bitwise::count(allSamples_.begin() + dim.CONR_, dim.CONR_) + Bitwise::count(allSamples_.begin() + dim.CASS_+ dim.CASR_, dim.CASR_);
+    ID_Sample homoMinor = Bitwise::count(allSamples_.begin() + (2* dim.CONR_), dim.CONR_) + Bitwise::count(allSamples_.begin() + dim.CASS_+(2* dim.CASR_), dim.CASR_) ;
     
     return (2*homoMinor+hetero)/(float)(2*homoMajor + hetero + 2*homoMinor);
 }
 
 ID_Sample Snp::computeDifferences(const Snp & other)const{
-    return ((dim.numControls_ + dim.numCases_)- popCountAnd(allSamples_, other.allSamples_, 0, allSamples_.size()));
+    return ((dim.numControls_ + dim.numCases_)- Bitwise::andCount(allSamples_.begin(), other.allSamples_.begin(), allSamples_.size()));
 }
 
 float Snp::computeUnknownRatio()const{
-    int numberKnown = popCount(allSamples_, 0, allSamples_.size());
+    int numberKnown = Bitwise::count(allSamples_.begin(), allSamples_.size());
 
     return ( numberKnown/(float)(dim.numControls_ + dim.numCases_) );
 }
@@ -70,11 +64,8 @@ void Snp::fillTable(CTable2& t, const Snp& snp1, const Snp& snp2){
     for (const auto& e : CTable::rowOrder) {
         const uint8_t rowI = 9 * e.first + e.second * 3;
 
-        t.data[rowI] = popCountAnd_it(snp1.allSamples_.begin() + (e.first * dim.CONR_), snp2.allSamples_.begin() + (e.second * dim.CONR_), dim.CONR_) + 1;
-        t.data[rowI + 1] = popCountAnd_it(snp1.allSamples_.begin() + (e.first * dim.CASR_ + dim.CASS_), snp2.allSamples_.begin() + (e.second * dim.CASR_ + dim.CASS_), dim.CASR_) + 1;
-
-        //t.data[rowI] =   popCountAnd_Vec(samples_, other.samples_, e.first * COW_, e.second * COW_, COW_ )+ 1;
-       // t.data[rowI + 1] = popCountAnd_Vec(samples_, other.samples_, e.first * CAW_ + CAS_, e.second * CAW_ + CAS_, CAW_) + 1;
+        t.data[rowI] = Bitwise::andCount(snp1.allSamples_.begin() + (e.first * dim.CONR_), snp2.allSamples_.begin() + (e.second * dim.CONR_), dim.CONR_) + 1;
+        t.data[rowI + 1] = Bitwise::andCount(snp1.allSamples_.begin() + (e.first * dim.CASR_ + dim.CASS_), snp2.allSamples_.begin() + (e.second * dim.CASR_ + dim.CASS_), dim.CASR_) + 1;
 
         //fill the row totals
         t.data[rowI + 2] = t.data[rowI] + t.data[rowI + 1];
@@ -91,8 +82,8 @@ float Snp::marginalTest()const{
 
    for (uint8_t i = 0; i <= 6; i+=3) {
        //Fill cells for this row, correcting by adding 1
-       t.data[i] = popCount(allSamples_, i/3 * dim.CONR_, dim.CONR_) + 1;
-       t.data[i + 1] = popCount(allSamples_, dim.CASS_ + (i/3 * dim.CASR_), dim.CASR_) + 1;
+       t.data[i] = Bitwise::count(allSamples_.begin() + (i/3 * dim.CONR_), dim.CONR_) + 1;
+       t.data[i + 1] = Bitwise::count(allSamples_.begin() + (dim.CASS_ + (i/3 * dim.CASR_)), dim.CASR_) + 1;
 
        //fill the row totals
        t.data[i + 2] = t.data[i] + t.data[i + 1];
@@ -121,18 +112,18 @@ float Snp::marginalTest()const{
 }
 
 void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest ){
-    std::array<std::vector<PackedGenotype>,3> packedGenotypes;
-    std::array<PackedGenotype, 3> sectionCode{ 0,0,0 };
+    std::array<std::vector<Bitwise::Genotype>,3> packedGenotypes;
+    std::array<Bitwise::Genotype, 3> sectionCode{ 0,0,0 };
 
-    PackedGenotype offset=0;
+    Bitwise::Genotype offset=0;
 
     for (auto it = begin; it != end; ++it) {
-        PackedGenotype mask = (PackedGenotype)1 << (PACKED_SIZE - (offset + 1) % PACKED_SIZE);
+        Bitwise::Genotype mask = (Bitwise::Genotype)1 << (Bitwise::Size - (offset + 1) % Bitwise::Size);
 
         sectionCode[*it] = sectionCode[*it] | mask;
         
         //When a section is full, push them back and reset the sections to empty;
-        if (((offset + 1) % PACKED_SIZE == 0)) {
+        if (((offset + 1) % Bitwise::Size == 0)) {
             packedGenotypes[0].push_back(sectionCode[0]);
             packedGenotypes[1].push_back(sectionCode[1]);
             packedGenotypes[2].push_back(sectionCode[2]);
@@ -147,7 +138,7 @@ void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<
 
     //Push final sections if not full
 
-    if (sectionCode != std::array<PackedGenotype, 3>{0, 0, 0}) {
+    if (sectionCode != std::array<Bitwise::Genotype, 3>{0, 0, 0}) {
         packedGenotypes[0].push_back(sectionCode[0]);
         packedGenotypes[1].push_back(sectionCode[1]);
         packedGenotypes[2].push_back(sectionCode[2]);
@@ -196,9 +187,9 @@ void Snp::setDimensions(ID_Sample controls, ID_Sample cases) {
        controls,
        cases,
        //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
-       controls / PACKED_SIZE + (controls % PACKED_SIZE != 0),
-       cases / PACKED_SIZE + (cases % PACKED_SIZE != 0),
-       3 * (controls / PACKED_SIZE + (controls % PACKED_SIZE != 0))
+       controls / Size + (controls % Size != 0),
+       cases / Size + (cases % Size != 0),
+       3 * (controls / Size + (controls % Size != 0))
     };
     */
 }
@@ -210,14 +201,14 @@ const SnpDimensions& Snp::getDimensions() {
 
 void Snp::to_serial(std::ostream& os, const Snp& snp) {
     os.write(reinterpret_cast<const char*>(&snp.index_),sizeof(ID_Snp));
-    vector_to_serial<PackedGenotype,ID_Snp>(os, snp.allSamples_);
+    vector_to_serial<Bitwise::Genotype,ID_Snp>(os, snp.allSamples_);
 }
 
 Snp Snp::from_serial(std::istream& is) {
     Snp e;
 
     is.read(reinterpret_cast<char*>(&e.index_), sizeof(ID_Snp));
-    e.allSamples_ = vector_from_serial<PackedGenotype, ID_Snp>(is);
+    e.allSamples_ = vector_from_serial<Bitwise::Genotype, ID_Snp>(is);
 
     return e;
 }

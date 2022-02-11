@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include "CommonStructs.h"
 #include <array>
 
 namespace CTable {
@@ -43,6 +43,4 @@ struct CTable2 {
 
         return chi2;
     }
-
-
 };

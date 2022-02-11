@@ -1,4 +1,4 @@
-#include "Types.h"
+#include "CommonStructs.h"
 
 #include <vector>
 #include <iostream>

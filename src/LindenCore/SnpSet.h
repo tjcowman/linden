@@ -3,7 +3,7 @@
 
 #include "Snp.h"
 #include "CommonStructs.h"
-#include "Types.h"
+
 #include <vector>
 
 
@@ -25,7 +25,12 @@ public:
 	template<typename F>
 	ID_Snp remove_if(F f);
 	
-	
+	void truncateTo(ID_Snp n)
+	{
+		data.resize(n);
+	}
+
+
 	static void to_serial(std::ostream& os, const SnpSet& snpSet);
 	static SnpSet from_serial(std::istream& is);
 
@@ -35,8 +40,6 @@ private:
 	ID_Snp sizeUnfiltered;
 	SnpDimensions dim;
 	std::vector<Snp> data;
-//	std::vector<Location> locations; //TODO REMOVE
-	
 };
 
 template<typename F>
