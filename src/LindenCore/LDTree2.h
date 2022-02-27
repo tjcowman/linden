@@ -38,6 +38,12 @@ public:
     const Snp& getRoot()const;
 
     std::vector<ID_Snp> getChildren(ID_Snp i)const;
+    
+    auto getChildren2(ID_Snp i) const
+    {
+        return snps_.getOutgoingIdsItStart(i);
+    }
+
     bool isLeaf(ID_Snp i)const;
 
 

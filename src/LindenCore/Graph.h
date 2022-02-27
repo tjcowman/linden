@@ -28,6 +28,16 @@ public:
 	const T& getElement(IT id)const;
 
 	std::vector<IT> getOutgoingIds(IT id)const;
+
+	// WARNING this relies on inplicit tree structure
+	auto getOutgoingIdsItStart(IT id)const
+	{
+		return JA.begin() + IA[id];
+
+	}
+
+	
+
 	bool isTerminal(IT id)const;
 
 

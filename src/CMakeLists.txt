@@ -18,7 +18,7 @@ add_executable(lindenV0
     linden.cpp 
 )  
 set_property(TARGET lindenV0 PROPERTY CXX_STANDARD 17)
-target_include_directories(lindenV0 PRIVATE LindenCore)
+target_include_directories(lindenV0 PRIVATE LindenCore LindenLoad)
 target_link_libraries(lindenV0
     Linden-Core-Old
     Linden-Load

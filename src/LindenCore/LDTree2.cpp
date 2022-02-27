@@ -103,9 +103,11 @@ void LDTree::epistasisTest(const LDTree& other)const {
         Snp::fillTable(cTable, snps_.getElement(c.first), other.snps_.getElement(c.second));
         float score = cTable.chi2();
      
-        auto lChildren = getChildren(c.first);
-        auto rChildren = other.getChildren(c.second);
+        //auto lChildren = getChildren(c.first);
+        //auto rChildren = other.getChildren(c.second);
         
+        auto lChildren = getChildren2(c.first);
+        auto rChildren = other.getChildren2(c.second);
 
         //If both not at leaves
         if(!isLeaf(c.first) && !other.isLeaf(c.second)) {
