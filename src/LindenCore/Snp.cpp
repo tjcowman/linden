@@ -5,42 +5,17 @@
 //Define static members, set in main
 SnpDimensions Snp::dim;
 
-Snp::Snp(){
-   // index_ = -1;
-   // numControls_ = 0;
-   // numCases_ = 0;
-   // allSamples_ = std::vector<PackedGenotype>();
-}
 
-Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases){
+Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cases)
+{
     packGenotypes(controls.rowBegin(index), controls.rowEnd(index), allSamples_);
     packGenotypes(cases.rowBegin(index), cases.rowEnd(index), allSamples_);
 
     index_ = index;
 }
 
-/*Snp::Snp(const Snp & cpy){
-    index_ = cpy.index_;
-    allSamples_ = cpy.allSamples_;
-}*/
-
-Snp::Snp(const Snp & s1, const Snp & s2){
-    //Index is -1 because any node created this way will be internal
-    //and not refer to a specific snp from the dataset
-    index_ = -1; //TODO: FIX TO BE EXPLICIT TYPE   (currently should wrap arount to largest uval)
-  //  std::cout << index_ << " ? "<< std::endl;
-    allSamples_ = Bitwise::merge(s1.allSamples_, s2.allSamples_);
-}
-
-bool Snp::operator==(const Snp& lhs)const {
-    return std::tie(index_, allSamples_) == std::tie(lhs.index_, lhs.allSamples_);
-}
-
-ID_Snp Snp::getIndex()const{
-    return index_;
-}
-
-float Snp::computeMinorAlleleFrequency()const{
+float Snp::computeMinorAlleleFrequency() const
+{
     ID_Sample homoMajor = Bitwise::count(allSamples_.begin(), dim.CONR_) + Bitwise::count(allSamples_.begin() + dim.CASS_, dim.CASR_) ;
     ID_Sample hetero = Bitwise::count(allSamples_.begin() + dim.CONR_, dim.CONR_) + Bitwise::count(allSamples_.begin() + dim.CASS_+ dim.CASR_, dim.CASR_);
     ID_Sample homoMinor = Bitwise::count(allSamples_.begin() + (2* dim.CONR_), dim.CONR_) + Bitwise::count(allSamples_.begin() + dim.CASS_+(2* dim.CASR_), dim.CASR_) ;
@@ -48,17 +23,20 @@ float Snp::computeMinorAlleleFrequency()const{
     return (2*homoMinor+hetero)/(float)(2*homoMajor + hetero + 2*homoMinor);
 }
 
-ID_Sample Snp::computeDifferences(const Snp & other)const{
+ID_Sample Snp::computeDifferences(const Snp & other) const
+{
     return ((dim.numControls_ + dim.numCases_)- Bitwise::andCount(allSamples_.begin(), other.allSamples_.begin(), allSamples_.size()));
 }
 
-float Snp::computeUnknownRatio()const{
+float Snp::computeUnknownRatio() const
+{
     int numberKnown = Bitwise::count(allSamples_.begin(), allSamples_.size());
 
     return ( numberKnown/(float)(dim.numControls_ + dim.numCases_) );
 }
 
-void Snp::fillTable(CTable2& t, const Snp& snp1, const Snp& snp2){
+void Snp::fillTable(CTable2& t, const Snp& snp1, const Snp& snp2)
+{
     t.zero();
 
     for (const auto& e : CTable::rowOrder) {
@@ -76,7 +54,8 @@ void Snp::fillTable(CTable2& t, const Snp& snp1, const Snp& snp2){
     }
 }
 
-float Snp::marginalTest()const{
+float Snp::marginalTest() const
+{
    CTable1 t;
    t.zero();
 
@@ -111,7 +90,8 @@ float Snp::marginalTest()const{
     return chi2;
 }
 
-void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest ){
+void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end, std::vector<uint64_t>& dest )
+{
     std::array<std::vector<Bitwise::Genotype>,3> packedGenotypes;
     std::array<Bitwise::Genotype, 3> sectionCode{ 0,0,0 };
 
@@ -169,46 +149,21 @@ void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<
         samples_.push_back(_mm256_loadu_si256((__m256i*) & packedGenotypes[2][i]));
     }
     */
-    //------
-
-
-
-
-
-  
-    
 }
 
-void Snp::setDimensions(ID_Sample controls, ID_Sample cases) {
-    Snp::dim = SnpDimensions(controls, cases);
-
-    /*
-    Snp::dim = {
-       controls,
-       cases,
-       //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
-       controls / Size + (controls % Size != 0),
-       cases / Size + (cases % Size != 0),
-       3 * (controls / Size + (controls % Size != 0))
-    };
-    */
-}
-
-const SnpDimensions& Snp::getDimensions() {
-    return Snp::dim;
-}
-
-
-void Snp::to_serial(std::ostream& os, const Snp& snp) {
+void Snp::to_serial(std::ostream& os, const Snp& snp) 
+{
     os.write(reinterpret_cast<const char*>(&snp.index_),sizeof(ID_Snp));
     vector_to_serial<Bitwise::Genotype,ID_Snp>(os, snp.allSamples_);
 }
 
-Snp Snp::from_serial(std::istream& is) {
-    Snp e;
+Snp Snp::from_serial(std::istream& is) 
+{
+    auto t1 = value_from_serial<ID_Snp>(is);
+    auto t2 =  vector_from_serial<Bitwise::Genotype, ID_Snp>(is);
 
-    is.read(reinterpret_cast<char*>(&e.index_), sizeof(ID_Snp));
-    e.allSamples_ = vector_from_serial<Bitwise::Genotype, ID_Snp>(is);
-
-    return e;
+    return Snp(
+        std::move(t1),
+        std::move(t2)
+    );
 }

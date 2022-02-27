@@ -8,7 +8,7 @@ LDForest::LDForest(SnpSet& snpSet, ID_Snp numSnps) :
     topSnpList_(TopSnpList(numSnps)) {
 
     const auto& s = snpSet.getSnps();
-    const auto& l = snpSet.loci;//.getLocations();
+    const auto& l = snpSet.getLoci();
 
     ldtrees_.reserve(s.size());
 
