@@ -1,10 +1,6 @@
 #include "LDTree.h" 
 
-LDTree::LDTree(const Snp& snp, const Location& location) : nodes_(std::vector<Snp>{ snp }), genomeLocations_(std::vector<Location>{ location }) {
- 
 
-    topSnpList_ = nullptr;//topSnpList;
-}
 
 LDTree::LDTree() {
 

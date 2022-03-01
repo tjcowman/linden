@@ -18,7 +18,13 @@ class LDTree
 {
     friend LDForest;
 public:
-    LDTree(const Snp& snp, const Location& location);
+
+    LDTree(const Snp& snp, const Location& location, TopSnpList* topSnpList=nullptr) : 
+        nodes_(std::vector<Snp>{ snp }), 
+        genomeLocations_(std::vector<Location>{ location }),
+        topSnpList_(topSnpList) 
+    { }
+
     LDTree();
 
     // LDTree(const LDTree & cpy); 

@@ -1,3 +1,4 @@
+
 /**
  * @author Tyler Cowman
  *
@@ -16,18 +17,41 @@
 #include <vector>
 #include <map>
 
-
-class LDForest;
-
 class LDTree
 {
-    friend LDForest;
 public:
-    LDTree();
-
-    LDTree(const Snp& snp, const Location& location);
+    // Standard constructor  
+    inline LDTree(const Snp& snp, const Location& location, TopSnpList* topSnpList = nullptr) :
+        snps_(Graph<Snp, ID_Snp>(snp)), 
+        locations_(Graph<Location, ID_Snp>(location)),
+        topSnpList_( topSnpList),
+        root_(0)
+    { }
  
-    LDTree( LDTree& t1,  LDTree& t2);
+    // Merge Constructor
+    inline LDTree( LDTree& t1,  LDTree& t2) :
+        root_(0),
+        locations_(Graph<Location, ID_Snp>::joinToRoot(
+            Location(), 
+            t1.locations_, 
+            t2.locations_
+        )),
+        snps_(Graph<Snp, ID_Snp>::joinToRoot(
+            Snp(t1.getRoot(), t2.getRoot()),
+            t1.snps_,
+            t2.snps_
+        )),
+        topSnpList_(nullptr)
+    { 
+        if(t1.topSnpList_ == t2.topSnpList_)
+        {
+            topSnpList_ = t1.topSnpList_;
+        }
+        else
+        {
+            std::cerr<<"subTrees point to different output lists"<<std::endl;
+        }
+    }
 
     bool operator==(const LDTree& lhs)const;
 
@@ -53,6 +77,13 @@ public:
     void clear();
 
     void epistasisTest(const LDTree& other)const;
+
+    const TopSnpList* getTopSnpList()
+    {
+        return topSnpList_;
+    }
+
+
 
     static void to_serial(std::ostream& os, const LDTree& e);
     static LDTree from_serial(std::istream& is);

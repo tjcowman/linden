@@ -1,27 +1,5 @@
 #include "TopSnpList.h"
 
-TopSnpList::TopSnpList(ID_Snp numberSnps) :
-    topK_(numberSnps),
-    cutoff_(0.0),
-    currentPartners_(std::vector<std::pair<ID_Snp, float>>(numberSnps, { -1,0.0 })),
-    testCounter_({0,0}),
-    insertSincePrefix_(0){
-
-    pairwiseSignificanceCounts_.fill(0);
-}
-
-TopSnpList::TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff)
-{
-    topK_ = topK;
-    cutoff_ = cutoff;
-
-    currentPartners_ = std::vector<std::pair<ID_Snp, float>>(numberSnps,{-1,0.0});
-
-    testCounter_ = { 0,0 };
-    
-    pairwiseSignificanceCounts_.fill(0);
-    insertSincePrefix_ = 0;
-}
 
 bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
 { 
@@ -67,24 +45,12 @@ bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
     return retVal;
 }
 
-ID_Snp TopSnpList::size()const {
-    return currentPartners_.size();
-}
-
-float TopSnpList::getCutoff()const{
-    return cutoff_;
-}
-
 void TopSnpList::incrementTestCounter(const TestCounter& tests){
     #pragma omp critical
     {
         testCounter_.internal += tests.internal;
         testCounter_.leaf += tests.leaf;
     }
-}
-
-const TestCounter& TopSnpList::getTestCounter()const{
-    return testCounter_;
 }
 
 void TopSnpList::calculateFormattedResults(){
@@ -97,10 +63,6 @@ void TopSnpList::calculateFormattedResults(){
 
     calculateReciprocalPairs();  
     sort(formattedPairs_.reciprocal.begin(), formattedPairs_.reciprocal.end(), TopPairing::orderByScore);
-}
-
-const FormattedPairs& TopSnpList::getPairs()const{
-    return formattedPairs_;
 }
 
 void TopSnpList::calculateReciprocalPairs(){

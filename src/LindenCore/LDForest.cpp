@@ -12,15 +12,10 @@ LDForest::LDForest(SnpSet& snpSet, ID_Snp numSnps) :
 
     ldtrees_.reserve(s.size());
 
-    for (ID_Snp i = 0; i < s.size(); ++i) {
-        ldtrees_.push_back(LDTree(s[i], l[s[i].getIndex()].location));
-        ldtrees_.back().topSnpList_ = &topSnpList_;
+    for (ID_Snp i = 0; i < s.size(); ++i) 
+    {
+        ldtrees_.push_back(LDTree(s[i], l[s[i].getIndex()].location, &topSnpList_));
     }
-}
-
-void LDForest::insert(LDTree&& ldTree){
-    ldTree.topSnpList_ = &topSnpList_;
-    ldtrees_.push_back(ldTree);  
 }
 
 size_t LDForest::size()const{

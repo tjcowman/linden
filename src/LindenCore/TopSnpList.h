@@ -91,20 +91,42 @@ class TopSnpList{
         /**
         * IMPORTANT : Currently needs numberSnps to be set to the size of the possible SNPIndexes(BEFORE ANY FILTERING)
         */
-        TopSnpList(ID_Snp nmberSnps);
-        //probably deprecate
-        TopSnpList(ID_Snp topK, ID_Snp numberSnps, float cutoff);          
+        inline TopSnpList(ID_Snp numberSnps) :
+            topK_(numberSnps),
+            cutoff_(0.0),
+            currentPartners_(std::vector<std::pair<ID_Snp, float>>(numberSnps, { -1,0.0 })),
+            testCounter_({0,0}),
+            insertSincePrefix_(0)
+        { 
+            pairwiseSignificanceCounts_.fill(0);
+        }
+   
         bool attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score);
         
         //Gets the number of snp Indexes used
-        ID_Snp size()const;
-        float getCutoff()const;
+        ID_Snp size() const
+        {    
+            return currentPartners_.size();
+        }   
+
+        float getCutoff()const
+        {
+            return cutoff_;
+        }
         
-        void incrementTestCounter(const TestCounter& tests);    
-        const TestCounter& getTestCounter()const;
+        void incrementTestCounter(const TestCounter& tests);  
+
+        const TestCounter& getTestCounter()const
+        {
+            return testCounter_;
+        }
 
         void calculateFormattedResults();
-        const FormattedPairs& getPairs()const;
+
+        const FormattedPairs& getPairs()const
+        {
+             return formattedPairs_;
+        }
  
     private:
         void calculateReciprocalPairs();

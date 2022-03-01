@@ -1,40 +1,5 @@
+
 #include "LDTree2.h" 
-
-LDTree::LDTree() {
-
-}
-
-LDTree::LDTree(const Snp& snp, const Location& location) : 
-    snps_(Graph<Snp, ID_Snp>(snp)), 
-    locations_(Graph<Location, ID_Snp>(location)) 
-{
-    topSnpList_ = nullptr;
-    root_ = 0;
-}
-
-LDTree::LDTree( LDTree& t1,  LDTree& t2)  {
-    root_ = 0;
-   
-    //Create new representative snp
-    Snp newRoot(t1.getRoot(), t2.getRoot());
-
-    //Update the locations data
-    locations_ = Graph<Location, ID_Snp>::joinToRoot(Location(), t1.locations_, t2.locations_);
-
-    //Update the Snp Tree (Graph) structure
-    snps_ = Graph<Snp, ID_Snp>::joinToRoot(newRoot, t1.snps_, t2.snps_);
-
-    //set the correct topSnpList pointer fail with error if the subtrees point to differnt top lists
-    if (t1.topSnpList_ != t2.topSnpList_) {
-        std::cerr << "subtrees point to different top snp lists during merge" << std::endl;
-        exit(1);
-    }
-    else {
-        topSnpList_ = t1.topSnpList_;
-    }
-
-
-}
 
 bool LDTree::operator==(const LDTree& lhs)const {
     return std::tie(root_, snps_, locations_) == std::tie(lhs.root_, lhs.snps_, lhs.locations_);
@@ -183,5 +148,5 @@ LDTree LDTree::from_serial(std::istream& is) {
     is.read(reinterpret_cast<char*>(&e.locations_[0]), num_locations*sizeof(Location));
 
     return e;*/
-    return LDTree();
+   // return LDTree();
 }
