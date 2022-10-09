@@ -1,14 +1,14 @@
+
 #pragma once
 
-#include "CommonStructs.h"
 #include <array>
 
-namespace CTable {
+namespace ContingencyTable {
     const static std::array<std::pair<uint8_t, uint8_t>, 9> rowOrder{ { {0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2} } };
 }
 
 
-struct CTable1 {
+struct ContingencyTable1 {
     std::array<ID_Sample, 11> data;
 
     void zero(){
@@ -16,7 +16,7 @@ struct CTable1 {
     }
 };
 
-struct CTable2 {
+struct ContingencyTable2 {
     std::array<int, 29> M_;
     std::array<ID_Sample, 29> data;
 

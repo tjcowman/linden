@@ -1,12 +1,12 @@
 
 #pragma once
 
-#include "Snp.h"
+#include "Snp.hpp"
 #include "CommonStructs.h"
 
 #include <vector>
 
-class SnpSet 
+class SnpSet
 {
 public:
 	 // For use with from_serial
@@ -25,12 +25,12 @@ public:
 		return data.size();
 	}
 
-	inline ID_Snp getSizeUnfiltered() const 
+	inline ID_Snp getSizeUnfiltered() const
 	{
 		return sizeUnfiltered;
 	}
 
-	inline const SnpDimensions& getDimensions() const 
+	inline const SnpDimensions& getDimensions() const
 	{
 		return dim;
 	}
@@ -47,14 +47,14 @@ public:
 
 	// Primarily a wrapper for the std library remove_if returns the number of elements removed
 	template<typename F>
-	ID_Snp remove_if(F f) 
+	ID_Snp remove_if(F f)
 	{
 		auto it = std::remove_if(data.begin(), data.end(), f);
 		ID_Snp removed = std::distance(it, data.end());
 		data.erase(it, data.end());
 		return removed;
 	}
-	
+
 	inline void truncateTo(ID_Snp n)
 	{
 		data.erase(data.begin()+n, data.end());

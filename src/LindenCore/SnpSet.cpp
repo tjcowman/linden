@@ -8,13 +8,13 @@ SnpSet::SnpSet(const std::vector<Locus>& loci, const GenotypeMatrix& controls, c
     dim(SnpDimensions(controls.width, cases.width)),
     loci(loci)
 {
-    for (ID_Snp i = 0; i < loci.size(); ++i) 
+    for (ID_Snp i = 0; i < loci.size(); ++i)
     {
         data.push_back(Snp(i, controls, cases));
     }
 }
 
-void SnpSet::to_serial(std::ostream& os, const SnpSet& snpSet) 
+void SnpSet::to_serial(std::ostream& os, const SnpSet& snpSet)
 {
     os.write(reinterpret_cast<const char*>(&snpSet.sizeUnfiltered), sizeof(ID_Snp));
     os.write(reinterpret_cast<const char*>(&snpSet.dim), sizeof(SnpDimensions));
@@ -22,10 +22,10 @@ void SnpSet::to_serial(std::ostream& os, const SnpSet& snpSet)
     vector_to_serialc<Locus, ID_Snp>(os, snpSet.loci);
 }
 
-SnpSet SnpSet::from_serial(std::istream& is) 
+SnpSet SnpSet::from_serial(std::istream& is)
 {
     SnpSet e;
-  
+
     auto Bread = is.tellg();
     is.read(reinterpret_cast<char*>(&e.sizeUnfiltered), sizeof(ID_Snp));
 

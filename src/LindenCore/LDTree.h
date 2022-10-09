@@ -1,13 +1,13 @@
 /**
  * @author Tyler Cowman
- * 
- * Class representing a single LD-Tree. The SNP nodes are seperated from the genome locations 
+ *
+ * Class representing a single LD-Tree. The SNP nodes are seperated from the genome locations
  * to reduce the memory footprint when calculating contingecy tables.
  */
 
 #pragma once
 
-#include "Snp.h"
+#include "Snp.hpp"
 #include "TopSnpList.h"
 
 #include <iostream>
@@ -19,15 +19,15 @@ class LDTree
     friend LDForest;
 public:
 
-    LDTree(const Snp& snp, const Location& location, TopSnpList* topSnpList=nullptr) : 
-        nodes_(std::vector<Snp>{ snp }), 
+    LDTree(const Snp& snp, const Location& location, TopSnpList* topSnpList=nullptr) :
+        nodes_(std::vector<Snp>{ snp }),
         genomeLocations_(std::vector<Location>{ location }),
-        topSnpList_(topSnpList) 
+        topSnpList_(topSnpList)
     { }
 
     LDTree();
 
-    // LDTree(const LDTree & cpy); 
+    // LDTree(const LDTree & cpy);
     LDTree( LDTree& t1,  LDTree& t2);
 
     bool operator==(const LDTree& lhs)const;

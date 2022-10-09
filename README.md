@@ -8,15 +8,15 @@ https://doi.org/10.1093/nar/gkx505
 # Installation
 
 ```bash
-#Using the command line, navigate to the main linden directory and then create a build directory.  
+#Using the command line, navigate to the main linden directory and then create a build directory.
 foo@bar:~$ mkdir build
-#Enter the build directory.    
-foo@bar:~$ cd build  
-#Generate the build file using cmake.  
-foo@bar:~$ cmake ..  
-#Compile linden to create the binary in the build directory.    
-foo@bar:~$ make linden  
-#Or install linden, note this probably requires sudo access.  
+#Enter the build directory.
+foo@bar:~$ cd build
+#Generate the build file using cmake.
+foo@bar:~$ cmake ..
+#Compile linden to create the binary in the build directory.
+foo@bar:~$ make linden
+#Or install linden, note this probably requires sudo access.
 foo@bar:~$ make install
 ```
 
@@ -41,8 +41,8 @@ SNP2	|1	|200000
 A plaintext dense matrix of genotypes with rows corresponding to the SNPs in the loci file, and columns for the relevant number of samples. The controls and cases should be in seperate files.
 
 ```
-00110100  
-00110101  
+00110100
+00110101
 ...
 ```
 

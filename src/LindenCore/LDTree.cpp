@@ -1,4 +1,4 @@
-#include "LDTree.h" 
+#include "LDTree.h"
 
 
 
@@ -22,7 +22,7 @@ LDTree::LDTree( LDTree & t1,  LDTree & t2){
     nodes_.reserve(1 + t1.size() + t2.size());
     genomeLocations_.reserve(1 + t1.size() + t2.size());
     topSnpList_ = t1.topSnpList_;
-    
+
     //Create new root node
     nodes_.push_back(Snp(t1.nodes_[0], t2.nodes_[0]));
     genomeLocations_.push_back(Location());
@@ -68,14 +68,14 @@ void LDTree::clear(){
 void LDTree::epistasisTest(const LDTree & other)const{
     //Vector to use as a stack for tests
     std::vector<std::pair<size_t, size_t> > s;
-    
+
     size_t leafStart1 = nodes_.size()/2;
     size_t leafStart2 = other.nodes_.size()/2;
 
     uint64_t  localInternalTestsDone = 0;
     uint64_t  localLeaftTestsDone = 0;
-    
-    CTable2 cTable;
+
+    ContingencyTable2 cTable;
 
     s.push_back(std::make_pair(0,0));
     while(!s.empty())
@@ -84,7 +84,7 @@ void LDTree::epistasisTest(const LDTree & other)const{
 
         std::pair<size_t, size_t> c = s.back();
         s.pop_back();
-      
+
        // float score = nodes_[c.first].epistasisTest(other.nodes_[c.second]);
         Snp::fillTable(cTable, nodes_[c.first], other.nodes_[c.second]);
         float score = cTable.chi2();
@@ -122,7 +122,7 @@ void LDTree::epistasisTest(const LDTree & other)const{
             {
                 s.push_back(std::make_pair(c.first, l2));
                 s.push_back(std::make_pair(c.first, r2));
-            }    
+            }
             ++localLeaftTestsDone;
             ++localInternalTestsDone;
         }
@@ -135,7 +135,7 @@ void LDTree::epistasisTest(const LDTree & other)const{
                 topSnpList_->attemptInsert(nodes_[c.first].getIndex(), other.nodes_[c.second].getIndex(), score);
                 localLeaftTestsDone += 2;
             }
-                
+
         }
         //If score below cutoff
             //Do nothing
@@ -148,7 +148,7 @@ void LDTree::epistasisTest(const LDTree & other)const{
    // cout<<"HERE"<<endl;
     size_t leafStart1 = nodes_.size()/2;
     size_t leafStart2 = other.nodes_.size()/2;
-    
+
     int n1 = rand() % (leafStart1+1) + leafStart1;
     int n2 = rand() % (leafStart2+1) + leafStart2;
    // cout<<n1<<" "<<n2<<endl;
@@ -162,7 +162,7 @@ void LDTree::epistasisTest(const LDTree & other)const{
 */
 
 void LDTree::to_serial(std::ostream& os, const LDTree& e){
- /*  
+ /*
     //Root node
     os.write(reinterpret_cast<const char*>(&e.root_), sizeof(ID_Snp));
    // Graph<Snp, ID_Snp> snps_;
@@ -177,6 +177,7 @@ void LDTree::to_serial(std::ostream& os, const LDTree& e){
 }
 
 LDTree LDTree::from_serial(std::istream& is) {
+    return LDTree(Snp(0, std::vector<Bitwise::Genotype>()),Location());
  /*   LDTree e;
 
     is.read(reinterpret_cast<char*>(&e.root_), sizeof(ID_Snp));

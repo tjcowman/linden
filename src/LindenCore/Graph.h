@@ -36,7 +36,7 @@ public:
 
 	}
 
-	
+
 
 	bool isTerminal(IT id)const;
 
@@ -173,7 +173,7 @@ Graph<T, IT>  Graph<T, IT>::from_serial(std::istream& is) {
 	e.JA = vector_from_serial<IT,IT>(is);
 	e.IA = vector_from_serial<IT, IT>(is);
 
-	
+
 	return e;
 }
 

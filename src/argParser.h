@@ -10,18 +10,16 @@ struct Args{
 
 int main(int argc, char* argv[] )
 {
-   
-    
     ARGLOOP(
         FLAG(random, r),
         ARG(numPairs, stol)
         ARG(epsilon, stod)
     );
-    
+
     std::cout<<args.epsilon<<std::endl;
     std::cout<<args.random<<std::endl;
     std::cout<<args.numPairs<<std::endl;
-    
+
     return 0;
 }
 */
@@ -37,29 +35,27 @@ template<class T>
 std::vector<T> stringToIntegerVector(std::string numberString)
 {
     std::vector<T> numbers;
-    
+
     std::istringstream ss(numberString);
     std::string token;
 
-    while(std::getline(ss, token, ',')) 
+    while(std::getline(ss, token, ','))
        numbers.push_back(stoll(token));
     return numbers;
 }
-    
+
 std::vector<std::string> stringToStringVector(std::string s)
 {
     std::stringstream ss(s);
-    
+
     std::vector<std::string> strings;
     while(true)
     {
-        
         std::string se;
         std::getline( ss, se,  ',');
         strings.push_back(se.substr(0, se.size()));
         if(ss.eof())
             break;
-        
     }
     return strings;
 }
@@ -82,10 +78,8 @@ bool isFlag(std::string token)
 
 #define ARGAPP(name){args.name}
 
-
 #define ARG(name, convert) else if(token==strf(--name)){args.name=convert(value);}
 #define FLAG(name, ch) else if(token==strf(-ch)){args.name=true;}
-
 
 #define ARGLOOP(f, x) \
 Args args;\

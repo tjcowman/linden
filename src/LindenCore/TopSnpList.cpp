@@ -2,7 +2,7 @@
 
 
 bool TopSnpList::attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score)
-{ 
+{
     bool retVal = false;
     #pragma omp critical
     {
@@ -58,10 +58,10 @@ void TopSnpList::calculateFormattedResults(){
     for(size_t i=0; i< currentPartners_.size(); ++i)
         if(currentPartners_[i].second >= getCutoff()-1 && currentPartners_[i].second >0)
             formattedPairs_.cutoff.push_back(  TopPairing(i, currentPartners_[i].first, currentPartners_[i].second )       );
-    
+
     sort(formattedPairs_.cutoff.begin(), formattedPairs_.cutoff.end(), TopPairing::orderByScore);
 
-    calculateReciprocalPairs();  
+    calculateReciprocalPairs();
     sort(formattedPairs_.reciprocal.begin(), formattedPairs_.reciprocal.end(), TopPairing::orderByScore);
 }
 

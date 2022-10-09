@@ -12,7 +12,7 @@ void vector_to_serial(std::ostream& os, std::vector<T> e)
 }
 
 template<class T, class IT>
-std::vector<T> vector_from_serial(std::istream& is) 
+std::vector<T> vector_from_serial(std::istream& is)
 {
 	//Read the length
 	IT length;
@@ -22,7 +22,7 @@ std::vector<T> vector_from_serial(std::istream& is)
 	std::vector<T> e;
 	e.resize(length);
 
-	//Read the elements 
+	//Read the elements
 	//NOTE: The check for length guards against a crash when the there is no data to write (not sure why this crashes)
 	if (length > 0)
 		is.read(reinterpret_cast<char*>(&e[0]), length * sizeof(T));
@@ -31,7 +31,7 @@ std::vector<T> vector_from_serial(std::istream& is)
 }
 
 template<class T, class IT>
-void vector_to_serialc(std::ostream& os, std::vector<T> e) 
+void vector_to_serialc(std::ostream& os, std::vector<T> e)
 {
 
 	IT length = static_cast<IT>(e.size());
@@ -47,7 +47,7 @@ void vector_to_serialc(std::ostream& os, std::vector<T> e)
 
 
 template<class T, class IT>
-std::vector<T> vector_from_serialc(std::istream& is) 
+std::vector<T> vector_from_serialc(std::istream& is)
 {
 	//Read the length
 	IT length;
@@ -58,7 +58,7 @@ std::vector<T> vector_from_serialc(std::istream& is)
 	//e.resize(length);
 	e.reserve(length);
 
-	//Read the elements 
+	//Read the elements
 	//NOTE: The check for length guards against a crash when the there is no data to write (not sure why this crashes)
 	if (length > 0) {
 		for (IT i = 0; i < length; ++i) {

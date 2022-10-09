@@ -1,6 +1,6 @@
 #include "Graph.h"
 #include "InputParser.h"
-#include "Snp.h"
+#include "Snp.hpp"
 #include "argParser.h"
 #include "CommonStructs.h"
 #include "LDForest.h"
@@ -103,7 +103,7 @@ TEST_CASE() {
 	}
 
 	REQUIRE(testObject(ldforest));
-	
+
 }
 
 
@@ -111,7 +111,7 @@ TEST_CASE() {
 	TestGraph g1(0);
 	TestGraph g2(1);
 	TestGraph g4(4);
-	
+
 //	g1.print(std::cout);
 	//std::cout << "\n\n";
 
@@ -153,5 +153,5 @@ TEST_CASE() {
 	//std::cout << "\n";
 
 
-	
+
 }

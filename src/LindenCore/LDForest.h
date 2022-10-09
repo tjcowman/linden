@@ -1,6 +1,6 @@
 /**
  * @author Tyler Cowman
- *  
+ *
  * Acts as a wrapper for a collection of LD-Trees and associated functionality
  * such as merging and testing the set of trees.
  */
@@ -9,7 +9,7 @@
 #pragma once
 
 #include "CommonStructs.h"
-#include "Snp.h"
+#include "Snp.hpp"
 #include "SnpSet.h"
 
 //Include the original Tree version for testing
@@ -34,12 +34,12 @@ class LDForest{
         LDForest();
         LDForest( ID_Snp numSnps);
         LDForest( SnpSet& snpSet, ID_Snp numSnps); //TODO: Make only require SnpSet
-        
+
         size_t size()const;
         bool operator==(const LDForest& lhs)const;
 
         void mergeTrees(double maxUnkownFraction);
-        void testTrees(int maxThreadUsage);   
+        void testTrees(int maxThreadUsage);
         //void writeResults(const std::vector<Locus>& infoMatrix, Args& args);
         void writeResults(const std::vector<Locus>& infoMatrix, const std::string& output);
 
@@ -48,10 +48,10 @@ class LDForest{
 
     private:
         size_t mergeTreeIteration(float unknownFraction);
-        
+
         std::vector<LDTree> ldtrees_;
         TopSnpList topSnpList_;
 
-           
+
 
 };

@@ -1,9 +1,11 @@
-#include "CommonStructs.h"
 
+#pragma once
+
+#include <filesystem>
 #include <fstream>
 #include <vector>
-#include <filesystem>
 
+#include "CommonStructs.h"
 
 std::ifstream openFileChecked(std::string filepath);
 

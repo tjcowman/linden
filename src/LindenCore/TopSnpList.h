@@ -1,6 +1,6 @@
 /**
  * @author Tyler Cowman
- * Stores the current most significant interaction for each SNP. 
+ * Stores the current most significant interaction for each SNP.
  */
 
 #pragma once
@@ -21,10 +21,10 @@ static const int MAX_CUTOFF = 100;//The maximum chi2 value to differentiate betw
 
 //Used in the analysis and output of top pairs, not in discovery and cutoff updating
 struct TopPairing{
-    
-    TopPairing(ID_Snp snpIndex1, ID_Snp snpIndex2, float score) : 
+
+    TopPairing(ID_Snp snpIndex1, ID_Snp snpIndex2, float score) :
         indexes_({snpIndex1,snpIndex2}),
-        score_(score) 
+        score_(score)
     { }
 
     /**
@@ -44,7 +44,7 @@ struct TopPairing{
                 p.score_,
             };
     }
-    
+
 
     bool operator==(const TopPairing& rhs)const {
         return((indexes_.first == rhs.indexes_.first || indexes_.first == rhs.indexes_.second) &&
@@ -60,17 +60,17 @@ struct TopPairing{
     bool operator <(const TopPairing &other )const{
         return indexes_<other.indexes_;
     }
-    
+
     static bool orderByScore(const TopPairing & a, const TopPairing &  b){
         return a.score_ > b.score_;
     }
-    
+
     friend std::ostream& operator<< (std::ostream &out, const TopPairing & topPairing){
         out<<topPairing.score_<<" "<<topPairing.indexes_.first<<" "<<topPairing.indexes_.second;
-        
+
         return out;
     }
-    
+
     std::pair<ID_Snp, ID_Snp> indexes_;
     float score_;
 
@@ -94,27 +94,27 @@ class TopSnpList{
         inline TopSnpList(ID_Snp numberSnps) :
             topK_(numberSnps),
             cutoff_(0.0),
-            currentPartners_(std::vector<std::pair<ID_Snp, float>>(numberSnps, { -1,0.0 })),
+            currentPartners_(std::vector<std::pair<ID_Snp, float>>(numberSnps, { -1,0.0f })),
             testCounter_({0,0}),
             insertSincePrefix_(0)
-        { 
+        {
             pairwiseSignificanceCounts_.fill(0);
         }
-   
+
         bool attemptInsert(ID_Snp snpIndex1, ID_Snp snpIndex2, float score);
-        
+
         //Gets the number of snp Indexes used
         ID_Snp size() const
-        {    
+        {
             return currentPartners_.size();
-        }   
+        }
 
         float getCutoff()const
         {
             return cutoff_;
         }
-        
-        void incrementTestCounter(const TestCounter& tests);  
+
+        void incrementTestCounter(const TestCounter& tests);
 
         const TestCounter& getTestCounter()const
         {
@@ -127,7 +127,7 @@ class TopSnpList{
         {
              return formattedPairs_;
         }
- 
+
     private:
         void calculateReciprocalPairs();
 
@@ -135,7 +135,7 @@ class TopSnpList{
         std::vector<std::pair<ID_Snp, float>> currentPartners_;
 
         TestCounter testCounter_;
-        
+
         float cutoff_;
         int topK_;
 
@@ -143,10 +143,10 @@ class TopSnpList{
         * Holds the count of detected pairs with <index> significance
         */
         std::array<ID_Snp, MAX_CUTOFF+1> pairwiseSignificanceCounts_;
-    
+
         ID_Snp  insertSincePrefix_;
 
         //Formatted results
         FormattedPairs formattedPairs_;
-    
+
 };

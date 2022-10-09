@@ -2,14 +2,14 @@
 /**
  * @author Tyler Cowman
  *
- * Class representing a single LD-Tree. 
+ * Class representing a single LD-Tree.
  * New implementation in order to utlize non-full binary trees of SNPs
  * The SNP nodes are seperated from the genome locations to reduce the memory footprint when calculating contingecy tables.
  */
 
 #pragma once
 
-#include "Snp.h"
+#include "Snp.hpp"
 #include "TopSnpList.h"
 #include "Graph.h"
 
@@ -20,20 +20,20 @@
 class LDTree
 {
 public:
-    // Standard constructor  
+    // Standard constructor
     inline LDTree(const Snp& snp, const Location& location, TopSnpList* topSnpList = nullptr) :
-        snps_(Graph<Snp, ID_Snp>(snp)), 
+        snps_(Graph<Snp, ID_Snp>(snp)),
         locations_(Graph<Location, ID_Snp>(location)),
         topSnpList_( topSnpList),
         root_(0)
     { }
- 
+
     // Merge Constructor
     inline LDTree( LDTree& t1,  LDTree& t2) :
         root_(0),
         locations_(Graph<Location, ID_Snp>::joinToRoot(
-            Location(), 
-            t1.locations_, 
+            Location(),
+            t1.locations_,
             t2.locations_
         )),
         snps_(Graph<Snp, ID_Snp>::joinToRoot(
@@ -42,7 +42,7 @@ public:
             t2.snps_
         )),
         topSnpList_(nullptr)
-    { 
+    {
         if(t1.topSnpList_ == t2.topSnpList_)
         {
             topSnpList_ = t1.topSnpList_;
@@ -62,7 +62,7 @@ public:
     const Snp& getRoot()const;
 
     std::vector<ID_Snp> getChildren(ID_Snp i)const;
-    
+
     auto getChildren2(ID_Snp i) const
     {
         return snps_.getOutgoingIdsItStart(i);
@@ -92,7 +92,7 @@ private:
 
     ID_Snp root_; //Root node as the graph is being utilized as a directed tree
     Graph<Snp, ID_Snp> snps_;
-    Graph<Location, ID_Snp> locations_; //Stores the genomic location of snps in this tree  
+    Graph<Location, ID_Snp> locations_; //Stores the genomic location of snps in this tree
 
     TopSnpList* topSnpList_;
 };

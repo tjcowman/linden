@@ -1,6 +1,6 @@
 /**
  * @author Tyler Cowman
- * 
+ *
  * These structs serve as containers for the information about a given run of LinDen
  * and are primarily used to provide an organized location for this data when printing
  * to standard out or a file later.
@@ -23,13 +23,12 @@ namespace ID_Invalid
 	constexpr ID_Snp Snp = std::numeric_limits<ID_Snp>::max();
 }
 
-
 static const uint32_t ESTIMATED_LD_RANGE = 1000000;
 
-struct Location 
+struct Location
 {
-    Location(uint32_t chromosome, uint32_t basePair) : 
-        chromosome_(chromosome), 
+    Location(uint32_t chromosome, uint32_t basePair) :
+        chromosome_(chromosome),
         basePair_(basePair)
     { }
 
@@ -52,7 +51,7 @@ struct Location
 
     bool inLinkageDisequilibrium(const Location& other) const
     {
-        if (chromosome_ != other.chromosome_) 
+        if (chromosome_ != other.chromosome_)
         {
             return false;
         }
@@ -65,16 +64,16 @@ struct Location
     uint32_t basePair_;
 };
 
-struct Locus 
+struct Locus
 {
-    static void to_serial(std::ostream& os, const Locus& e) 
+    static void to_serial(std::ostream& os, const Locus& e)
     {
         //Writes the id length and id chars
         size_t length = e.id.size();
         os.write(reinterpret_cast<const char*>(&length), sizeof(size_t));
         os.write(reinterpret_cast<const char*>(e.id.data()), length * sizeof(char) );
 
-        //Writes the location struct 
+        //Writes the location struct
         os.write(reinterpret_cast<const char*>(&e.location), sizeof(Location));
     }
 
@@ -83,7 +82,7 @@ struct Locus
     {
         Locus e;
         size_t length;
-        
+
         is.read(reinterpret_cast<char*>(&length), 8);//sizeof(size_t));
 
         e.id.resize(length);
@@ -94,7 +93,7 @@ struct Locus
         return e;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Locus& e) 
+    friend std::ostream& operator<<(std::ostream& os, const Locus& e)
     {
         os << e.id << "\t" << e.location;
         return os;
@@ -104,29 +103,29 @@ struct Locus
     Location location;
 };
 
-struct GenotypeMatrix 
+struct GenotypeMatrix
 {
     ID_Sample width;
     ID_Snp height;
     std::vector<ID_Genotype> data;
 
-    std::vector<ID_Genotype>::const_iterator rowBegin(size_t row) const 
+    std::vector<ID_Genotype>::const_iterator rowBegin(size_t row) const
     {
         return data.begin() + row * width;
     }
 
-    std::vector<ID_Genotype>::const_iterator rowEnd(size_t row) const 
+    std::vector<ID_Genotype>::const_iterator rowEnd(size_t row) const
     {
         return data.begin() + (row+1) * width;
     }
 };
 
-struct Log 
+struct Log
 {
     ID_Snp snps_;
     ID_Sample controls_;
     ID_Sample cases_;
-    
+
     //Varies based on trial
     ID_Snp mafRemoved_;
     ID_Snp marginalSignificanceRemoved_;

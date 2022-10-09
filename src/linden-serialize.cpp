@@ -4,11 +4,10 @@
 #include <vector>
 #include <omp.h>
 
-#include "Types.h"
 #include "argParser.h"
-#include "InputParser.h"
+#include "InputParser.hpp"
 #include "CommonStructs.h"
-#include "Snp.h"
+#include "Snp.hpp"
 #include "SnpSet.h"
 #include "LDForest.h"
 
@@ -18,9 +17,6 @@ struct Args {
     std::string cases;
 
     std::string output = "";
-
-    //std::string 
-
     int maxThreads;
 };
 

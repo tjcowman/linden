@@ -42,7 +42,7 @@ def test_bin(bin_path, input_args, other_args):
         else:
             total_cutoff += float(row[0])
             count_cutoff += 1
-            
+
     #print(result.stderr)
     print(t_end-t_begin, total_recip/count_recip, total_cutoff/count_cutoff)
 

@@ -1,5 +1,5 @@
 
-#include "LDTree2.h" 
+#include "LDTree2.h"
 
 bool LDTree::operator==(const LDTree& lhs)const {
     return std::tie(root_, snps_, locations_) == std::tie(lhs.root_, lhs.snps_, lhs.locations_);
@@ -52,14 +52,14 @@ void LDTree::clear() {
 void LDTree::epistasisTest(const LDTree& other)const {
     uint64_t localInternalTestsDone = 0;
     uint64_t localLeaftTestsDone = 0;
-    CTable2 cTable;
+    ContingencyTable2 cTable;
 
     //Vector to use as a stack for tests
     std::vector<std::pair<ID_Snp, ID_Snp> > s;
     s.push_back({ 0, 0 });
 
     while (!s.empty()) {
-        float cutOff = topSnpList_->getCutoff();      
+        float cutOff = topSnpList_->getCutoff();
         auto c = s.back();
 
         s.pop_back();
@@ -67,10 +67,10 @@ void LDTree::epistasisTest(const LDTree& other)const {
 
         Snp::fillTable(cTable, snps_.getElement(c.first), other.snps_.getElement(c.second));
         float score = cTable.chi2();
-     
+
         //auto lChildren = getChildren(c.first);
         //auto rChildren = other.getChildren(c.second);
-        
+
         auto lChildren = getChildren2(c.first);
         auto rChildren = other.getChildren2(c.second);
 
@@ -116,12 +116,12 @@ void LDTree::epistasisTest(const LDTree& other)const {
         //If score below cutoff
             //Do nothing
     }
-    
+
     topSnpList_->incrementTestCounter(TestCounter{ localInternalTestsDone,  localLeaftTestsDone });
 }
 
 void LDTree::to_serial(std::ostream& os, const LDTree& e){
- /*  
+ /*
     //Root node
     os.write(reinterpret_cast<const char*>(&e.root_), sizeof(ID_Snp));
    // Graph<Snp, ID_Snp> snps_;
@@ -136,6 +136,7 @@ void LDTree::to_serial(std::ostream& os, const LDTree& e){
 }
 
 LDTree LDTree::from_serial(std::istream& is) {
+    return LDTree(Snp(0, std::vector<Bitwise::Genotype>()),Location());
  /*   LDTree e;
 
     is.read(reinterpret_cast<char*>(&e.root_), sizeof(ID_Snp));

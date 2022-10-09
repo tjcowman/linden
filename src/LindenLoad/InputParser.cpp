@@ -1,11 +1,10 @@
 
-#include <string>
-#include <charconv>
 #include <array>
+#include <charconv>
+#include <string>
 #include <map>
 
 #include "InputParser.hpp"
-
 
 std::ifstream openFileChecked(std::string filepath){
     std::ifstream file(filepath);
@@ -23,23 +22,22 @@ std::ifstream openFileChecked(std::string filepath){
 std::vector<Locus> parseLoci(std::ifstream ifs){
     std::vector<Locus> ret;
     std::map<std::string, uint32_t> chromosomeEncoder;
-   
+
     //determine delimiter between tab and space by peeking the first line
     std::string lineBuffer;
-    
+
     // Get current position
     auto len = ifs.tellg();
     std::getline(ifs, lineBuffer);
     std::string delimiter = lineBuffer.find("\t") != std::string::npos ? "\t": " " ;
     // Return to position before "Read line".
     ifs.seekg(len, std::ios_base::beg);
-    
 
     while (std::getline(ifs, lineBuffer)) {
-   
         std::array<uint32_t, 4> delims{0,0,0,0};
         for (uint8_t i = 0; i < 3; ++i) {
-            delims[i+1] = lineBuffer.find(delimiter, delims[i]+1);
+            auto nextDelim = lineBuffer.find(delimiter, delims[i]+1);
+            delims[i+1] = (nextDelim != std::string::npos) ? nextDelim : lineBuffer.size();
         }
 
         uint32_t chromosome;
@@ -47,8 +45,8 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
 
         auto res = std::from_chars(lineBuffer.data()+delims[1]+1, lineBuffer.data() + delims[2], chromosome,10);
         if (res.ec != std::errc{}) { //must be represented by some non integral type
-           // std::cerr << "chromsome read error\n";
-           // exit(1);
+            std::cerr << "chromsome read error\n";
+            exit(1);
             std::string chr = lineBuffer.substr(delims[1] + 1, delims[2] - delims[1]);
             if (chromosomeEncoder.count(chr) == 0) {
                 chromosomeEncoder[chr] = chromosomeEncoder.size()+23; //human numeric chromosomes from 1->22
@@ -61,9 +59,7 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
             std::cerr << "location read error\n";
             exit(1);
         }
-
         ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1] - delims[0]), Location(chromosome, location) });
-       // ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1] - delims[0]), Location{location} });
     }
     ifs.close();
 
