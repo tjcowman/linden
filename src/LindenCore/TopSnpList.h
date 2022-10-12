@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <map>
-#include <vector>
-#include <utility>
-#include <iostream>
-#include <fstream>
 #include <algorithm>
 #include <array>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <utility>
+#include <vector>
 
 static const int MAX_CUTOFF = 100;//The maximum chi2 value to differentiate between
 //static const int PREFIX_SUM_ROLLOVER = 1000;
@@ -46,7 +46,7 @@ struct TopPairing{
     }
 
 
-    bool operator==(const TopPairing& rhs)const {
+    bool operator==(const TopPairing& rhs) const {
         return((indexes_.first == rhs.indexes_.first || indexes_.first == rhs.indexes_.second) &&
             (indexes_.second == rhs.indexes_.first || indexes_.second == rhs.indexes_.second)
             );
@@ -57,7 +57,7 @@ struct TopPairing{
             std::swap(indexes_.first, indexes_.second);
     }
 
-    bool operator <(const TopPairing &other )const{
+    bool operator <(const TopPairing &other ) const{
         return indexes_<other.indexes_;
     }
 
@@ -109,21 +109,21 @@ class TopSnpList{
             return currentPartners_.size();
         }
 
-        float getCutoff()const
+        float getCutoff() const
         {
             return cutoff_;
         }
 
         void incrementTestCounter(const TestCounter& tests);
 
-        const TestCounter& getTestCounter()const
+        const TestCounter& getTestCounter() const
         {
             return testCounter_;
         }
 
         void calculateFormattedResults();
 
-        const FormattedPairs& getPairs()const
+        const FormattedPairs& getPairs() const
         {
              return formattedPairs_;
         }

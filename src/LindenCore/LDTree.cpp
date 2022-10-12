@@ -14,7 +14,7 @@ LDTree::LDTree(const LDTree& cpy){
 }
 */
 
-bool LDTree::operator==(const LDTree& lhs)const {
+bool LDTree::operator==(const LDTree& lhs) const {
     return std::tie(nodes_, genomeLocations_) == std::tie(lhs.nodes_, lhs.genomeLocations_);
 }
 
@@ -40,24 +40,24 @@ LDTree::LDTree( LDTree & t1,  LDTree & t2){
     }
 }
 
-bool LDTree::empty()const{
+bool LDTree::empty() const{
     return nodes_.empty();
 }
 
-size_t LDTree::size()const{
+size_t LDTree::size() const{
     return nodes_.size();
 }
 
-const Snp & LDTree::getRoot()const{
+const Snp & LDTree::getRoot() const{
     return nodes_[0];
 }
 
-ID_Sample LDTree::computeDifferences(const LDTree & other)const{
+ID_Sample LDTree::computeDifferences(const LDTree & other) const{
     return nodes_[0].computeDifferences(other.nodes_[0]);
 }
 
 //check on equivalent tree sizes and check on tree overlap
-bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff)const{
+bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff) const{
     return (!empty() && size() == other.size()) && computeDifferences(other) < maxDiff;
 }
 
@@ -65,7 +65,7 @@ void LDTree::clear(){
     nodes_.clear();
 }
 
-void LDTree::epistasisTest(const LDTree & other)const{
+void LDTree::epistasisTest(const LDTree & other) const{
     //Vector to use as a stack for tests
     std::vector<std::pair<size_t, size_t> > s;
 
@@ -143,7 +143,7 @@ void LDTree::epistasisTest(const LDTree & other)const{
     topSnpList_->incrementTestCounter(TestCounter{ localInternalTestsDone,  localLeaftTestsDone });
 }
 
-/*void LDTree::epistasisTestNoTrees(const LDTree& other, TopSnpList& topSnpList)const
+/*void LDTree::epistasisTestNoTrees(const LDTree& other, TopSnpList& topSnpList) const
 {
    // cout<<"HERE"<<endl;
     size_t leafStart1 = nodes_.size()/2;

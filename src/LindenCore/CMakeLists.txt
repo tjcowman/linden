@@ -19,6 +19,7 @@ target_link_libraries(Linden-Core
     Statistics
  )
 target_include_directories(Linden-Core PRIVATE ../LindenLoad)
+target_include_directories(Linden-Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 add_library(Linden-Core-Old STATIC

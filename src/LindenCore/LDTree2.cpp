@@ -1,55 +1,26 @@
 
 #include "LDTree2.h"
 
-bool LDTree::operator==(const LDTree& lhs)const {
-    return std::tie(root_, snps_, locations_) == std::tie(lhs.root_, lhs.snps_, lhs.locations_);
-}
-
-bool LDTree::empty()const{
-    return snps_.empty();
-}
-
-size_t LDTree::size()const {
-    return snps_.size();
-}
-
-const Snp& LDTree::getRoot()const {
+const Snp& LDTree::getRoot() const {
     return snps_.getElement(0);
 }
 
-std::vector<ID_Snp> LDTree::getChildren(ID_Snp i)const {
-    return snps_.getOutgoingIds(i);
-}
-
-bool LDTree::isLeaf(ID_Snp i)const {
+bool LDTree::isLeaf(ID_Snp i) const {
     return snps_.isTerminal(i);
 }
 
-const Snp& LDTree::getSnp(ID_Snp i)const {
-    return snps_.getElement(i);
-}
-
-
-ID_Sample LDTree::computeDifferences(const LDTree& other)const {
+ID_Sample LDTree::computeDifferences(const LDTree& other) const {
     return getRoot().computeDifferences(other.getRoot());
 }
 
-bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff)const {
+bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff) const {
     //The restriction used to be to enusre binary trees, with this DS it is no longer required. However a useful hueristic should be investigated.
     if (size() == 0 || other.size() == 0) return false;
     else
         return computeDifferences(other) < maxDiff;
 }
 
-
-void LDTree::clear() {
-    root_ = ID_Invalid::Snp;
-    snps_.clear();
-    topSnpList_ = nullptr;
-}
-
-
-void LDTree::epistasisTest(const LDTree& other)const {
+void LDTree::epistasisTest(const LDTree& other) const {
     uint64_t localInternalTestsDone = 0;
     uint64_t localLeaftTestsDone = 0;
     ContingencyTable2 cTable;

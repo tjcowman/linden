@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "Snp.hpp"
-#include "CommonStructs.h"
-
 #include <vector>
+
+#include "CommonStructs.h"
+#include "Snp.hpp"
 
 class SnpSet
 {
@@ -12,7 +12,7 @@ public:
 	 // For use with from_serial
 	SnpSet() :
 		sizeUnfiltered(0),
-		dim(SnpDimensions(0,0)),
+		dim(Snp::Dimensions(0,0)),
 		data(std::vector<Snp>())
 	{ }
 
@@ -30,7 +30,7 @@ public:
 		return sizeUnfiltered;
 	}
 
-	inline const SnpDimensions& getDimensions() const
+	inline const Snp::Dimensions& getDimensions() const
 	{
 		return dim;
 	}
@@ -67,6 +67,6 @@ public:
 private:
 	std::vector<Locus> loci;
 	ID_Snp sizeUnfiltered;
-	SnpDimensions dim;
+	Snp::Dimensions dim;
 	std::vector<Snp> data;
 };

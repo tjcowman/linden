@@ -30,19 +30,19 @@ public:
     // LDTree(const LDTree & cpy);
     LDTree( LDTree& t1,  LDTree& t2);
 
-    bool operator==(const LDTree& lhs)const;
+    bool operator==(const LDTree& lhs) const;
 
-    bool empty()const;
-    size_t size()const;
+    bool empty() const;
+    size_t size() const;
 
-    const Snp& getRoot()const;
+    const Snp& getRoot() const;
 
-    ID_Sample computeDifferences(const LDTree& other)const;
-    bool validMerge(const LDTree& other, ID_Sample maxDiff)const;
+    ID_Sample computeDifferences(const LDTree& other) const;
+    bool validMerge(const LDTree& other, ID_Sample maxDiff) const;
 
     void clear();
 
-    void epistasisTest(const LDTree& other)const;
+    void epistasisTest(const LDTree& other) const;
 
 
     static void to_serial(std::ostream& os, const LDTree& e);

@@ -18,11 +18,11 @@ LDForest::LDForest(SnpSet& snpSet, ID_Snp numSnps) :
     }
 }
 
-size_t LDForest::size()const{
+size_t LDForest::size() const{
     return ldtrees_.size();
 }
 
-bool LDForest::operator==(const LDForest& lhs)const {
+bool LDForest::operator==(const LDForest& lhs) const {
     return ldtrees_ == lhs.ldtrees_;
 }
 
@@ -151,7 +151,7 @@ void LDForest::to_serial(std::ostream& os, const LDForest& e) {
 
     //IMPORTANT WRITE/READ SET SNP SIZE DIMENSIONS HERE AS THEY ARE STATIC TODO: make this less confusing
     auto dim = Snp::getDimensions();
-    os.write(reinterpret_cast<const char*>(&dim), sizeof(SnpDimensions));
+    os.write(reinterpret_cast<const char*>(&dim), sizeof(Snp::Dimensions));
 
     //Write number of trees
     ID_Snp numTrees = e.ldtrees_.size();
@@ -165,11 +165,11 @@ void LDForest::to_serial(std::ostream& os, const LDForest& e) {
 LDForest LDForest::from_serial(std::istream& is)
 {
     ID_Snp numSnps;
-    SnpDimensions dim;
+    Snp::Dimensions dim;
     ID_Snp numTrees;
 
     is.read(reinterpret_cast<char*>(&numSnps), sizeof(ID_Snp));
-    is.read(reinterpret_cast<char*>(&dim), sizeof(SnpDimensions));
+    is.read(reinterpret_cast<char*>(&dim), sizeof(Snp::Dimensions));
     is.read(reinterpret_cast<char*>(&numTrees), sizeof(ID_Snp));
 
     Snp::setDimensions(dim.numControls_, dim.numCases_);

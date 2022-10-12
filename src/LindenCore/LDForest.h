@@ -35,8 +35,8 @@ class LDForest{
         LDForest( ID_Snp numSnps);
         LDForest( SnpSet& snpSet, ID_Snp numSnps); //TODO: Make only require SnpSet
 
-        size_t size()const;
-        bool operator==(const LDForest& lhs)const;
+        size_t size() const;
+        bool operator==(const LDForest& lhs) const;
 
         void mergeTrees(double maxUnkownFraction);
         void testTrees(int maxThreadUsage);

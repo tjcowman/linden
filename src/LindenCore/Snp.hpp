@@ -11,29 +11,9 @@
 
 #include "ContingencyTable.hpp"
 
-struct SnpDimensions
-{
-    SnpDimensions()
-    { }
-
-    SnpDimensions(ID_Sample numControls, ID_Sample numCases) :
-        numControls_(numControls),
-        numCases_(numCases),
-        //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
-        CONR_(numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)),
-        CASR_(numCases / Bitwise::Size + (numCases % Bitwise::Size != 0)),
-        CASS_(3 * (numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)))
-    { }
-
-    ID_Sample numControls_;
-    ID_Sample numCases_;
-    ID_Sample CONR_;
-    ID_Sample CASR_;
-    ID_Sample CASS_;
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 //! @class Snp
+//!
 //! Stores the case and control information for a single SNP, also stores the 
 //! orginal index in the full dataset. Constructed from plaintext 
 //! reperesentations of each genotype, i,e. a one byte 0,1,2 per genotype.
@@ -43,6 +23,31 @@ struct SnpDimensions
 class Snp
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////
+    //! @struct Dimensions
+    //!
+    ////////////////////////////////////////////////////////////////////////////
+    struct Dimensions
+    {
+        Dimensions()
+        { }
+
+        Dimensions(ID_Sample numControls, ID_Sample numCases) :
+            numControls_(numControls),
+            numCases_(numCases),
+            //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
+            CONR_(numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)),
+            CASR_(numCases / Bitwise::Size + (numCases % Bitwise::Size != 0)),
+            CASS_(3 * (numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)))
+        { }
+
+        ID_Sample numControls_;
+        ID_Sample numCases_;
+        ID_Sample CONR_;
+        ID_Sample CASR_;
+        ID_Sample CASS_;
+    };
+
     // Construct a Snp from an index and vector of samples, ex: from serialized data
     Snp(ID_Snp index, const std::vector<Bitwise::Genotype>& samples);
 
@@ -67,10 +72,10 @@ public:
     // Sets the snp dimensions for all snps.
     inline static void setDimensions(ID_Sample controls, ID_Sample cases)
     {
-        Snp::dim = SnpDimensions(controls, cases);
+        Snp::dim = Dimensions(controls, cases);
     }
     // Gets the snp dimensions.
-    inline static const SnpDimensions& getDimensions()
+    inline static const Dimensions& getDimensions()
     {
         return Snp::dim;
     };
@@ -82,7 +87,7 @@ public:
     ID_Sample computeDifferences(const Snp & other) const;
 
     // Calculate proportion of ambiguous genotypes.
-    float computeUnknownRatio()const;
+    float computeUnknownRatio() const;
 
     // Fills out a contingency table with genotypes from two snps.
     static void fillTable(ContingencyTable2& t, const Snp& snp1, const Snp& snp2);
@@ -105,5 +110,5 @@ private:
     std::vector<Bitwise::Genotype> allSamples_;
 
     //! Dimensions of the current snp data
-    static SnpDimensions dim;
+    static Dimensions dim;
 };

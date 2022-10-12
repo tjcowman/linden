@@ -1,14 +1,11 @@
-#include "CommonStructs.h"
-
-#include <vector>
-#include <iostream>
-#include <algorithm>
-#include <tuple>
-
 #pragma once
 
+#include <algorithm>
+#include <iostream>
+#include <tuple>
+#include <vector>
 
-
+#include "CommonStructs.h"
 
 template<class T, class IT>
 class Graph {
@@ -18,30 +15,26 @@ public:
 	Graph(T data);
 	Graph(const Graph& cpy);
 
-	bool operator==(const Graph& lhs)const;
+	bool operator==(const Graph& lhs) const;
 
-	bool empty()const;
-	size_t size()const;
+	bool empty() const;
+	size_t size() const;
 	void clear();
 
 	//Gets the element of type T from the passed index
-	const T& getElement(IT id)const;
+	const T& getElement(IT id) const;
 
-	std::vector<IT> getOutgoingIds(IT id)const;
+	std::vector<IT> getOutgoingIds(IT id) const;
 
-	// WARNING this relies on inplicit tree structure
-	auto getOutgoingIdsItStart(IT id)const
+	// WARNING this relies on implicit tree structure
+	auto getOutgoingIdsItStart(IT id) const
 	{
 		return JA.begin() + IA[id];
-
 	}
 
+	bool isTerminal(IT id) const;
 
-
-	bool isTerminal(IT id)const;
-
-
-	void print(std::ostream& os)const;
+	void print(std::ostream& os) const;
 
 
 	//Increments the index for all vertices and edges, increasing the number of vertices
@@ -70,7 +63,7 @@ template<class T, class IT>
 Graph<T, IT>::Graph(const Graph& cpy) : V(cpy.V), A(cpy.A), JA(cpy.JA), IA(cpy.IA){}
 
 template<class T, class IT>
-bool Graph<T, IT>::operator==(const Graph& lhs)const {
+bool Graph<T, IT>::operator==(const Graph& lhs) const {
 	return std::tie(V, A, JA, IA) == std::tie(lhs.V, lhs.A, lhs.JA, lhs.IA);
 
 }
@@ -84,22 +77,28 @@ Graph<T, IT>::Graph(T data) {
 }
 
 template<class T, class IT>
-size_t Graph<T, IT>::size()const {
+size_t Graph<T, IT>::size() const {
 	return V.size();
 }
 
 template<class T, class IT>
-const T& Graph<T, IT>::getElement(IT id)const{
+const T& Graph<T, IT>::getElement(IT id) const{
 	return V[id];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//! Gets the target node indexes outgoing from a source node.
+//!
+//! @param id The node index to lookup.
+////////////////////////////////////////////////////////////////////////////////
 template<class T, class IT>
-std::vector<IT> Graph<T, IT>::getOutgoingIds(IT id)const{
+std::vector<IT> Graph<T, IT>::getOutgoingIds(IT id) const
+{
 	return std::vector<IT>(JA.begin() + IA[id], JA.begin() + IA[id + 1]);
 }
 
 template<class T, class IT>
-bool Graph<T, IT>::isTerminal(IT id)const {
+bool Graph<T, IT>::isTerminal(IT id) const {
 	return IA[id + 1] - IA[id] == 0;
 }
 
@@ -112,7 +111,7 @@ void Graph<T, IT>::clear() {
 }
 
 template<class T, class IT>
-void Graph<T, IT>::print(std::ostream& os)const {
+void Graph<T, IT>::print(std::ostream& os) const {
 	os << "V: ";
 	for (const auto& e : V) {
 		os << e << " ";
@@ -139,7 +138,7 @@ void Graph<T, IT>::print(std::ostream& os)const {
 
 
 template<class T, class IT>
-bool Graph<T, IT>::empty()const {
+bool Graph<T, IT>::empty() const {
 	return V.empty();
 }
 

@@ -11,15 +11,19 @@ std::ifstream openFileChecked(std::string filepath){
 
     if (!file.is_open()){
         std::cerr << "file <" << filepath << "> not opened\n";
-        exit(1);
     }
-    else{
-        return file;
-    }
+    return file;
+
 }
 
 //TODO: Improve input validation ex: char at end of numeric values
 std::vector<Locus> parseLoci(std::ifstream ifs){
+
+    if (!ifs.is_open())
+    {
+        return std::vector<Locus>();
+    }
+
     std::vector<Locus> ret;
     std::map<std::string, uint32_t> chromosomeEncoder;
 
@@ -46,7 +50,8 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
         auto res = std::from_chars(lineBuffer.data()+delims[1]+1, lineBuffer.data() + delims[2], chromosome,10);
         if (res.ec != std::errc{}) { //must be represented by some non integral type
             std::cerr << "chromsome read error\n";
-            exit(1);
+            return std::vector<Locus>();
+            
             std::string chr = lineBuffer.substr(delims[1] + 1, delims[2] - delims[1]);
             if (chromosomeEncoder.count(chr) == 0) {
                 chromosomeEncoder[chr] = chromosomeEncoder.size()+23; //human numeric chromosomes from 1->22
@@ -57,7 +62,7 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
         res = std::from_chars(lineBuffer.data() + delims[2]+1, lineBuffer.data() + delims[3], location);
         if (res.ec != std::errc{}) {
             std::cerr << "location read error\n";
-            exit(1);
+            return std::vector<Locus>();
         }
         ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1] - delims[0]), Location(chromosome, location) });
     }
@@ -67,6 +72,12 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
 }
 
 GenotypeMatrix parseGenotypes(std::ifstream ifs) {
+
+    if (!ifs.is_open())
+    {
+        return GenotypeMatrix();
+    }
+
     GenotypeMatrix ret;
 
     std::string lineBuffer;
@@ -77,7 +88,7 @@ GenotypeMatrix parseGenotypes(std::ifstream ifs) {
             width = lineBuffer.size();
         }else if(width != lineBuffer.size()){
             std::cerr << "input matrix not rectangular" << "\n";
-            exit(1);
+            return GenotypeMatrix();
         }
 
         for (const auto& e : lineBuffer) {
@@ -86,7 +97,7 @@ GenotypeMatrix parseGenotypes(std::ifstream ifs) {
                 ret.data.push_back(val);
             }else{
                 std::cerr << "input matrix has invalid genotype" << "\n";
-                exit(1);
+                return GenotypeMatrix();
             }
         }
     }

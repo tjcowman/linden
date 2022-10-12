@@ -1,0 +1,11 @@
+add_executable(linden-tests
+    main.cpp
+)
+set_property(TARGET linden-tests PROPERTY CXX_STANDARD 17)
+target_link_libraries(linden-tests
+    Linden-Core
+    Linden-Load
+    OpenMP::OpenMP_CXX
+    Catch2
+#    Catch2::Catch2WithMain
+)

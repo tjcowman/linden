@@ -1,11 +1,18 @@
+
 #include "Snp.hpp"
 
 #include "Serializers.hpp"
 
 //Define static members, set in main
-SnpDimensions Snp::dim;
+Snp::Dimensions Snp::dim;
 
-// Construct a Snp from an index and vector of samples, ex: from serialized data
+///////////////////////////////////////////////////////////////////////
+//! Construct a Snp from an index and vector of samples.
+//! For example, from serialized data.
+//!
+//! @param index Index for this snp.
+//! @param samples Vector of genotype samples
+///////////////////////////////////////////////////////////////////////
 Snp::Snp(ID_Snp index, const std::vector<Bitwise::Genotype>& samples) :
     index_(index),
     allSamples_(samples)
@@ -27,7 +34,6 @@ Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cas
     index_ = index;
 }
 
-//TODO: FIX TO BE EXPLICIT TYPE (currently should wrap arount to largest uval)
 ////////////////////////////////////////////////////////////////////////
 //! Constructs a new snp by merging two children snps. Note that the
 //! index in this case is -1 as it will be an internal snp.
@@ -36,6 +42,7 @@ Snp::Snp(ID_Snp index, const GenotypeMatrix& controls, const GenotypeMatrix& cas
 //! @param s2 The right snp node.
 ////////////////////////////////////////////////////////////////////////
 Snp::Snp(const Snp & s1, const Snp & s2) :
+    //TODO: FIX TO BE EXPLICIT TYPE (currently should wrap arount to largest uval)
     index_(-1),
     allSamples_(Bitwise::merge(s1.allSamples_, s2.allSamples_))
 { }
@@ -149,7 +156,6 @@ void Snp::packGenotypes(std::vector<uint8_t>::const_iterator begin, std::vector<
         packedGenotypes[1].push_back(sectionCode[1]);
         packedGenotypes[2].push_back(sectionCode[2]);
     }
-
 
     dest.insert(dest.end(), packedGenotypes[0].begin(), packedGenotypes[0].end());
     dest.insert(dest.end(), packedGenotypes[1].begin(), packedGenotypes[1].end());
