@@ -4,11 +4,16 @@ cmake_minimum_required(VERSION 3.20)
 project(linden VERSION 1.0)
 
 find_package(OpenMP REQUIRED)
-#find_package(Catch2 REQUIRED)
+
+# Function to add the cpp file to the global list of tests
+include(cmake/RegisterTest.cmake)
 
 add_subdirectory(deps)
 add_subdirectory(src)
 add_subdirectory(example)
+
+
+
 add_subdirectory(test)
 
 

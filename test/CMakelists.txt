@@ -1,11 +1,13 @@
+get_property(reg_tests GLOBAL PROPERTY reg_tests)
+
 add_executable(linden-tests
     main.cpp
-)
+    ${reg_tests})
+#target_compile_options(linden-tests PUBLIC whole-archive)
 set_property(TARGET linden-tests PROPERTY CXX_STANDARD 17)
-target_link_libraries(linden-tests
-    Linden-Core
-    Linden-Load
-    OpenMP::OpenMP_CXX
-    Catch2
-#    Catch2::Catch2WithMain
-)
+#target_link_libraries(linden-tests PUBLIC
+#    Statistics-Test
+#)
+#target_link_libraries(linden-tests PUBLIC
+#    Statistics-Test)
+    
