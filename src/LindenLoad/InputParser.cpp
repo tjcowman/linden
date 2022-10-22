@@ -5,6 +5,7 @@
 #include <map>
 
 #include "InputParser.hpp"
+#include "Location.hpp"
 
 std::ifstream openFileChecked(std::string filepath){
     std::ifstream file(filepath);
@@ -17,14 +18,14 @@ std::ifstream openFileChecked(std::string filepath){
 }
 
 //TODO: Improve input validation ex: char at end of numeric values
-std::vector<Locus> parseLoci(std::ifstream ifs){
+std::vector<Linden::Genetics::Locus> parseLoci(std::ifstream ifs){
 
     if (!ifs.is_open())
     {
-        return std::vector<Locus>();
+        return std::vector<Linden::Genetics::Locus>();
     }
 
-    std::vector<Locus> ret;
+    std::vector<Linden::Genetics::Locus> ret;
     std::map<std::string, uint32_t> chromosomeEncoder;
 
     //determine delimiter between tab and space by peeking the first line
@@ -50,7 +51,7 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
         auto res = std::from_chars(lineBuffer.data()+delims[1]+1, lineBuffer.data() + delims[2], chromosome,10);
         if (res.ec != std::errc{}) { //must be represented by some non integral type
             std::cerr << "chromsome read error\n";
-            return std::vector<Locus>();
+            return std::vector<Linden::Genetics::Locus>();
             
             std::string chr = lineBuffer.substr(delims[1] + 1, delims[2] - delims[1]);
             if (chromosomeEncoder.count(chr) == 0) {
@@ -62,9 +63,9 @@ std::vector<Locus> parseLoci(std::ifstream ifs){
         res = std::from_chars(lineBuffer.data() + delims[2]+1, lineBuffer.data() + delims[3], location);
         if (res.ec != std::errc{}) {
             std::cerr << "location read error\n";
-            return std::vector<Locus>();
+            return std::vector<Linden::Genetics::Locus>();
         }
-        ret.emplace_back(Locus{ lineBuffer.substr(delims[0], delims[1] - delims[0]), Location(chromosome, location) });
+        ret.emplace_back(Linden::Genetics::Locus{ lineBuffer.substr(delims[0], delims[1] - delims[0]), Linden::Genetics::Location(chromosome, location) });
     }
     ifs.close();
 

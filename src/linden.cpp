@@ -17,10 +17,6 @@
 #include "SnpSet.h"
 #include "TopSnpList.h"
 
-//Used for determining the chi2 correseponding to a pvalue of 1*10^-i for single locus significance
-//Input as an integer denoting the -log10 signficance up to 6
-const static std::array<float, 7> chi2DegreesFreedomTable{0.0f, 2.71f, 6.63f, 10.82f, 15.14f, 19.57f, 24.87f};
-
 // obtain a time-based seed:
 unsigned  randSeed = std::chrono::system_clock::now().time_since_epoch().count();
 
@@ -30,7 +26,8 @@ struct Args
     std::string controls;
     std::string cases;
 
-    std::filesystem::path snpSet = ""; //if a serialized snpset provided, dont need the other files
+    //if a serialized snpset provided, dont need the other files
+    std::filesystem::path snpSet = ""; 
 
     std::string output = "";
 
@@ -50,7 +47,7 @@ struct Args
 };
 
 void testData(Args& args){
-    std::vector<Locus> loci;
+    std::vector<Linden::Genetics::Locus> loci;
     GenotypeMatrix cases;
     GenotypeMatrix controls;
 
@@ -115,7 +112,7 @@ void testData(Args& args){
     log.mafRemoved_ = snps.remove_if([args](const Snp& e){return e.computeMinorAlleleFrequency() < args.minMAF; });
     std::clog << "\tremoved minor allele frequency: " << log.mafRemoved_ << "\n";
 
-    log.marginalSignificanceRemoved_ = snps.remove_if([args](const Snp& e) {return e.marginalTest() > chi2DegreesFreedomTable[args.maxMS]; });
+    log.marginalSignificanceRemoved_ = snps.remove_if([args](const Snp& e) {return e.marginalTest() > Statistics::GetChi2Table()[args.maxMS]; });
     std::clog << "\tremoved marginal significance: " << log.marginalSignificanceRemoved_ << "\n";
 
     //Initialize the ldforest, note that currently the loci size needs to refer to the range of possible indexes not how many post filterd SNPs there are

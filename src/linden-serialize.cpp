@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 
 
 
-    std::vector<Locus> loci;
+    std::vector<Linden::Genetics::> loci;
     GenotypeMatrix cases;
     GenotypeMatrix controls;
 

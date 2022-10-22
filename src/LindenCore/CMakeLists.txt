@@ -14,9 +14,10 @@ add_library(Linden-Core STATIC
     TopSnpList.h
 )
 set_property(TARGET Linden-Core PROPERTY CXX_STANDARD 17)
-target_link_libraries(Linden-Core
+target_link_libraries(Linden-Core PUBLIC
     OpenMP::OpenMP_CXX
     Statistics
+    Linden::Genetics
  )
 target_include_directories(Linden-Core PRIVATE ../LindenLoad)
 target_include_directories(Linden-Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -43,3 +44,5 @@ target_link_libraries(Linden-Core-Old
     Statistics
 )
 target_include_directories(Linden-Core-Old PRIVATE ../LindenLoad)
+
+RegisterTest(Snp.test.cpp)

@@ -1,6 +1,7 @@
 add_subdirectory(LindenCore)
 add_subdirectory(LindenLoad)
 add_subdirectory(Statistics)
+add_subdirectory(Genetics)
 
 # main executable
 add_executable(linden

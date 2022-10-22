@@ -23,7 +23,7 @@ bool LDTree::validMerge(const LDTree& other, ID_Sample maxDiff) const {
 void LDTree::epistasisTest(const LDTree& other) const {
     uint64_t localInternalTestsDone = 0;
     uint64_t localLeaftTestsDone = 0;
-    ContingencyTable2 cTable;
+    ContingencyTable<9> cTable;
 
     //Vector to use as a stack for tests
     std::vector<std::pair<ID_Snp, ID_Snp> > s;
@@ -37,7 +37,7 @@ void LDTree::epistasisTest(const LDTree& other) const {
 
 
         Snp::fillTable(cTable, snps_.getElement(c.first), other.snps_.getElement(c.second));
-        float score = cTable.chi2();
+        float score = cTable.Chi2();
 
         //auto lChildren = getChildren(c.first);
         //auto rChildren = other.getChildren(c.second);
@@ -107,7 +107,7 @@ void LDTree::to_serial(std::ostream& os, const LDTree& e){
 }
 
 LDTree LDTree::from_serial(std::istream& is) {
-    return LDTree(Snp(0, std::vector<Bitwise::Genotype>()),Location());
+    return LDTree(Snp(0, std::vector<Bitwise::Genotype>()),Linden::Genetics::Location());
  /*   LDTree e;
 
     is.read(reinterpret_cast<char*>(&e.root_), sizeof(ID_Snp));

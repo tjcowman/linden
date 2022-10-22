@@ -75,7 +75,7 @@ void LDTree::epistasisTest(const LDTree & other) const{
     uint64_t  localInternalTestsDone = 0;
     uint64_t  localLeaftTestsDone = 0;
 
-    ContingencyTable2 cTable;
+    ContingencyTable<9> cTable;
 
     s.push_back(std::make_pair(0,0));
     while(!s.empty())
@@ -87,7 +87,7 @@ void LDTree::epistasisTest(const LDTree & other) const{
 
        // float score = nodes_[c.first].epistasisTest(other.nodes_[c.second]);
         Snp::fillTable(cTable, nodes_[c.first], other.nodes_[c.second]);
-        float score = cTable.chi2();
+        float score = cTable.Chi2();
 
         size_t l1= (c.first<<1) +1;
         size_t r1= (c.first<<1) +2;

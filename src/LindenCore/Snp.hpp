@@ -1,14 +1,14 @@
 
 #pragma once
 
-#include <iostream>
-#include <vector>
 #include <array>
-#include <stdint.h>
 #include <cmath>
+#include <iostream>
+#include <stdint.h>
 #include <tuple>
-#include "Bitwise.h"
+#include <vector>
 
+#include "Bitwise.h"
 #include "ContingencyTable.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,6 +26,9 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     //! @struct Dimensions
     //!
+    //! Stores data relating to the size input snp data including conversions
+    //! to the number of packed elements and their locations in the underlying 
+    //! packed genotype array.
     ////////////////////////////////////////////////////////////////////////////
     struct Dimensions
     {
@@ -35,17 +38,23 @@ public:
         Dimensions(ID_Sample numControls, ID_Sample numCases) :
             numControls_(numControls),
             numCases_(numCases),
-            //Determine the number of packed elements required to store num samples, adds one element to handle the last non-full element
-            CONR_(numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)),
-            CASR_(numCases / Bitwise::Size + (numCases % Bitwise::Size != 0)),
-            CASS_(3 * (numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)))
+            // Determine the number of packed elements required to store num samples
+            // adds one element to handle the last non-full element
+            numPackedControls_(numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)),
+            numPackedCases_(numCases / Bitwise::Size + (numCases % Bitwise::Size != 0)),
+            casesBegin_(3 * (numControls / Bitwise::Size + (numControls % Bitwise::Size != 0)))
         { }
 
+        //! Total number of control samples.
         ID_Sample numControls_;
+        //! Total number of case samples.
         ID_Sample numCases_;
-        ID_Sample CONR_;
-        ID_Sample CASR_;
-        ID_Sample CASS_;
+        //! Number of packed control elements.
+        ID_Sample numPackedControls_;
+        //! Number of packed case elements.
+        ID_Sample numPackedCases_;
+        //! Starting index of the packed case samples.
+        ID_Sample casesBegin_;
     };
 
     // Construct a Snp from an index and vector of samples, ex: from serialized data
@@ -90,7 +99,7 @@ public:
     float computeUnknownRatio() const;
 
     // Fills out a contingency table with genotypes from two snps.
-    static void fillTable(ContingencyTable2& t, const Snp& snp1, const Snp& snp2);
+    static void fillTable(ContingencyTable<9>& t, const Snp& snp1, const Snp& snp2);
 
     // Peforms a marginal significance test on the snp.
     float marginalTest() const;
@@ -99,10 +108,22 @@ public:
     static Snp from_serial(std::istream& is);
 
 private:
+
+    // Gets iterator to the start of packed control genotpyes
+    inline std::vector<Bitwise::Genotype>::const_iterator GetControlsBegin(int genotype) const
+    {
+        return allSamples_.begin() + (genotype * dim.numPackedControls_);
+    }
+    // Gets iterator to the start of packed case genotpyes
+    inline std::vector<Bitwise::Genotype>::const_iterator GetCasesBegin(int genotype) const
+    {
+        return allSamples_.begin() + dim.casesBegin_ + (genotype * dim.numPackedCases_);
+    }
+
     // Packs range of genotype values into their bitwise representations.
     void packGenotypes(std::vector<uint8_t>::const_iterator begin, 
-        std::vector<uint8_t>::const_iterator end, 
-        std::vector<Bitwise::Genotype>& dest);
+                       std::vector<uint8_t>::const_iterator end, 
+                       std::vector<Bitwise::Genotype>& dest);
 
     //! Unique index corresponding to the snp.
     ID_Snp index_;

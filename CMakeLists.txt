@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.20)
 # set the project name
 project(linden VERSION 1.0)
 
+#if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+#endif()
+
 find_package(OpenMP REQUIRED)
 
 # Function to add the cpp file to the global list of tests

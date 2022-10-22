@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Graph.h"
+#include "Location.hpp"
 #include "Snp.hpp"
 #include "TopSnpList.h"
 
@@ -20,9 +21,9 @@ class LDTree
 {
 public:
     // Constructor
-    inline LDTree(const Snp& snp, const Location& location, TopSnpList* topSnpList = nullptr) :
+    inline LDTree(const Snp& snp, const Linden::Genetics::Location& location, TopSnpList* topSnpList = nullptr) :
         snps_(Graph<Snp, ID_Snp>(snp)),
-        locations_(Graph<Location, ID_Snp>(location)),
+        locations_(Graph<Linden::Genetics::Location, ID_Snp>(location)),
         topSnpList_( topSnpList),
         root_(0)
     { }
@@ -36,8 +37,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     inline LDTree( LDTree& t1,  LDTree& t2) :
         root_(0),
-        locations_(Graph<Location, ID_Snp>::joinToRoot(
-            Location(),
+        locations_(Graph<Linden::Genetics::Location, ID_Snp>::joinToRoot(
+            Linden::Genetics::Location(),
             t1.locations_,
             t2.locations_
         )),
@@ -135,7 +136,7 @@ private:
     //! Genotype data for snps in the tree.
     Graph<Snp, ID_Snp> snps_;
     //! Location of snps in the tree.
-    Graph<Location, ID_Snp> locations_; 
+    Graph<Linden::Genetics::Location, ID_Snp> locations_; 
     //! List used to track snp pairs, shared between all trees.
     TopSnpList* topSnpList_;
 };

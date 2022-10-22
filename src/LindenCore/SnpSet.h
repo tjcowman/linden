@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "Locus.hpp"
 #include "CommonStructs.h"
 #include "Snp.hpp"
 
@@ -17,7 +18,7 @@ public:
 	{ }
 
 	// NOTE: CURRENTLY ONLY CONSTRUCT WITH THIS. LOCATIONS MUST BE INDEXED BASED ON THE STORED SNP_INDEX DUE TO FILTERING EX: IN LDFOReet creation
-	SnpSet(const std::vector<Locus>& loci, const GenotypeMatrix& controls, const GenotypeMatrix& cases);
+	SnpSet(const std::vector<Linden::Genetics::Locus>& loci, const GenotypeMatrix& controls, const GenotypeMatrix& cases);
 
 	// Getters
 	inline ID_Snp size() const
@@ -40,7 +41,7 @@ public:
 		return data;
 	}
 
-	inline const std::vector<Locus>& getLoci() const
+	inline const std::vector<Linden::Genetics::Locus>& getLoci() const
 	{
 		return loci;
 	}
@@ -65,7 +66,7 @@ public:
 
 
 private:
-	std::vector<Locus> loci;
+	std::vector<Linden::Genetics::Locus> loci;
 	ID_Snp sizeUnfiltered;
 	Snp::Dimensions dim;
 	std::vector<Snp> data;
