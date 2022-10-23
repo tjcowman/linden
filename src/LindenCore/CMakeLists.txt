@@ -11,14 +11,12 @@ add_library(Linden-Core STATIC
     SnpSet.cpp
     SnpSet.h
     TopSnpList.cpp
-    TopSnpList.h
-)
+    TopSnpList.h)
 set_property(TARGET Linden-Core PROPERTY CXX_STANDARD 17)
 target_link_libraries(Linden-Core PUBLIC
     OpenMP::OpenMP_CXX
     Statistics
-    Linden::Genetics
- )
+    Linden::Genetics)
 target_include_directories(Linden-Core PRIVATE ../LindenLoad)
 target_include_directories(Linden-Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -35,14 +33,13 @@ add_library(Linden-Core-Old STATIC
     SnpSet.cpp
     SnpSet.h
     TopSnpList.cpp
-    TopSnpList.h
-)
+    TopSnpList.h)
 target_compile_definitions(Linden-Core-Old PUBLIC -DoldTree)
 set_property(TARGET Linden-Core-Old PROPERTY CXX_STANDARD 17)
 target_link_libraries(Linden-Core-Old
     OpenMP::OpenMP_CXX
     Statistics
-)
+    Linden::Genetics)
 target_include_directories(Linden-Core-Old PRIVATE ../LindenLoad)
 
 RegisterTest(Snp.test.cpp)

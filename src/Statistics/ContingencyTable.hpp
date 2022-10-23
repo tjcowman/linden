@@ -4,7 +4,7 @@
 #include <array>
 #include <cmath>
 
-#include "CommonStructs.h"
+#include "Id.hpp"
 
 namespace Statistics
 {
@@ -23,66 +23,70 @@ namespace Statistics
     }
 }
 
-template<std::size_t Values>
-class ContingencyTable
+namespace Linden
 {
-public:
 
-    inline void zero()
+    template<std::size_t Values>
+    class ContingencyTable
     {
-        m_data.fill(0);
-    }
+    public:
 
-    inline std::array<ID_Sample, Values * 3 + 2>& Data()
-    {
-        return m_data;
-    }
-
-    ID_Sample& ColTotal(int col)
-    {
-        return m_data[Values*3 + col];
-    }
-
-    ID_Sample& RowTotal(int row)
-    {
-        return m_data[(row*3) + 2];
-    }
-
-    inline float Chi2()
-    {
-        float chi2 = 0.0;
-        
-        auto c3 = m_data[colTotalsIndex] + m_data[colTotalsIndex+1]; // total
-        for (int row = 0; row < Values; ++row)
+        inline void zero()
         {
-            for (int col = 0; col < levels; ++col)
-            {
-                ID_Sample c1 = m_data[row * 3 + levels]; // row total
-                ID_Sample c2 = m_data[colTotalsIndex + col]; // col total
-                ID_Sample c4 = m_data[row * 3 + col];
-
-                float expected = (float)(c1 * c2) / (float)c3;
-                chi2 += (pow(c4 - expected, 2) / expected);
-            }
+            m_data.fill(0);
         }
-        return chi2;
+
+        inline std::array<Genetics::Id::Sample, Values * 3 + 2>& Data()
+        {
+            return m_data;
+        }
+
+        Genetics::Id::Sample& ColTotal(int col)
+        {
+            return m_data[Values*3 + col];
+        }
+
+        Genetics::Id::Sample& RowTotal(int row)
+        {
+            return m_data[(row*3) + 2];
+        }
+
+        inline float Chi2()
+        {
+            float chi2 = 0.0;
+            
+            auto c3 = m_data[colTotalsIndex] + m_data[colTotalsIndex+1]; // total
+            for (int row = 0; row < Values; ++row)
+            {
+                for (int col = 0; col < levels; ++col)
+                {
+                    Genetics::Id::Sample c1 = m_data[row * 3 + levels]; // row total
+                    Genetics::Id::Sample c2 = m_data[colTotalsIndex + col]; // col total
+                    Genetics::Id::Sample c4 = m_data[row * 3 + col];
+
+                    float expected = (float)(c1 * c2) / (float)c3;
+                    chi2 += (pow(c4 - expected, 2) / expected);
+                }
+            }
+            return chi2;
+        }
+
+    private:
+        //! Starting index of the column totals.
+        const static int colTotalsIndex = Values * 3;
+        //! Number of levels ex: case, control groups
+        const static int levels = 2;
+        //! Backing data structure.
+        std::array<Genetics::Id::Sample, Values * 3 + 2> m_data;
+    };
+
+    namespace ContingencyTableTmp
+    {
+        const static std::array<std::pair<uint8_t, uint8_t>, 9> rowOrder
+        {{ 
+            {0,0}, {0,1}, {0,2},
+            {1,0}, {1,1}, {1,2},
+            {2,0}, {2,1}, {2,2}
+        }};
     }
-
-private:
-    //! Starting index of the column totals.
-    const static int colTotalsIndex = Values * 3;
-    //! Number of levels ex: case, control groups
-    const static int levels = 2;
-    //! Backing data structure.
-    std::array<ID_Sample, Values * 3 + 2> m_data;
-};
-
-namespace ContingencyTableTmp
-{
-    const static std::array<std::pair<uint8_t, uint8_t>, 9> rowOrder
-    {{ 
-        {0,0}, {0,1}, {0,2},
-        {1,0}, {1,1}, {1,2},
-        {2,0}, {2,1}, {2,2}
-    }};
 }

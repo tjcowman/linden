@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Types.hpp"
+#include "Id.hpp"
 
 namespace Linden::Genetics
 {
@@ -38,7 +38,7 @@ namespace Linden::Genetics
                 return false;
             }
             //gets the absolute difference between two unsigned integral numbers
-            ID_Snp dist = basePair_ > other.basePair_ ? basePair_ - other.basePair_ : other.basePair_ - basePair_;
+            Genetics::Id::Snp dist = basePair_ > other.basePair_ ? basePair_ - other.basePair_ : other.basePair_ - basePair_;
             return(dist <= ESTIMATED_LD_RANGE);
         }
 

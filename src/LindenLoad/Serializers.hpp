@@ -1,4 +1,7 @@
 
+#include <vector>
+#include <iostream>
+
 //TODO: put these in some sort of serialization namespace/file
 template<class T, class IT>
 void vector_to_serial(std::ostream& os, std::vector<T> e)

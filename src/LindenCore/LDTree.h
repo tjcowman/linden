@@ -12,46 +12,53 @@
 
 #include <iostream>
 #include <vector>
-class LDForest;
 
-class LDTree
+#include "Location.hpp"
+
+namespace Linden::Core
 {
-    friend LDForest;
-public:
 
-    LDTree(const Snp& snp, const Location& location, TopSnpList* topSnpList=nullptr) :
-        nodes_(std::vector<Snp>{ snp }),
-        genomeLocations_(std::vector<Location>{ location }),
-        topSnpList_(topSnpList)
-    { }
+    class LDForest;
 
-    LDTree();
+    class LDTree
+    {
+        friend LDForest;
+    public:
 
-    // LDTree(const LDTree & cpy);
-    LDTree( LDTree& t1,  LDTree& t2);
+        LDTree(const Snp& snp, const Genetics::Location& location, TopSnpList* topSnpList=nullptr) :
+            nodes_(std::vector<Snp>{ snp }),
+            genomeLocations_(std::vector<Genetics::Location>{ location }),
+            topSnpList_(topSnpList)
+        { }
 
-    bool operator==(const LDTree& lhs) const;
+        LDTree();
 
-    bool empty() const;
-    size_t size() const;
+        // LDTree(const LDTree & cpy);
+        LDTree( LDTree& t1,  LDTree& t2);
 
-    const Snp& getRoot() const;
+        bool operator==(const LDTree& lhs) const;
 
-    ID_Sample computeDifferences(const LDTree& other) const;
-    bool validMerge(const LDTree& other, ID_Sample maxDiff) const;
+        bool empty() const;
+        size_t size() const;
 
-    void clear();
+        const Snp& getRoot() const;
 
-    void epistasisTest(const LDTree& other) const;
+        Genetics::Id::Sample computeDifferences(const LDTree& other) const;
+        bool validMerge(const LDTree& other, Genetics::Id::Sample maxDiff) const;
+
+        void clear();
+
+        void epistasisTest(const LDTree& other) const;
 
 
-    static void to_serial(std::ostream& os, const LDTree& e);
-    static LDTree from_serial(std::istream& is);
+        static void to_serial(std::ostream& os, const LDTree& e);
+        static LDTree from_serial(std::istream& is);
 
-private:
+    private:
 
-    TopSnpList* topSnpList_;
+        TopSnpList* topSnpList_;
 
-    std::vector<Snp> nodes_;
-    std::vector<Location> genomeLocations_;
-};
+        std::vector<Snp> nodes_;
+        std::vector<Genetics::Location> genomeLocations_;
+    };
+}

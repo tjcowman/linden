@@ -7,6 +7,7 @@ add_library(Statistics-Test STATIC
     ContingencyTable.test.cpp)
 target_link_libraries(Statistics-Test
     Catch2
-    Linden-Load) #tmp
+    Linden-Load
+    Linden::Genetics) #tmp
 
 RegisterTest(ContingencyTable.test.cpp)

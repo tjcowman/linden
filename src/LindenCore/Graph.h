@@ -5,7 +5,6 @@
 #include <tuple>
 #include <vector>
 
-#include "CommonStructs.h"
 
 template<class T, class IT>
 class Graph {

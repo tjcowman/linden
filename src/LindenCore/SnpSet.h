@@ -4,70 +4,72 @@
 #include <vector>
 
 #include "Locus.hpp"
-#include "CommonStructs.h"
 #include "Snp.hpp"
 
-class SnpSet
+namespace Linden::Core
 {
-public:
-	 // For use with from_serial
-	SnpSet() :
-		sizeUnfiltered(0),
-		dim(Snp::Dimensions(0,0)),
-		data(std::vector<Snp>())
-	{ }
-
-	// NOTE: CURRENTLY ONLY CONSTRUCT WITH THIS. LOCATIONS MUST BE INDEXED BASED ON THE STORED SNP_INDEX DUE TO FILTERING EX: IN LDFOReet creation
-	SnpSet(const std::vector<Linden::Genetics::Locus>& loci, const GenotypeMatrix& controls, const GenotypeMatrix& cases);
-
-	// Getters
-	inline ID_Snp size() const
+	class SnpSet
 	{
-		return data.size();
-	}
+	public:
+		// For use with from_serial
+		SnpSet() :
+			sizeUnfiltered(0),
+			dim(Snp::Dimensions(0,0)),
+			data(std::vector<Snp>())
+		{ }
 
-	inline ID_Snp getSizeUnfiltered() const
-	{
-		return sizeUnfiltered;
-	}
+		// NOTE: CURRENTLY ONLY CONSTRUCT WITH THIS. LOCATIONS MUST BE INDEXED BASED ON THE STORED SNP_INDEX DUE TO FILTERING EX: IN LDFOReet creation
+		SnpSet(const std::vector<Genetics::Locus>& loci, const Genetics::GenotypeMatrix& controls, const Genetics::GenotypeMatrix& cases);
 
-	inline const Snp::Dimensions& getDimensions() const
-	{
-		return dim;
-	}
+		// Getters
+		inline Genetics::Id::Snp size() const
+		{
+			return data.size();
+		}
 
-	inline const std::vector<Snp>& getSnps() const
-	{
-		return data;
-	}
+		inline Genetics::Id::Snp getSizeUnfiltered() const
+		{
+			return sizeUnfiltered;
+		}
 
-	inline const std::vector<Linden::Genetics::Locus>& getLoci() const
-	{
-		return loci;
-	}
+		inline const Snp::Dimensions& getDimensions() const
+		{
+			return dim;
+		}
 
-	// Primarily a wrapper for the std library remove_if returns the number of elements removed
-	template<typename F>
-	ID_Snp remove_if(F f)
-	{
-		auto it = std::remove_if(data.begin(), data.end(), f);
-		ID_Snp removed = std::distance(it, data.end());
-		data.erase(it, data.end());
-		return removed;
-	}
+		inline const std::vector<Snp>& getSnps() const
+		{
+			return data;
+		}
 
-	inline void truncateTo(ID_Snp n)
-	{
-		data.erase(data.begin()+n, data.end());
-	}
+		inline const std::vector<Genetics::Locus>& getLoci() const
+		{
+			return loci;
+		}
 
-	static void to_serial(std::ostream& os, const SnpSet& snpSet);
-	static SnpSet from_serial(std::istream& is);
+		// Primarily a wrapper for the std library remove_if returns the number of elements removed
+		template<typename F>
+		Genetics::Id::Snp remove_if(F f)
+		{
+			auto it = std::remove_if(data.begin(), data.end(), f);
+			Genetics::Id::Snp removed = std::distance(it, data.end());
+			data.erase(it, data.end());
+			return removed;
+		}
+
+		inline void truncateTo(Genetics::Id::Snp n)
+		{
+			data.erase(data.begin()+n, data.end());
+		}
+
+		static void to_serial(std::ostream& os, const SnpSet& snpSet);
+		static SnpSet from_serial(std::istream& is);
 
 
-private:
-	std::vector<Linden::Genetics::Locus> loci;
-	ID_Snp sizeUnfiltered;
-	Snp::Dimensions dim;
-	std::vector<Snp> data;
-};
+	private:
+		std::vector<Genetics::Locus> loci;
+		Genetics::Id::Snp sizeUnfiltered;
+		Snp::Dimensions dim;
+		std::vector<Snp> data;
+	};
+}

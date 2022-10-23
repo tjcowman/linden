@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include <cstdint>
 #include <vector>
 
@@ -6,10 +8,10 @@
 #include <intrin.h>
 #endif
 
-#include "CommonStructs.h"
+#include "Id.hpp"
 
 //Define types and sizes for handling packed genotype representations, can change to facilitate more bitwise parallelism ex 32bit -> 64bit
-namespace Bitwise
+namespace Linden::Bitwise
 {
     // Compiler specific function for performing population counting
 #if defined(_MSC_VER)
@@ -31,7 +33,7 @@ namespace Bitwise
         std::vector<Genotype>  retVal;
         retVal.reserve(v1.size());
 
-        for (ID_Snp i = 0; i < v1.size(); ++i)
+        for (Genetics::Id::Snp i = 0; i < v1.size(); ++i)
         {
             retVal.push_back(v1[i] & v2[i]);
         }
@@ -39,19 +41,19 @@ namespace Bitwise
     }
 
     // Peforms population count on a vector of genotype data
-    inline ID_Snp count(std::vector<Genotype>::const_iterator  v, ID_Snp distance)
+    inline Genetics::Id::Snp count(std::vector<Genotype>::const_iterator  v, Genetics::Id::Snp distance)
     {
         Genotype retVal = 0;
-        for (ID_Snp i = 0; i < distance; ++i)
+        for (Genetics::Id::Snp i = 0; i < distance; ++i)
         {
             retVal += static_cast<Genotype>(POPCOUNT_FUNCTION(*v));
             ++v;
         }
-        return static_cast<ID_Snp>(retVal);
+        return static_cast<Genetics::Id::Snp>(retVal);
     }
 
     // Peforms bitwise and followdby population count on two parallel vectors of genotype data
-    inline ID_Snp andCount(std::vector<Genotype>::const_iterator v1, std::vector<Genotype>::const_iterator v2, ID_Snp distance)
+    inline Genetics::Id::Snp andCount(std::vector<Genotype>::const_iterator v1, std::vector<Genotype>::const_iterator v2, Genetics::Id::Snp distance)
     {
         Genotype retVal = 0;
 
@@ -62,7 +64,7 @@ namespace Bitwise
             ++v1;
             ++v2;
         }
-        return static_cast<ID_Snp>(retVal);
+        return static_cast<Genetics::Id::Snp>(retVal);
     }
 
 

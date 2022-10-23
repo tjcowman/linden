@@ -1,48 +1,50 @@
 
+#include "Serializers.hpp"
 #include "SnpSet.h"
 
-#include "Serializers.hpp"
-
-SnpSet::SnpSet(const std::vector<Linden::Genetics::Locus>& loci, const GenotypeMatrix& controls, const GenotypeMatrix& cases) :
-    sizeUnfiltered(loci.size()),
-    dim(Snp::Dimensions(controls.width, cases.width)),
-    loci(loci)
+namespace Linden::Core
 {
-    for (ID_Snp i = 0; i < loci.size(); ++i)
+    SnpSet::SnpSet(const std::vector<Genetics::Locus>& loci, const Genetics::GenotypeMatrix& controls, const Genetics::GenotypeMatrix& cases) :
+        sizeUnfiltered(loci.size()),
+        dim(Snp::Dimensions(controls.width, cases.width)),
+        loci(loci)
     {
-        data.push_back(Snp(i, controls, cases));
-    }
-}
-
-void SnpSet::to_serial(std::ostream& os, const SnpSet& snpSet)
-{
-    os.write(reinterpret_cast<const char*>(&snpSet.sizeUnfiltered), sizeof(ID_Snp));
-    os.write(reinterpret_cast<const char*>(&snpSet.dim), sizeof(Snp::Dimensions));
-    vector_to_serialc<Snp, ID_Snp>(os, snpSet.data);
-    vector_to_serialc<Linden::Genetics::Locus, ID_Snp>(os, snpSet.loci);
-}
-
-SnpSet SnpSet::from_serial(std::istream& is)
-{
-    SnpSet e;
-
-    auto Bread = is.tellg();
-    is.read(reinterpret_cast<char*>(&e.sizeUnfiltered), sizeof(ID_Snp));
-
-    auto Aread = is.tellg();
-    is.read(reinterpret_cast<char*>(&e.dim), sizeof(Snp::Dimensions));
-
-    if(is.fail())
-    {
-        std::cerr<<"Read fail"<<std::endl;
+        for (Genetics::Id::Snp i = 0; i < loci.size(); ++i)
+        {
+            data.push_back(Snp(i, controls, cases));
+        }
     }
 
-    e.data = vector_from_serialc<Snp, ID_Snp>(is);
+    void SnpSet::to_serial(std::ostream& os, const SnpSet& snpSet)
+    {
+        os.write(reinterpret_cast<const char*>(&snpSet.sizeUnfiltered), sizeof(Genetics::Id::Snp));
+        os.write(reinterpret_cast<const char*>(&snpSet.dim), sizeof(Snp::Dimensions));
+        vector_to_serialc<Snp, Genetics::Id::Snp>(os, snpSet.data);
+        vector_to_serialc<Genetics::Locus, Genetics::Id::Snp>(os, snpSet.loci);
+    }
 
-    auto Rread = is.tellg();
-    e.loci = vector_from_serialc<Linden::Genetics::Locus, ID_Snp>(is);
+    SnpSet SnpSet::from_serial(std::istream& is)
+    {
+        SnpSet e;
 
-    auto Lread = is.tellg();
+        auto Bread = is.tellg();
+        is.read(reinterpret_cast<char*>(&e.sizeUnfiltered), sizeof(Genetics::Id::Snp));
 
-    return e;
+        auto Aread = is.tellg();
+        is.read(reinterpret_cast<char*>(&e.dim), sizeof(Snp::Dimensions));
+
+        if(is.fail())
+        {
+            std::cerr<<"Read fail"<<std::endl;
+        }
+
+        e.data = vector_from_serialc<Snp, Genetics::Id::Snp>(is);
+
+        auto Rread = is.tellg();
+        e.loci = vector_from_serialc<Genetics::Locus, Genetics::Id::Snp>(is);
+
+        auto Lread = is.tellg();
+
+        return e;
+    }
 }

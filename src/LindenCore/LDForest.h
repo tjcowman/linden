@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "CommonStructs.h"
 #include "Snp.hpp"
 #include "SnpSet.h"
 
@@ -25,16 +24,18 @@
 #include <vector>
 #include <fstream>
 
-//The number of ldtrees each tree will compare against for merging
-static const ID_Snp MERGE_SEARCH_DISTANCE = 10;
+namespace Linden::Core
+{
+    //The number of ldtrees each tree will compare against for merging
+    static const Genetics::Id::Snp MERGE_SEARCH_DISTANCE = 10;
 
-class LDForest{
+    class LDForest
+    {
     public:
-
         //TODO implement to not require a num snps by correctly sizing the topSnplist based on internal data (NOTE NEEEDS THE MAX POSSIBLE INDEX NOT FILTERED NUMBER)
         LDForest();
-        LDForest( ID_Snp numSnps);
-        LDForest( SnpSet& snpSet, ID_Snp numSnps); //TODO: Make only require SnpSet
+        LDForest( Genetics::Id::Snp numSnps);
+        LDForest( SnpSet& snpSet, Genetics::Id::Snp numSnps); //TODO: Make only require SnpSet
 
         size_t size() const;
         bool operator==(const LDForest& lhs) const;
@@ -52,7 +53,5 @@ class LDForest{
 
         std::vector<LDTree> ldtrees_;
         TopSnpList topSnpList_;
-
-
-
-};
+    };
+}

@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "Location.hpp"
-#include "Types.hpp"
+#include "Id.hpp"
 
 namespace Linden::Genetics
 {
