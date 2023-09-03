@@ -1,0 +1,15 @@
+
+<script>
+    let socket = new WebSocket("ws://0.0.0.0:8081");
+
+    socket.onopen = function(e) {
+    socket.send("test");
+
+    socket.onmessage = function(event) {
+        alert(`[message] Data received from server: ${event.data}`);
+    };
+
+    }
+</script>
+
+

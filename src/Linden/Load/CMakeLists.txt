@@ -1,7 +1,6 @@
 add_library(Linden-Load STATIC
     InputParser.cpp
     InputParser.hpp
-    Serializers.hpp
 )
 target_link_libraries(Linden-Load PUBLIC
     Genetics)

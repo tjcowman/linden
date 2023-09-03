@@ -5,7 +5,7 @@
 #include <tuple>
 #include <vector>
 
-#include "Serializers.hpp"
+//#include "Serializers.hpp"
 
 template<class T, class IT>
 class Graph {
@@ -145,9 +145,9 @@ bool Graph<T, IT>::empty() const {
 
 template<class T, class IT>
 void Graph<T, IT>::to_serial(std::ostream& os, const Graph& e) {
-
+	// TODO Implement
 	//The T may be more complex than an integer indexing value
-	IT num=e.V.size();
+	/*IT num=e.V.size();
 	os.write(reinterpret_cast<const char*>(&num), sizeof(IT));
 	for (IT i = 0; i < num; ++i) {
 		T::to_serial(os, e.V[i]);
@@ -155,12 +155,13 @@ void Graph<T, IT>::to_serial(std::ostream& os, const Graph& e) {
 
 	vector_to_serial<IT, IT>(os, e.A);
 	vector_to_serial<IT, IT>(os, e.JA);
-	vector_to_serial<IT, IT>(os, e.IA);
+	vector_to_serial<IT, IT>(os, e.IA);*/
 }
 
 template<class T, class IT>
 Graph<T, IT>  Graph<T, IT>::from_serial(std::istream& is) {
-	Graph e;
+	// TODO Implement
+	/*Graph e;
 
 	IT num;
 	is.read(reinterpret_cast<char*>(&num), sizeof(IT));
@@ -169,11 +170,12 @@ Graph<T, IT>  Graph<T, IT>::from_serial(std::istream& is) {
 		e.V.push_back(T::from_serial(is));
 	}
 	e.A = vector_from_serial<IT, IT>(is);
-	e.JA = vector_from_serial<IT,IT>(is);
+	e.JA = vector_from_serial<IT, IT>(is);
 	e.IA = vector_from_serial<IT, IT>(is);
 
 
-	return e;
+	return e;*/
+	return Graph();
 }
 
 

@@ -1,8 +1,6 @@
 
 #include "Snp.hpp"
 
-#include "Serializers.hpp"
-
 namespace Linden::Core
 {
 
@@ -212,15 +210,18 @@ namespace Linden::Core
 
     void Snp::to_serial(std::ostream& os, const Snp& snp)
     {
-        os.write(reinterpret_cast<const char*>(&snp.index_),sizeof(Genetics::Id::Snp));
-        vector_to_serial<Bitwise::Genotype,Genetics::Id::Snp>(os, snp.allSamples_);
+        // TODO Implement
+        // os.write(reinterpret_cast<const char*>(&snp.index_),sizeof(Genetics::Id::Snp));
+        // vector_to_serial<Bitwise::Genotype,Genetics::Id::Snp>(os, snp.allSamples_);
     }
 
     Snp Snp::from_serial(std::istream& is)
     {
-        auto t1 = value_from_serial<Genetics::Id::Snp>(is);
-        auto t2 =  vector_from_serial<Bitwise::Genotype, Genetics::Id::Snp>(is);
+        // TODO Implement
+        // auto t1 = value_from_serial<Genetics::Id::Snp>(is);
+        // auto t2 =  vector_from_serial<Bitwise::Genotype, Genetics::Id::Snp>(is);
 
-        return Snp( std::move(t1), std::move(t2));
+        // return Snp( std::move(t1), std::move(t2));
+        return Snp();
     }
 }

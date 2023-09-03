@@ -5,7 +5,6 @@
 #include <fstream>
 #include <vector>
 
-
 #include "Locus.hpp"
 #include "GenotypeMatrix.hpp"
 

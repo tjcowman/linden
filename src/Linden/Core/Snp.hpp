@@ -60,6 +60,10 @@ namespace Linden::Core
             Genetics::Id::Sample casesBegin_;
         };
 
+        // Contstructs an empty Snp
+        Snp()
+        { };
+
         // Construct a Snp from an index and vector of samples, ex: from serialized data
         Snp(Genetics::Id::Snp index, const std::vector<Bitwise::Genotype>& samples);
 
