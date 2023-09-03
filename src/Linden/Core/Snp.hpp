@@ -102,7 +102,7 @@ namespace Linden::Core
         float computeUnknownRatio() const;
 
         // Fills out a contingency table with genotypes from two snps.
-        static void fillTable(ContingencyTable<9>& t, const Snp& snp1, const Snp& snp2);
+        static void fillTable(Statistics::ContingencyTable<9>& t, const Snp& snp1, const Snp& snp2);
 
         // Peforms a marginal significance test on the snp.
         float marginalTest() const;

@@ -104,12 +104,12 @@ namespace Linden::Core
     //! @param snp1 The first Snp.
     //! @param snp2 The second Snp.
     ////////////////////////////////////////////////////////////////////////////////
-    void Snp::fillTable(ContingencyTable<9>& t, const Snp& snp1, const Snp& snp2)
+    void Snp::fillTable(Statistics::ContingencyTable<9>& t, const Snp& snp1, const Snp& snp2)
     {
         t.zero();
         auto& data = t.Data();
 
-        for (const auto& e : ContingencyTableTmp::rowOrder)
+        for (const auto& e : Statistics::ContingencyTableTmp::rowOrder)
         {
             const uint8_t rowI = 9 * e.first + e.second * 3;
 
@@ -139,7 +139,7 @@ namespace Linden::Core
     ////////////////////////////////////////////////////////////////////////////////
     float Snp::marginalTest() const
     {
-        ContingencyTable<3> t;
+        Statistics::ContingencyTable<3> t;
         auto& data = t.Data();
         t.zero();
 

@@ -6,7 +6,7 @@
 
 TEST_CASE("ContingencyTable")
 {
-    Linden::ContingencyTable<2> table;
+    Statistics::ContingencyTable<2> table;
     table.Data() = {
         34, 56, 90,
         22, 34, 56,

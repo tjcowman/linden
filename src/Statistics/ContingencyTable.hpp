@@ -21,10 +21,7 @@ namespace Statistics
     {
         return chi2Table;
     }
-}
 
-namespace Linden
-{
     template<std::size_t Values>
     class ContingencyTable
     {

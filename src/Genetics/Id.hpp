@@ -3,7 +3,7 @@
 
 #include <limits>
 
-namespace Linden::Genetics::Id
+namespace Genetics::Id
 {
     // Maxium number of input Snps
     using Snp = std::uint32_t;

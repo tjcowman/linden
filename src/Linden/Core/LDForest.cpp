@@ -103,7 +103,7 @@ namespace Linden::Core
         std::clog<<std::endl;
     }
 
-    void LDForest::writeResults(const std::vector<Linden::Genetics::Locus>& infoMatrix, const std::string& output){
+    void LDForest::writeResults(const std::vector<Genetics::Locus>& infoMatrix, const std::string& output){
         topSnpList_.calculateFormattedResults();
 
         std::ofstream ofs;

@@ -1,40 +1,4 @@
-add_subdirectory(LindenCore)
-add_subdirectory(LindenLoad)
+
+add_subdirectory(Linden)
 add_subdirectory(Statistics)
 add_subdirectory(Genetics)
-
-# main executable
-add_executable(linden
-    linden.cpp
-)
-set_property(TARGET linden PROPERTY CXX_STANDARD 17)
-target_include_directories(linden PRIVATE LindenCore LindenLoad)
-target_link_libraries(linden
-    Linden-Core
-    Linden-Load
-    OpenMP::OpenMP_CXX
-)
-
-# add the original LDTree version
-add_executable(lindenV0
-    linden.cpp
-)
-set_property(TARGET lindenV0 PROPERTY CXX_STANDARD 17)
-target_include_directories(lindenV0 PRIVATE LindenCore LindenLoad)
-target_link_libraries(lindenV0
-    Linden-Core-Old
-    Linden-Load
-    OpenMP::OpenMP_CXX
-)
-
-# Serializing program
-add_executable(linden-serialize
-    linden-serialize.cpp
-)
-set_property(TARGET linden-serialize PROPERTY CXX_STANDARD 17)
-target_include_directories(linden-serialize PRIVATE LindenCore)
-target_link_libraries(linden-serialize
-    Linden-Core
-    Linden-Load
-    OpenMP::OpenMP_CXX
-)

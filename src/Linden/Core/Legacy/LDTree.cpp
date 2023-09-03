@@ -78,7 +78,7 @@ namespace Linden::Core
         uint64_t  localInternalTestsDone = 0;
         uint64_t  localLeaftTestsDone = 0;
 
-        ContingencyTable<9> cTable;
+        Statistics::ContingencyTable<9> cTable;
 
         s.push_back(std::make_pair(0,0));
         while(!s.empty())

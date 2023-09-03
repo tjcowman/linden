@@ -3,7 +3,7 @@
 
 #include "Id.hpp"
 
-namespace Linden::Genetics
+namespace Genetics
 {
     struct GenotypeMatrix
     {
