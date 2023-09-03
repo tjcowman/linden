@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <tuple>
+
 #include "Id.hpp"
 
 namespace Linden::Genetics

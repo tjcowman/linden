@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <limits>
+
 namespace Linden::Genetics::Id
 {
     // Maxium number of input Snps
@@ -11,6 +13,4 @@ namespace Linden::Genetics::Id
     using Sample = std::uint32_t; 
 
     constexpr Snp InvalidSnp = std::numeric_limits<Snp>::max();
-
-
 }

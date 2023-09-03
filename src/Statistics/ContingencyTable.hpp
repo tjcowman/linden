@@ -25,7 +25,6 @@ namespace Statistics
 
 namespace Linden
 {
-
     template<std::size_t Values>
     class ContingencyTable
     {

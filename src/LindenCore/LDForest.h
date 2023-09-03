@@ -10,16 +10,10 @@
 
 #include "Snp.hpp"
 #include "SnpSet.h"
-
-//Include the original Tree version for testing
-#ifdef oldTree
 #include "LDTree.h"
-#else
-#include "LDTree2.h"
-#endif
-
 #include "Locus.hpp"
 #include "TopSnpList.h"
+
 #include <limits.h>
 #include <vector>
 #include <fstream>

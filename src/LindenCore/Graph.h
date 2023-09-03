@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 
+#include "Serializers.hpp"
 
 template<class T, class IT>
 class Graph {

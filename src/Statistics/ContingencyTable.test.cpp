@@ -14,5 +14,4 @@ TEST_CASE("ContingencyTable")
     };
 
     REQUIRE(abs(table.Chi2() - .0332) < .001);
-
 }

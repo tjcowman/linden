@@ -22,13 +22,11 @@ struct Args {
 
 int main(int argc, char* argv[])
 {
-
     //Bring up help menu when no args, help, or h are first argument
     if ((argc == 1) || ((std::string)argv[1] == "--help") || ((std::string)argv[1] == "-h")) {
         std::cout << "linden v 1.0" << std::endl;
         return 0;
     }
-
 
     ARGLOOP(,
         ARG(maxThreads, stol)
@@ -38,12 +36,9 @@ int main(int argc, char* argv[])
         ARG(output, )
     )
 
-
-
     std::vector<Linden::Genetics::Locus> loci;
     Linden::Genetics::GenotypeMatrix cases;
     Linden::Genetics::GenotypeMatrix controls;
-
 
     //The controls and cases expect 0,1,2 chars
     #pragma omp parallel sections num_threads( std::min(3, args.maxThreads ) )
