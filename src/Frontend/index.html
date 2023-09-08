@@ -1,15 +1,24 @@
 
+
+
+<html>
+<body>
+
+<p id="p1">Hello World!</p>
+
+
+</body>
+</html> 
+
 <script>
     let socket = new WebSocket("ws://0.0.0.0:8081");
 
     socket.onopen = function(e) {
-    socket.send("test");
+    socket.send("{\"request\" : \"init\"}");
 
     socket.onmessage = function(event) {
-        alert(`[message] Data received from server: ${event.data}`);
+        document.getElementById("p1").innerHTML = `${event.data}`;
     };
 
     }
 </script>
-
-

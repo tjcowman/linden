@@ -6,9 +6,10 @@
 #include <boost/beast/websocket.hpp>
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/strand.hpp>
+#include <functional>
 #include <iostream>
+#include <string>
 
-#include "Platform.hpp"
 #include "Session.hpp"
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
@@ -27,10 +28,12 @@ namespace Linden::Application
 
     public:
         // Take ownership of the socket
-        explicit Session(tcp::socket&& socket, Platform& platform);
+        explicit Session(tcp::socket&& socket);
 
         // Get on the correct executor
         void run();
+
+        void Write(const std::string& data);
 
         // Start the asynchronous operation
         void on_run();
@@ -47,10 +50,22 @@ namespace Linden::Application
             beast::error_code ec,
             std::size_t bytes_transferred);
 
+        inline void SetReadHandler(std::function<void(const std::string&)>& handler)
+        {
+            m_readHandler = handler;
+        }
+        inline void SetWriteHandler(std::function<void(const std::string&)>& handler)
+        {
+            m_writeHandler = handler;
+        }
+
     private:
         // Report a failure
         void fail(beast::error_code ec, char const* what);
 
-        Platform& m_platform;
+        //! Called when the session reads from the socket.
+        std::function<void(const std::string&)> m_readHandler;
+        //! Called when the session writes from the socket.
+        std::function<void(const std::string&)> m_writeHandler;
     };
 }

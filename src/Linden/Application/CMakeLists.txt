@@ -1,5 +1,6 @@
 
 add_library(Linden-Application STATIC
+    Ping.hpp
     Session.cpp
     Session.hpp
     Listener.cpp

@@ -14,11 +14,9 @@ namespace Linden::Application
 {
     Listener::Listener(
         net::io_context& ioc,
-        tcp::endpoint endpoint,
-        Platform& platform)
+        tcp::endpoint endpoint)
         : ioc_(ioc)
         , acceptor_(ioc)
-        , m_platform(platform)
     {
         beast::error_code ec;
 
@@ -68,6 +66,15 @@ namespace Linden::Application
         do_accept();
     }
 
+    void Listener::Update(const std::string& data)
+    {
+        
+        for (const auto& session : m_sessions)
+        {
+            session->Write(data);
+        }
+    }
+
     void Listener::do_accept()
     {
         // The new connection gets its own strand
@@ -87,7 +94,11 @@ namespace Linden::Application
         else
         {
             // Create the session and run it
-            std::make_shared<Session>(std::move(socket), m_platform)->run();
+            m_sessions.push_back(
+                std::make_shared<Session>(std::move(socket)));
+            m_sessions.back()->SetReadHandler(m_readHandler);
+            m_sessions.back()->SetWriteHandler(m_writeHandler);
+            m_sessions.back()->run();
         }
 
         // Accept another connection

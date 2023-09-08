@@ -7,9 +7,8 @@
 namespace Linden::Application
 {
     // Take ownership of the socket
-    Session::Session(tcp::socket&& socket, Platform& platform) :
-        ws_(std::move(socket)),
-        m_platform(platform)
+    Session::Session(tcp::socket&& socket) :
+        ws_(std::move(socket))
     { }
 
     // Get on the correct executor
@@ -22,6 +21,16 @@ namespace Linden::Application
         net::dispatch(ws_.get_executor(),
             beast::bind_front_handler(
                 &Session::on_run,
+                shared_from_this()));
+    }
+
+    void Session::Write(const std::string& data)
+    {
+        std::cout<<"data "<< data << std::endl;
+        ws_.async_write(
+            boost::asio::buffer(data),
+            beast::bind_front_handler(
+                &Session::on_write,
                 shared_from_this()));
     }
 
@@ -80,15 +89,21 @@ namespace Linden::Application
         if(ec)
             fail(ec, "read");
 
-        m_platform.Read(beast::buffers_to_string(buffer_.data()));
+        /*m_platform.Read(beast::buffers_to_string(buffer_.data()), [this](const std::string& response)
+        {
+            ws_.async_write(
+                boost::asio::buffer(response),
+                beast::bind_front_handler(
+                    &Session::on_write,
+                    shared_from_this()));
+        });*/
 
-        // Echo the message
-        ws_.text(ws_.got_text());
-        ws_.async_write(
-            buffer_.data(),
-            beast::bind_front_handler(
-                &Session::on_write,
-                shared_from_this()));
+        if (m_readHandler != nullptr)
+        {
+            m_readHandler(beast::buffers_to_string(buffer_.data()));
+        }
+        
+
     }
 
     void Session::on_write(

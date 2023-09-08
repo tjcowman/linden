@@ -4,6 +4,7 @@
 
 #include "Application/Session.hpp"
 #include "Application/Listener.hpp"
+#include "Platform.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -14,10 +15,17 @@ int main(int argc, char *argv[])
     // The io_context is required for all I/O
     boost::beast::net::io_context ioc{threads};
 
-    Linden::Application::Platform platform;
+    Linden::Application::Platform platform(ioc);
 
     // Create and launch a listening port
-    std::make_shared<Linden::Application::Listener>(ioc, tcp::endpoint{address, port}, platform)->run();
+    auto listener = std::make_shared<Linden::Application::Listener>(ioc, tcp::endpoint{address, port});
+    
+    platform.SetUpdateHandler([&](const std::string& data)
+    {
+        listener->Update(data);
+    });
+
+    listener->run();
 
     // Run the I/O service on the requested number of threads
     std::vector<std::thread> v;

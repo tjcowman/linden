@@ -4,11 +4,12 @@ cmake_minimum_required(VERSION 3.24)
 project(linden VERSION 1.0)
 
 #if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE Debug)
 #endif()
 
 find_package(OpenMP REQUIRED)
 find_package(Boost REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 # Function to add the cpp file to the global list of tests
 include(cmake/RegisterTest.cmake)

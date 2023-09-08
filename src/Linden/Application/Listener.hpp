@@ -7,9 +7,11 @@
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/strand.hpp>
 #include <iostream>
+#include <list>
+#include <memory>
 
 #include "Listener.hpp"
-#include "Platform.hpp"
+#include "Session.hpp"
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -28,11 +30,12 @@ namespace Linden::Application
     public:
         Listener(
             net::io_context& ioc,
-            tcp::endpoint endpoint,
-            Platform& platform);
+            tcp::endpoint endpoint);
 
         // Start accepting incoming connections
         void run();
+
+        void Update(const std::string& data);
 
     private:
         // Report a failure
@@ -42,6 +45,21 @@ namespace Linden::Application
 
         void on_accept(beast::error_code ec, tcp::socket socket);
 
-        Platform& m_platform;
+        inline void SetReadHandler(std::function<void(const std::string&)>& handler)
+        {
+            m_readHandler = handler;
+        }
+        inline void SetWriteHandler(std::function<void(const std::string&)>& handler)
+        {
+            m_writeHandler = handler;
+        }
+
+        //! Called when the session reads from the socket.
+        std::function<void(const std::string&)> m_readHandler;
+        //! Called when the session writes from the socket.
+        std::function<void(const std::string&)> m_writeHandler;
+
+        // TODO does this need to be shared?
+        std::list<std::shared_ptr<Session>> m_sessions;
     };
 }
